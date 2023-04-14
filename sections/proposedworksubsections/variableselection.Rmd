@@ -1,0 +1,11 @@
+---
+title: ''
+output: pdf_document
+---
+
+\subsection{Proposed Extension 3: Covariate Selection}
+\label{Sec:variableselection}
+
+The covariates play an important role in how they affect the estimated capture probabilities that ultimately influence the estimate of the population size $N$.  If many covariates are present, we need a method for determining which covariates should be used along with possible interactions, which would relax the independence assumption between covariates.  Even in the presence of a single covariate, how that covariate is used can have a major effect on the inference process.  Perhaps some sort of non-linear transformation such as the log would give a better linear fit.  A couple of strategies come to mind.  First, we could consider some form of model averaging where multiple models are considered with various combinations of covariates.  Alternatively, we could implement a prior that induces variables selection such as the horseshoe prior or spike and slab prior.  A third possible solution is to perform some sort of post-hoc analysis between various fits and compute the Bayes factor.
+
+

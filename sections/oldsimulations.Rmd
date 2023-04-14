@@ -1,0 +1,349 @@
+---
+title: ''
+output: pdf_document
+---
+
+\section{Simulations}
+\label{Sec:simulations}
+
+```{r simulatedata}
+mydata100m <- readRDS(file="simdata/moddependence/mydata100.rds")
+mydata200m <- readRDS(file="simdata/moddependence/mydata200.rds")
+mydata300m <- readRDS(file="simdata/moddependence/mydata300.rds")
+mydata500m <- readRDS(file="simdata/moddependence/mydata500.rds")
+mydata1000m <- readRDS(file="simdata/moddependence/mydata1000.rds")
+mydata2000m <- readRDS(file="simdata/moddependence/mydata2000.rds")
+mydata2000l <- readRDS(file="simdata/lightdependence/mydata2000.rds")
+mydata2000h <- readRDS(file="simdata/heavydependence/mydata2000.rds")
+
+
+myposterior1_100m <- readRDS(file="simdata/moddependence/myposterior1-100.rds")
+myposterior2_100m <- readRDS(file="simdata/moddependence/myposterior2-100.rds")
+myposterior3_100m <- readRDS(file="simdata/moddependence/myposterior3-100.rds")
+myposterior1_200m <- readRDS(file="simdata/moddependence/myposterior1-200.rds")
+myposterior2_200m <- readRDS(file="simdata/moddependence/myposterior2-200.rds")
+myposterior3_200m <- readRDS(file="simdata/moddependence/myposterior3-200.rds")
+myposterior1_300m <- readRDS(file="simdata/moddependence/myposterior1-300.rds")
+myposterior2_300m <- readRDS(file="simdata/moddependence/myposterior2-300.rds")
+myposterior3_300m <- readRDS(file="simdata/moddependence/myposterior3-300.rds")
+myposterior1_500m <- readRDS(file="simdata/moddependence/myposterior1-500.rds")
+myposterior2_500m <- readRDS(file="simdata/moddependence/myposterior2-500.rds")
+myposterior3_500m <- readRDS(file="simdata/moddependence/myposterior3-500.rds")
+myposterior1_1000m <- readRDS(file="simdata/moddependence/myposterior1-1000.rds")
+myposterior2_1000m <- readRDS(file="simdata/moddependence/myposterior2-1000.rds")
+myposterior3_1000m <- readRDS(file="simdata/moddependence/myposterior3-1000.rds")
+myposterior1_2000m <- readRDS(file="simdata/moddependence/myposterior1-2000.rds")
+myposterior2_2000m <- readRDS(file="simdata/moddependence/myposterior2-2000.rds")
+myposterior3_2000m <- readRDS(file="simdata/moddependence/myposterior3-2000.rds")
+myposterior1_2000l <- readRDS(file="simdata/lightdependence/myposterior1-2000.rds")
+myposterior2_2000l <- readRDS(file="simdata/lightdependence/myposterior2-2000.rds")
+myposterior3_2000l <- readRDS(file="simdata/lightdependence/myposterior3-2000.rds")
+myposterior1_2000h <- readRDS(file="simdata/heavydependence/myposterior1-2000.rds")
+myposterior2_2000h <- readRDS(file="simdata/heavydependence/myposterior2-2000.rds")
+myposterior3_2000h <- readRDS(file="simdata/heavydependence/myposterior3-2000.rds")
+
+myLCMCRposterior_100m <- readRDS(file="simdata/moddependence/myLCMCRposterior100.rds")
+myLCMCRposterior_200m <- readRDS(file="simdata/moddependence/myLCMCRposterior200.rds")
+myLCMCRposterior_300m <- readRDS(file="simdata/moddependence/myLCMCRposterior300.rds")
+myLCMCRposterior_500m <- readRDS(file="simdata/moddependence/myLCMCRposterior500.rds")
+myLCMCRposterior_1000m <- readRDS(file="simdata/moddependence/myLCMCRposterior1000.rds")
+myLCMCRposterior_2000m <- readRDS(file="simdata/moddependence/myLCMCRposterior2000.rds")
+myLCMCRposterior_2000l <- readRDS(file="simdata/lightdependence/myLCMCRposterior2000.rds")
+myLCMCRposterior_2000h <- readRDS(file="simdata/heavydependence/myLCMCRposterior2000.rds")
+
+myIndependenceposterior_100m <- readRDS(file="simdata/moddependence/myIndependenceposterior100.rds")
+myIndependenceposterior_200m <- readRDS(file="simdata/moddependence/myIndependenceposterior200.rds")
+myIndependenceposterior_300m <- readRDS(file="simdata/moddependence/myIndependenceposterior300.rds")
+myIndependenceposterior_500m <- readRDS(file="simdata/moddependence/myIndependenceposterior500.rds")
+myIndependenceposterior_1000m <- readRDS(file="simdata/moddependence/myIndependenceposterior1000.rds")
+myIndependenceposterior_2000m <- readRDS(file="simdata/moddependence/myIndependenceposterior2000.rds")
+myIndependenceposterior_2000l <- readRDS(file="simdata/lightdependence/myIndependenceposterior2000.rds")
+myIndependenceposterior_2000h <- readRDS(file="simdata/heavydependence/myIndependenceposterior2000.rds")
+
+
+dataBLRCR1 <- cbind(myposterior1_100m$N,
+                    myposterior1_200m$N,
+                    myposterior1_300m$N,
+                    myposterior1_500m$N,
+                    myposterior1_1000m$N,
+                    myposterior1_2000m$N)
+dataBLRCR2 <- cbind(myposterior2_100m$N,
+                    myposterior2_200m$N,
+                    myposterior2_300m$N,
+                    myposterior2_500m$N,
+                    myposterior2_1000m$N,
+                    myposterior2_2000m$N)
+dataBLRCR3 <- cbind(myposterior3_100m$N,
+                    myposterior3_200m$N,
+                    myposterior3_300m$N,
+                    myposterior3_500m$N,
+                    myposterior3_1000m$N,
+                    myposterior3_2000m$N)
+dataLCMCR <- cbind(myLCMCRposterior_100m,
+                   myLCMCRposterior_200m,
+                   myLCMCRposterior_300m,
+                   myLCMCRposterior_500m,
+                   myLCMCRposterior_1000m,
+                   myLCMCRposterior_2000m)
+dataIND <- cbind(myIndependenceposterior_100m,
+                 myIndependenceposterior_200m,
+                 myIndependenceposterior_300m,
+                 myIndependenceposterior_500m,
+                 myIndependenceposterior_1000m,
+                 myIndependenceposterior_2000m)
+
+datadependency <- cbind(myposterior1_2000l$N,
+                        myposterior2_2000l$N,
+                        myposterior3_2000l$N,
+                        myposterior1_2000m$N,
+                        myposterior2_2000m$N,
+                        myposterior3_2000m$N,
+                        myposterior1_2000h$N,
+                        myposterior2_2000h$N,
+                        myposterior3_2000h$N,
+                        myLCMCRposterior_2000l,
+                        myLCMCRposterior_2000m,
+                        myLCMCRposterior_2000h,
+                        myIndependenceposterior_2000l,
+                        myIndependenceposterior_2000m,
+                        myIndependenceposterior_2000h)
+
+#clear some memory
+rm(myposterior1_100m,myposterior2_100m,myposterior3_100m,
+   myposterior1_200m,myposterior2_200m,myposterior3_200m,
+   myposterior1_300m,myposterior2_300m,myposterior3_300m,
+   myposterior1_500m,myposterior2_500m,myposterior3_500m,
+   myposterior1_1000m,myposterior2_1000m,myposterior3_1000m,
+   myposterior1_2000l,myposterior2_2000l,myposterior3_2000l,
+   myposterior1_2000m,myposterior2_2000m,myposterior3_2000m,
+   myposterior1_2000h,myposterior2_2000h,myposterior3_2000h,
+   myLCMCRposterior_100m,myLCMCRposterior_200m,myLCMCRposterior_300m,
+   myLCMCRposterior_500m,myLCMCRposterior_1000m,myLCMCRposterior_2000m,
+   myIndependenceposterior_100m,myIndependenceposterior_200m,myIndependenceposterior_300m,
+   myIndependenceposterior_500m,myIndependenceposterior_1000m,myIndependenceposterior_2000m)
+
+
+
+BLRCRMeans1 = colMeans(dataBLRCR1)
+BLRCRMeans2 = colMeans(dataBLRCR2)
+BLRCRMeans3 = colMeans(dataBLRCR3)
+LCMCRMeans = colMeans(dataLCMCR)
+INDMeans = colMeans(dataIND)
+dependMeans = colMeans(datadependency)
+
+BLRCRQuants1 = matrix(rep(NA,6*3),ncol=3)
+BLRCRQuants2 = matrix(rep(NA,6*3),ncol=3)
+BLRCRQuants3 = matrix(rep(NA,6*3),ncol=3)
+LCMCRQuants = matrix(rep(NA,6*3),ncol=3)
+INDQuants = matrix(rep(NA,6*3),ncol=3)
+dependQuants = matrix(rep(NA,15*3),ncol=3)
+for(sample in 1:6){
+  BLRCRQuants1[sample,]<-quantile(dataBLRCR1[,sample], c(0.025, 0.5, 0.975))
+  BLRCRQuants2[sample,]<-quantile(dataBLRCR2[,sample], c(0.025, 0.5, 0.975))
+  BLRCRQuants3[sample,]<-quantile(dataBLRCR3[,sample], c(0.025, 0.5, 0.975))
+  LCMCRQuants[sample,]<-quantile(dataLCMCR[,sample], c(0.025, 0.5, 0.975))
+  INDQuants[sample,]<-quantile(dataIND[,sample], c(0.025, 0.5, 0.975))
+}
+for(sample in 1:15){
+  dependQuants[sample,]<-quantile(datadependency[,sample], c(0.025, 0.5, 0.975))
+}
+```
+
+
+
+In this section, I simulate some data in accordance with \autoref{eqn:logitdatacreation} using two covariates ($H$=2) and four lists ($J=4$).  The covariates are drawn from two independent standard normal distributions.  Three sets of $\beta$ coefficients are chosen that create "light", "moderate", and "heavy" dependency between the lists and are described in \autoref{table:1}.  I run 6 simulations with $N=$[100,200,300,500,1000,2000].
+
+The Bayesian Logistic Regression RCR requires a prior mean and covariance for the coefficients, which are set to $$\boldsymbol{b}=\boldsymbol{0} \text{ and } \boldsymbol{B}=\begin{bmatrix}
+1 & 0 & 0\\
+0 & 1 & 0\\
+0 & 0 & 1
+\end{bmatrix}.$$
+The number of samples for each algorithm in each simulation is set to 10,000 with no burn-in or thinning.  The results on the following pages show the posterior distribution of $N$.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{||c c c c||} 
+ \hline
+ \multicolumn{4}{||c||}{"Light"}\\
+ \hline
+ List ($j$) & $\beta_{0j}$ & $\beta_{1j}$ & $\beta_{2j}$   \\ [0.5ex] 
+ \hline\hline
+ 1 & -2 &  -1  & 1 \\ 
+ 2 & -2 & 1  &  -1 \\
+ 3 & -2 & 1  &  1 \\
+ 4 & -2 &  -1  &  -1 \\
+ \hline
+\end{tabular}
+\begin{tabular}{||c c c c||} 
+\hline
+ \multicolumn{4}{||c||}{"Moderate"}\\
+ \hline
+ List ($j$) & $\beta_{0j}$ & $\beta_{1j}$ & $\beta_{2j}$   \\ [0.5ex] 
+ \hline\hline
+ 1 & -2 &  -1  & 1 \\ 
+ 2 & -2 & 1  &  -1 \\
+ 3 & -2 & -1  &  1 \\
+ 4 & -2 &  1  &  -1 \\
+ \hline
+\end{tabular}
+\begin{tabular}{||c c c c||} 
+ \hline
+ \multicolumn{4}{||c||}{"Heavy"}\\
+ \hline
+ List ($j$) & $\beta_{0j}$ & $\beta_{1j}$ & $\beta_{2j}$   \\ [0.5ex] 
+ \hline\hline
+ 1 & -2 &  -1  & 1 \\ 
+ 2 & -2 & -1  &  1 \\
+ 3 & -2 & -1  &  1 \\
+ 4 & -2 &  -1  &  1 \\
+ \hline
+\end{tabular}
+\caption{Coefficients for Simulated Data}
+\label{table:1}
+\end{table}
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{||r r r r c||} 
+ \hline
+$N$ & $n$ & Method & E[N] & $95\%$ CI   \\ [0.5ex] 
+ \hline\hline
+ 100  &`r nrow(mydata100m)` & BLRCR(1) & `r op(BLRCRMeans1[1],1)`  & (`r op(BLRCRQuants1[1,c(1,3)],0)`) \\ 
+      &                     & BLRCR(2) & `r op(BLRCRMeans2[1],1)`  & (`r op(BLRCRQuants2[1,c(1,3)],0)`) \\ 
+      &                     & BLRCR(3) & `r op(BLRCRMeans3[1],1)`  & (`r op(BLRCRQuants3[1,c(1,3)],0)`) \\ 
+      &                     & LCMCR & `r op(LCMCRMeans[1],1)`   & (`r op(LCMCRQuants[1,c(1,3)],0)`) \\ 
+      &                     & Independent & `r op(INDMeans[1],1)`   & (`r op(INDQuants[1,c(1,3)],0)`) \\ 
+ \hline
+ 200  &`r nrow(mydata200m)` & BLRCR(1) & `r op(BLRCRMeans1[2],1)`  & (`r op(BLRCRQuants1[2,c(1,3)],0)`) \\
+      &                     & BLRCR(2) & `r op(BLRCRMeans2[2],1)`  & (`r op(BLRCRQuants2[2,c(1,3)],0)`) \\ 
+      &                     & BLRCR(3) & `r op(BLRCRMeans3[2],1)`  & (`r op(BLRCRQuants3[2,c(1,3)],0)`) \\ 
+      &                     & LCMCR & `r op(LCMCRMeans[2],1)`   & (`r op(LCMCRQuants[2,c(1,3)],0)`) \\ 
+      &                     & Independent & `r op(INDMeans[2],1)`   & (`r op(INDQuants[2,c(1,3)],0)`) \\ 
+ \hline
+ 300  &`r nrow(mydata300m)` & BLRCR(1) & `r op(BLRCRMeans1[3],1)`  & (`r op(BLRCRQuants1[3,c(1,3)],0)`) \\
+      &                     & BLRCR(2) & `r op(BLRCRMeans2[3],1)`  & (`r op(BLRCRQuants2[3,c(1,3)],0)`) \\ 
+      &                     & BLRCR(3) & `r op(BLRCRMeans3[3],1)`  & (`r op(BLRCRQuants3[3,c(1,3)],0)`) \\ 
+      &                     & LCMCR & `r op(LCMCRMeans[3],1)`   & (`r op(LCMCRQuants[3,c(1,3)],0)`) \\ 
+      &                     & Independent & `r op(INDMeans[3],1)`   & (`r op(INDQuants[3,c(1,3)],0)`) \\ 
+ \hline
+ 500  &`r nrow(mydata500m)` & BLRCR(1) & `r op(BLRCRMeans1[4],1)`  & (`r op(BLRCRQuants1[4,c(1,3)],0)`) \\
+      &                     & BLRCR(2) & `r op(BLRCRMeans2[4],1)`  & (`r op(BLRCRQuants2[4,c(1,3)],0)`) \\ 
+      &                     & BLRCR(3) & `r op(BLRCRMeans3[4],1)`  & (`r op(BLRCRQuants3[4,c(1,3)],0)`) \\ 
+      &                     & LCMCR & `r op(LCMCRMeans[4],1)`   & (`r op(LCMCRQuants[4,c(1,3)],0)`) \\ 
+      &                     & Independent & `r op(INDMeans[4],1)`   & (`r op(INDQuants[4,c(1,3)],0)`) \\ 
+ \hline
+ 1000 &`r nrow(mydata1000m)`& BLRCR(1) & `r op(BLRCRMeans1[5],1)`  & (`r op(BLRCRQuants1[5,c(1,3)],0)`) \\
+      &                     & BLRCR(2) & `r op(BLRCRMeans2[5],1)`  & (`r op(BLRCRQuants2[5,c(1,3)],0)`) \\ 
+      &                     & BLRCR(3) & `r op(BLRCRMeans3[5],1)`  & (`r op(BLRCRQuants3[5,c(1,3)],0)`) \\ 
+      &                     & LCMCR & `r op(LCMCRMeans[5],1)`   & (`r op(LCMCRQuants[5,c(1,3)],0)`) \\ 
+      &                     & Independent & `r op(INDMeans[5],1)`   & (`r op(INDQuants[5,c(1,3)],0)`) \\ 
+ \hline
+ 2000 &`r nrow(mydata2000m)`& BLRCR(1) & `r op(BLRCRMeans1[6],1)`  & (`r op(BLRCRQuants1[6,c(1,3)],0)`) \\
+      &                     & BLRCR(2) & `r op(BLRCRMeans2[6],1)`  & (`r op(BLRCRQuants2[6,c(1,3)],0)`) \\ 
+      &                     & BLRCR(3) & `r op(BLRCRMeans3[6],1)`  & (`r op(BLRCRQuants3[6,c(1,3)],0)`) \\ 
+      &                     & LCMCR & `r op(LCMCRMeans[6],1)`   & (`r op(LCMCRQuants[6,c(1,3)],0)`) \\ 
+      &                     & Independent & `r op(INDMeans[6],1)`   & (`r op(INDQuants[6,c(1,3)],0)`) \\ 
+ \hline
+\end{tabular}
+\caption{Results capture-recapture simulations with "moderate" dependency between lists.}
+\label{table:2}
+\end{table}
+
+
+
+
+```{r posteriorNplots, fig.align='center',fig.width=10,fig.height=10,fig.margin=TRUE,fig.cap="\\label{fig:Nposteriors}Posterior Distribution of N=[100,200,300,500,1000,2000] simulated with moderate dependency between lists using BLRCR(2)."}
+#Histograms of N
+library(tidyr)
+library(ggplot2)
+library(grid)
+library(gridExtra)
+library(lemon) #allows g_legend
+library(cowplot)
+
+dfBLRCR2 <- data.frame(dataBLRCR1)
+names(dfBLRCR2) <- c("N=100","N=200","N=300","N=500","N=1000","N=2000")
+
+lines <- data.frame(
+  intercepts = c(100,nrow(mydata100m)),
+  names = c("True Population Size (N)", "Observed Sample Size (n)")
+)
+BLRCRplot100 <- ggplot(dfBLRCR2, aes(x=`N=100`)) + 
+                geom_histogram(color="black",fill="black",binwidth=1,aes(y=..density..)) +
+                geom_vline(data=lines,
+                           aes(xintercept=intercepts,color=names,linetype=names), 
+                           size=1,key_glyph = "path") +
+                xlab("Sampled N") +
+                ggtitle(paste("N = 100, n=",nrow(mydata100m))) +
+                scale_color_manual(name='',
+                     values=c(`True Population Size (N)`='red', `Observed Sample Size (n)`='blue')) +
+                scale_linetype_manual(name='',
+                     values=c(`True Population Size (N)`='solid', `Observed Sample Size (n)`='dashed')) +
+                theme(legend.key.size = unit(1, 'cm'),legend.text = element_text(size=10))
+BLRCRplot200 <- ggplot(dfBLRCR2, aes(x=`N=200`)) + 
+                geom_histogram(color="black",fill="black",binwidth=1,aes(y=..density..)) + 
+                geom_vline(aes(xintercept=200),color="red", linetype="solid", size=1) +
+                geom_vline(aes(xintercept=nrow(mydata200m)),color="blue", linetype="dashed", size=1) +
+                xlab("Sampled N") +
+                ggtitle(paste("N = 200, n=",nrow(mydata200m))) 
+BLRCRplot300 <- ggplot(dfBLRCR2, aes(x=`N=300`)) + 
+                geom_histogram(color="black",fill="black",binwidth=1,aes(y=..density..)) +
+                geom_vline(aes(xintercept=300),color="red", linetype="solid", size=1) +
+                geom_vline(aes(xintercept=nrow(mydata300m)),color="blue", linetype="dashed", size=1) +
+                xlab("Sampled N") +
+                ggtitle(paste("N = 300, n=",nrow(mydata300m))) 
+BLRCRplot500 <- ggplot(dfBLRCR2, aes(x=`N=500`)) + 
+                geom_histogram(color="black",fill="black",binwidth=1,aes(y=..density..)) +
+                geom_vline(aes(xintercept=500),color="red", linetype="solid", size=1) +
+                geom_vline(aes(xintercept=nrow(mydata500m)),color="blue", linetype="dashed", size=1) +
+                xlab("Sampled N") +
+                ggtitle(paste("N = 500, n=",nrow(mydata500m))) 
+BLRCRplot1000 <- ggplot(dfBLRCR2, aes(x=`N=1000`)) + 
+                 geom_histogram(color="black",fill="black",binwidth=1,aes(y=..density..)) +
+                 geom_vline(aes(xintercept=1000),color="red", linetype="solid", size=1) +
+                 geom_vline(aes(xintercept=nrow(mydata1000m)),color="blue", linetype="dashed", size=1) +
+                 xlab("Sampled N") +
+                 ggtitle(paste("N = 1000, n=",nrow(mydata1000m))) 
+BLRCRplot2000 <- ggplot(dfBLRCR2, aes(x=`N=2000`)) + 
+                 geom_histogram(color="black",fill="black",binwidth=1,aes(y=..density..)) +
+                 geom_vline(aes(xintercept=2000),color="red", linetype="solid", size=1) +
+                 geom_vline(aes(xintercept=nrow(mydata2000m)),color="blue", linetype="dashed", size=1) +
+                 xlab("Sampled N") +
+                 ggtitle(paste("N = 2000, n=",nrow(mydata2000m))) 
+mm <- theme(plot.margin=unit(rep(1,6), "line"))
+
+
+grid_arrange_shared_legend(BLRCRplot100+mm,BLRCRplot200+mm,BLRCRplot300+mm,
+                           BLRCRplot500+mm,BLRCRplot1000+mm,BLRCRplot2000+mm, ncol=2, nrow=3, position='right')
+```
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{||r r r r c||} 
+ \hline
+$\boldsymbol{\beta}$ & $n$ & Method & E[N] & $95\%$ CI   \\ [0.5ex] 
+ \hline\hline
+ "light"  &`r nrow(mydata2000l)` & BLRCR(1) & `r op(dependMeans[1],1)`  & (`r op(dependQuants[1,c(1,3)],0)`) \\ 
+      &                     & BLRCR(2) & `r op(dependMeans[2],1)`  & (`r op(dependQuants[2,c(1,3)],0)`) \\ 
+      &                     & BLRCR(3) & `r op(dependMeans[3],1)`  & (`r op(dependQuants[3,c(1,3)],0)`) \\ 
+      &                     & LCMCR & `r op(dependMeans[10],1)`   & (`r op(dependQuants[10,c(1,3)],0)`) \\ 
+      &                     & Independent & `r op(dependMeans[13],1)`   & (`r op(dependQuants[13,c(1,3)],0)`) \\ 
+ \hline
+ "moderate"  &`r nrow(mydata2000m)` & BLRCR(1) & `r op(dependMeans[4],1)`  & (`r op(dependQuants[4,c(1,3)],0)`) \\
+      &                     & BLRCR(2) & `r op(dependMeans[5],1)`  & (`r op(dependQuants[5,c(1,3)],0)`) \\ 
+      &                     & BLRCR(3) & `r op(dependMeans[6],1)`  & (`r op(dependQuants[6,c(1,3)],0)`) \\ 
+      &                     & LCMCR & `r op(dependMeans[11],1)`   & (`r op(dependQuants[11,c(1,3)],0)`) \\ 
+      &                     & Independent & `r op(dependMeans[14],1)`   & (`r op(dependQuants[14,c(1,3)],0)`) \\ 
+ \hline
+ "heavy"  &`r nrow(mydata2000h)` & BLRCR(1) & `r op(dependMeans[7],1)`  & (`r op(dependQuants[7,c(1,3)],0)`) \\
+      &                     & BLRCR(2) & `r op(dependMeans[8],1)`  & (`r op(dependQuants[8,c(1,3)],0)`) \\ 
+      &                     & BLRCR(3) & `r op(dependMeans[9],1)`  & (`r op(dependQuants[9,c(1,3)],0)`) \\ 
+      &                     & LCMCR & `r op(dependMeans[12],1)`   & (`r op(dependQuants[12,c(1,3)],0)`) \\ 
+      &                     & Independent & `r op(dependMeans[15],1)`   & (`r op(dependQuants[15,c(1,3)],0)`) \\ 
+ \hline
+\end{tabular}
+\caption{Results capture-recapture simulations using $N=2000$ with "light", "moderate", and "heavy" dependency between lists.}
+\label{table:3}
+\end{table}

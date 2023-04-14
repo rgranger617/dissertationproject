@@ -1,0 +1,67 @@
+---
+title: ''
+output: pdf_document
+---
+
+```{=tex}
+\section{Summary of Proposal and Timeline}
+\label{Sec:timeline}
+```
+The objective of this dissertation project is to develop a Bayesian capture-recapture (CR) method that can utilize covariate information to understand the heterogeneity between individuals. Presented in this proposal is a framework for modelling capture-recapture with covariates.  Specifically, we develop the Bayesian Logistic Regression Capture Recapture (BLRCR) that utilizes the covariate information directly in estimating individual capture rates. Further, we account for unobserved heterogeneity with the use of latent classes.  This model is solved using an MCMC algorithm to approximate the posterior distribution of our population size, $N$. I propose three primary areas of interest that will be addressed as the focus of the dissertation: unobserved heterogeneity, modelling the covariate distribution, and covariate selection.
+
+\subsection{Unobserved Heterogeneity}
+
+
+This extension concerns the issue of unobserved heterogeneity described in subsection \ref{Sec:condindependence}.  To account for this heterogeneity, the algorithm detects latent groups and applies different intercepts in the linear term that defines the capture probability. Currently the number of latent classes is fixed and must be selected by the practitioner.  An extension would be to include some method for determining the number of latent classes to include.  While it may be reasonable in some cases to know the number of latent classes, an obvious approach would be to incorporate a stick-breaking prior on the number of latent classes.
+
+\subsection{Modelling the Covariate Distribution}
+
+A requirement of the algorithm is the necessity of specifying a distribution for the missing covariates, discussed in subsection \ref{Sec:selectcovariates}. Typically this distribution is unknown so utilizing a distribution that is fairly flexible is ideal.  In this proposal, we implemented the non-parametric approach of using an infinite mixture of normals with membership determiend through a stick-breaking process (and additionally a single multivariate normal which is a special case). While the infinite mixture of normal distributions tends to perform well when the distribution is at least somewhat normal, it struggles when presented with certain non-normal distributions.  Alternatively, I propose using Dirichlet process mixtures as described in \cite{gelman_bayesian_2014}. A sufficiently large concentration parameter, $\alpha \rightarrow \infty$, would be in essence the same thing as the empirical distribution.
+
+\subsection{Covariate Selection}
+
+If many covariates are present, we need a method for determining which covariates should be used while also considering interaction effects.  Along these same lines, we need to consider how a variable affects the capture probability as some sort of transformation may be required.  We suggest three possible routes including model averaging, variable selection through priors, or even post-hoc analysis like computing the Bayes factor.
+
+
+\subsection{Further Ideas and Futurework}
+
+The extensions mentioned above are of primary focus for the dissertation, but there are several other minor extensions that may be considered.  A summary of all proposed extensions and future ideas can be found in \autoref{table:timelinetable}.  Extensions with priority equal to 1 will be addressed in the dissertation. Extensions with priority greater than 1 will be explored if time permits with lower values having higher priority. Extensions that do not get covered will be left for future work.
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{||p{3cm}||p{10cm}|p{1.2cm}||} 
+ \hline
+ Extension & Description & Priority    \\ [0.5ex] 
+ \hline\hline
+  Stick Breaking Priors & Instead of fixing the number of unobserved latent intercepts, we could use stick breaking priors. &  1   \\ 
+ \hline
+ Distribution for Covariates & Currently we implement a mixture of normals to represent the missing covariates.  This is shown through simulation to work fairly well; however, often times we have non-continuous covariates or covariates that differ greatly from normality.  We will explore the empirical distribution or a more generalized Dirichlet process for the covariates. & 1   \\
+ \hline
+  Covariate Selection & Currently, the model assumes the covariates to be used are known.  Even with a single covariate, the relationship may be non-linear.  One way to address this issue is through the use of polynomials or interactions of the covariates.  Since this may cause the parameter space to get quite large, this could require a need for variable selection. & 1  \\
+ \hline
+ Create an R Package & We plan to develop an R package that allows practitioners the easy and fast ability to use the algorithm & 1   \\ 
+ \hline
+ Missing Covariates of Observed Data & Using the methodology described in this paper, the imputation of missing covariates should be naturally imputable. &  2   \\ 
+ \hline
+ The Probability of Missing & Currently we use a Monte Carlo within MCMC to find the probability of missing (see \cite{bonner_mcmcmc_2014}).  It may be advantageous to try different types of methods or even approximations like a Laplace Approximation (see \cite{herliansyah_laplace_2022})&  2  \\
+  \hline
+Conditional Likelihood Newton's Method & Develop an algorithm to get the MAP estimate using Newton's Method.  Could find confidence interval using bootstrap. & 3  \\
+ \hline
+Conditional Likelihood MCMC & Instead of specifying a distribution for the covariates, sample the beta coefficients using the conditional likelihood. A method like this would eliminate the need to specify a distribution and would still allow for detection of latent classes and the imputation of missing covariates for observed individuals.  We may need to exercise caution as this methodology may not properly consider the variation in the covariates. & 4   \\
+ \hline
+ Model Latent Groups & Use logistic regression or even Gaussian Processes to classify individuals (through the label step in LCMCR) instead of using it to directly determine probability of capture. In the literature review, I note there are two ways to handle covariates: stratification and using them to model and estimate capture probabilities. A promising potential third method would be to picture the population as having latent classes (see \cite{manriquevallier_bayesian_2016}), and using the covariates to classify individuals into those classes.&  5  \\
+ \hline
+\end{tabular}
+\caption{Potential Dissertation Extensions and Priority}
+\label{table:timelinetable}
+\end{table}
+
+\subsection{Current Status of Project and Timeline}
+
+From this proposal document, we can see that the basic framework and the Bayesian Logistic Regression (BLRCR) model have already been derived and studied.  While considerable work has already been completed on modelling the unobserved heterogeneity (extension 1) and specifying the covariate distribution (extension 2), there is still some work left to be completed. As of now, little has been done in the area of covariate selection (extension 3), which will encompass most of the future effort.  The current plan is to finish up with the first two extensions and then begin exploring methods for handling covariate selection.
+
+The preliminary results of section \ref{Sec:simulations} only utilize simulations.  While simulations are an excellent tool to evaluate the success of an algorithm, the final project will use some real datasets.  
+
+The objective is to finish the dissertation project by May 2024.
+

@@ -1,0 +1,43 @@
+---
+title: ''
+output: pdf_document
+---
+
+\section{Proposed Work: Capture-Recapture with Covariates: The Bayesian Logistic Capture-Recapture Model with Extensions}
+\label{sec:CRwithCovariates}
+
+In this section, we develop a Bayesian procedure for the CR problem with covariates that has a number of desirable characteristics:
+
+\begin{list}{}{}
+
+\item[1)] extensible;
+
+\item[2)] uses discrete and continuous covariates;
+
+\item[3)] allows for multiple lists;
+
+\item[4)] can be informed through use of priors;
+
+\item[5)] resistant to sparsity;
+
+\end{list}
+
+A key concern of any capture-recapture framework is that the estimation is highly dependent on model assumptions. Through the use of a full likelihood, we are able to add extensions more readily including more robust ways of handling heterogeneity. In particular, we are concerned with both "observable" heterogeneity and "unobservable" heterogeneity. We define "observable" heterogeneity as heterogeneity that can be detected through the use of covariates and "Unobservable" heterogeneity as the heterogeneity that persists but for which no covariate information exists. 
+
+Section \ref{Sec:CRbackground} begins with a Bayesian framework for the capture-recapture problem with covariates. We propose in subsection \ref{Sec:BLRCRmodel} a specific model following this procedure which we call the Bayesian Logistic Regression Capture-Recapture (BLRCR) model and estimate the posterior through a Markov Chain Monte Carlo (MCMC) algorithm. The remaining three subsections discuss extensions to specifying the distribution of the covariates (subsection \ref{Sec:selectcovariates}), discovering unobserved heterogeneity (subsection \ref{Sec:condindependence}), and variable selection (subsection \ref{Sec:variableselection}).  
+
+
+```{r CRmodels, child = 'proposedworksubsections/CRmodels.Rmd'}
+```
+
+```{r selectcovariates, child = 'proposedworksubsections/BLRCRmodel.Rmd'}
+```
+
+```{r selectcovariates, child = 'proposedworksubsections/selectcovariates.Rmd'}
+```
+
+```{r hiddencovariates, child = 'proposedworksubsections/hiddencovariates.Rmd'}
+```
+
+```{r hiddencovariates, child = 'proposedworksubsections/variableselection.Rmd'}
+```

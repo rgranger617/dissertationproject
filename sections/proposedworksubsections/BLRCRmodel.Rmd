@@ -1,0 +1,107 @@
+---
+title: ''
+output: pdf_document
+---
+
+
+<!--------------------------------------------------------->
+<!---------- Bayesian logistic Regression Section --------->
+<!--------------------------------------------------------->
+
+\subsection{The Bayesian Logistic Regression Capture-Recapture Model}
+\label{Sec:BLRCRmodel}
+
+\subsubsection{The BLRCR Model}
+
+A key assumption of the model is that the list captures are independent given the covariates, i.e, $p(\boldsymbol{y_i}|\boldsymbol{x_i}) = \prod_{i=j}^J p(y_{ij}|x_{i},\theta)$. Using the framework from subsection \ref{sec:CRwithcovariates}, we implement the Bayesian Logistic Regression Capture-Recapture (BLRCR) model which uses independent logistic regressions to estimate the capture probabilities on each list. Suppose $y_{ij}$ and $x_{ih}$ are generated in the following way:
+
+\begin{align} 
+\label{eqn:logitdatacreation}
+y_{ij}|\boldsymbol{x_i}& \stackrel{ind}{\sim} \text{Bernoulli}(\lambda_{ij}(\boldsymbol{x_i})) \hspace{10px} \text{for } i=1,...,N \text{ and } j=1,...,J\\  
+\boldsymbol{x_{i}} & \stackrel{iid}{\sim} \boldsymbol{g}(\boldsymbol{\phi}) \hspace{10px} \text{for } i=1,...,N,
+\end{align}
+
+where
+
+\begin{equation}
+\label{eqn:sigmoidfunc}
+\lambda_{ij}(\boldsymbol{x_i})=\sigma(\boldsymbol{x_i}^T\boldsymbol{\beta_j}) = \frac{1}{1+e^{-\boldsymbol{x_i}^T\boldsymbol{\beta_j}}},
+\end{equation}
+
+and $\boldsymbol{g}(\boldsymbol{\phi})$ is the distribution of the $H$ covariates.  The capture probability that individual $i$ appears on list $j$ is equal to $\lambda_{ij}$, and this value can be calculated with a nonstochastic transformation of $\boldsymbol{x_i}$ and $\boldsymbol{\beta_j}$ through the sigmoid function (see \autoref{eqn:sigmoidfunc}). In the linear term, $\boldsymbol{x_i}^T\boldsymbol{\beta_j}$, a different set of $\boldsymbol{\beta_j}$ covariates are used to determine each $\lambda_{ij}$ implying a total of $k\times(h+1)$ coefficients with the inclusion of an intercept.  Notice this setup implies each individual's capture pattern is independent conditional on the covariates. 
+
+In order to complete the Bayesian model, priors must be assigned to unknown parameters $\boldsymbol{\beta_j}$ and N. For now, assume $\boldsymbol{\phi}$ is known and are thus treated as hyperparameters (this will be further addressed in subsection \ref{Sec:selectcovariates}).  For $\boldsymbol{\beta_j}$, a multivariate normal prior is assigned to the set of coefficients for each list with mean of $\boldsymbol{b}\in \mathcal{R}^{H+1}$ and covariance of $\boldsymbol{B}\in \mathcal{R}^{(H+1) \times (H+1)}$.  For $N$, we use the Jeffrey's prior \citep{jeffreys_theory_1967}, $p(N) = \frac{1}{N}$, which provides a covenient form for the conditional posterior distribution of $N$.  
+
+Plugging in the likelihood distribution as described in \autoref{eqn:logitdatacreation} and the aforementioned priors into \autoref{eqn:fullposteriorderive} yields the posterior
+\begin{align}
+\label{eqn:fullposteriorderivevalues}
+\nonumber p(N,\boldsymbol{\beta},\mathcal{X}_{mis}|\mathcal{Y}_{obs},\mathcal{X}_{obs}) \propto &  \left[{N\choose n}\prod_{i=1}^n \prod_{j=1}^J \lambda_{ij}(\boldsymbol{x_i})^{y_{ij}}(1-\lambda_{ij}(\boldsymbol{x_i}))^{1-y_{ij}}\prod_{i=n+1}^N \prod_{j=1}^J (1-\lambda_{ij}(\boldsymbol{x_i})) \right] \\
+\nonumber \times & \left[ \prod_{i=1}^n \boldsymbol{g}(\boldsymbol{x_i}|\boldsymbol{\phi_h}) \right] \times \left[ \prod_{i=n+1}^N \boldsymbol{g}(\boldsymbol{x_i}|\boldsymbol{\phi_h}) \right] \times \left[\frac{1}{N}\right] \\
+\times & \left[ \prod_{j=1}^J \left(\frac{1}{2\pi}\right)^{H/2}|\boldsymbol{B}|^{-1/2}e^{-\frac{1}{2}(\boldsymbol{b}-\boldsymbol{\beta_j})^T\boldsymbol{B}^{-1}(\boldsymbol{b}-\boldsymbol{\beta_j})}\right].
+\end{align}
+
+
+<!--------------------------------------------------------->
+<!---------------- Estimation of the BLRCR ---------------->
+<!--------------------------------------------------------->
+
+
+\subsubsection{Estimation of the BLRCR}
+\label{sec:estimationBLRCRMCMC}
+
+An exact analytic solution for the posterior is intractable, so we implement the Monte Carlo Markov Chain (MCMC) algorithm of Gibbs Sampling, where sequential draws from $\boldsymbol{\beta}$, $N$, and $\mathcal{X}_{mis}$ are taken conditional on all other parameters.
+
+\begin{list}{}{}
+
+\item[1)] Sample $\boldsymbol{\beta}$.  For this stage $\mathcal{X}_{mis}$ and $\mathcal{X}_{obs}$ are both known implying $N$ is known as well.  Therefore the sampling equation reduces to 
+\begin{equation}
+\label{eqn:conditionalbeta}
+p(\boldsymbol{\beta}|\mathcal{Y},N,\mathcal{X}_{mis},\mathcal{X}_{obs}) = p(\boldsymbol{\beta}|\mathcal{Y},\mathcal{X}), 
+\end{equation}
+which is simply the posterior distribution of Bayesian logistic regression.   Posterior samples can be obtained from \autoref{eqn:conditionalbeta} by first sampling a latent variable from the Polya-Gamma distribution and using this latent variable in the mean and covariance function of a multivariate normal \citep{polson_bayesian_2013}.
+
+\item[2)] Sample $N$ and $\mathcal{X}_{mis}$.  Adding up the number of missing covariates, $n_0$, with the number of observed covariates, $n$, fully determines $N=n_0+n$.  This issue makes it impossible to compute the standard Gibbs sampling equation for $N$.  To get around this complication, we sample the parameters simultaneously \citep{basu_bayesian_2001},
+
+\begin{equation}
+\label{eqn:gibbsNandXmis}
+p(N,\mathcal{X}_{mis}|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs})\propto p(N|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs})p(\mathcal{X}_{mis}|N,\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs}).
+\end{equation}
+From \autoref{eqn:gibbsNandXmis}, observe the joint distribution of $N$ and $\mathcal{X}_{obs}$ can be decomposed into two parts from which can be sampled.  The first part of this equation is the joint distribution of $N$ and $\mathcal{X}_{mis}$ marginalized over the missing covariates.  The second part is the distribution of the missing covariates where the number of missing covariates, $n_0$, is known.
+
+  \begin{list}{}{}
+    \item[i.] Sample $N \sim  p(N|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs})$. 
+    \begin{align}
+    \label{eqn:deriveNdistribution}
+\nonumber    p(N|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs}) & = \int_{\boldsymbol{x_{n+1}}} \hspace{-10px}\cdots \int_{\boldsymbol{x_{N}}} p(N,\mathcal{X}_{mis}|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs}) d\boldsymbol{x_{n+1}}\cdots d\boldsymbol{x_{N}}\\
+\nonumber    & \propto \int_{\boldsymbol{x_{n+1}}} \hspace{-10px}\cdots \int_{\boldsymbol{x_{N}}}\left[{N\choose n} \prod_{i=n+1}^N \prod_{j=1}^J (1-\lambda_{ij}) \right]\left[ \prod_{i=n+1}^N\boldsymbol{g}(\boldsymbol{x_i}|\boldsymbol{\phi}) \right]\left[\frac{1}{N}\right]d\boldsymbol{x_{n+1}}\cdots d\boldsymbol{x_{N}}\\
+\nonumber    & = \frac{(N-1)!}{(N-n)!n!} \left[ \int_{\boldsymbol{x}}\boldsymbol{g}(\boldsymbol{x_i}|\boldsymbol{\phi})\prod_{j=1}^J (1-\lambda_{ij}) d\boldsymbol{x}\right]^{N-n}\\
+    & \propto {N - 1\choose n-1} \left[\underbrace{ E_{\boldsymbol{g}(\boldsymbol{\theta_h})}\left[\prod_{j=1}^J (1-\lambda_{ij})\right]}_{\equiv \rho} \right]^{N-n}
+    \end{align}
+    
+    Instead of sampling $N$, sample $n_0$.
+    
+    \begin{align}
+    \label{eqn:deriven0distribution}
+\nonumber    p(n_0|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs}) \propto & {n_0 + n -1 \choose n-1}\rho^{n_0} \\
+\nonumber \propto & {n_0 + n -1 \choose n-1} \rho^{n_0} \underbrace{(1-\rho)^{n}}_{\text =constant}\\
+=& \text{NegativeBinomial}(n, 1-\rho).
+    \end{align}
+    
+The distribution of $n_0$ follows a negative binomial with parameter $n$ for the number of "successes" and $1-p$ as the "success" rate.  In this context, a "success" is defined as an observation being unobserved.  The value of $\rho$ is defined in \autoref{eqn:deriveNdistribution} and can be computed via numerical integration or estimated via a Monte Carlo within MCMC step as in \cite{bonner_mcmcmc_2014}.  After computing $\rho$ and sampling $n_0$ through \autoref{eqn:deriven0distribution}, find $N = n_0 + n$.
+    
+  
+  \item[ii.] Sample $\mathcal{X}_{mis}$.   The missing observation, $\boldsymbol{x_i}$, is drawn independently of all other covariates, so $\boldsymbol{x_i}$ does not depend on any other $\boldsymbol{x_i} \in \mathcal{X}_{obs}\cup \mathcal{X}_{mis} $.  Also, by definition, if $\boldsymbol{x_i} \in \mathcal{X}_{mis}$, then $\boldsymbol{y_i} = \boldsymbol{0}$. Therefore, the distribution to be sampled is
+  \begin{align}
+  \label{eqn:conditionalXmis}
+  \nonumber p(\boldsymbol{x_i}|N,\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs})&=p(\boldsymbol{x_i} |\boldsymbol{y_i}=\boldsymbol{0},\boldsymbol{\beta})\\
+  &\propto \boldsymbol{g}(\boldsymbol{x_i}|\boldsymbol{\phi})\prod_{j=1}^J (1-\lambda_{ij}(\boldsymbol{x_i}))
+  \end{align}
+To sample from \autoref{eqn:conditionalXmis}, we use rejection sampling of a truncated distribution.  To do this, first draw a sample $\boldsymbol{x_i}$ from the distribution of the covariates, $\boldsymbol{g}(\boldsymbol{\phi})$. Next, accept the sample with probability of $\boldsymbol{x_i}$ being missing, i.e, $\prod_{j=1}^J (1-\lambda_{ij}(\boldsymbol{x_i}))$.  If the sample is not accepted, reject it, and draw another sample from $\boldsymbol{g}(\boldsymbol{\phi})$. Repeat this until we obtain $n_0 = N - n$ missing covariates.  On average, this sampling techniques requires us to draw $N$ total covariates for each sample.
+  
+  \end{list}
+  
+  
+
+\end{list}
+
+

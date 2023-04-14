@@ -1,0 +1,69 @@
+---
+title: ''
+output: pdf_document
+---
+
+
+<!--------------------------------------------------------->
+<!-------------- Classical Capture-Recapture -------------->
+<!--------------------------------------------------------->
+
+\subsection{Background and Preliminaries}
+\label{Sec:CRbackground}
+
+\subsubsection{The Classical Capture-Recapture Approach}
+\label{sec:classicalCR}
+
+We begin with the multinomial multiple-recapture framework first presented in \cite{darroch_multiple-recapture_1958} and utilized by numerous past and more recent works \citep{sandland_statistical_1984}.   This section summarizes this framework, heavily relying on the notation of \cite{manriquevallier_bayesian_2016}. The objective of this capture-recapture framework is to estimate the unknown size, $N$, of a population of individuals assuming the population size remains unchanged throughout the capturing occasions, i.e. a closed population, and that the captured individuals can be matched perfectly. Individuals are captured (sampled) through the use of $J\ge 2$ lists.  If individual, $i$, is captured on list $j$, then $y_{ij}=1$ with $y_{ij}=0$ otherwise.  When aggregated across lists, we refer to these values as capture vectors, $\boldsymbol{y_i} = (y_{i1},...,y_{iJ})$. If an individual is not identified on any of the $J$ lists, $\boldsymbol{y_i} = \textbf{0} \equiv (0,...,0)$, then that individual is considered "unobserved" or "missing".  The number of unobserved individuals, $n_0$, plus the number of individuals that are captured on at least one list, $n$, is equal to the size of the population, i.e, $N = n_0 + n$.
+
+Each individual's capture vector, $\boldsymbol{y_i}$, is generated from probability distribution, $f(\boldsymbol{y}|\theta)$ for all $i = 1,...,N$.   Reordering the individuals such that the observed individuals are $1,...,n$ and the unobserved individuals are $n+1,...,N$ leads to the following joint likelihood 
+
+\begin{equation}
+\label{eqn:jointlikelihoodequation1}
+p(\mathcal{Y}_{obs}|N,\boldsymbol{\theta})={N\choose n} f(\boldsymbol{0}|\boldsymbol{\theta})^{N-n}\prod_{i=1}^n f(\boldsymbol{y_i}|\boldsymbol{\theta})I(N\ge n),
+\end{equation}
+
+where $\mathcal{Y}_{obs} = (\boldsymbol{y}_1,...,\boldsymbol{y_n})$, the observed capture vectors. For the classical CR problem, the only data is the observed capture histories, $\mathcal{Y}_{obs}$.  The parameters of interest are $N$ and $\boldsymbol{\theta}$.  We place a prior distribution, $p(N,\boldsymbol{\theta})$, on the parameters with the objective of computing the posterior distribution,
+
+\begin{equation}
+\label{eqn:simpleposteriorclassical}
+p(N,\boldsymbol{\theta}|\mathcal{Y}_{obs}) \propto p(\mathcal{Y}_{obs}|N,\boldsymbol{\theta})p(N,\boldsymbol{\theta}).
+\end{equation}
+
+
+<!--------------------------------------------------------->
+<!----------- Capture-Recapture with Covariates ----------->
+<!--------------------------------------------------------->
+
+\subsubsection{Capture-Recapture with Covariates}
+\label{sec:CRwithcovariates}
+
+We expand the framework from the previous section by allowing each individual's capture probability to be dependent on a matrix of covariates, $\mathcal{X}$. Let $x_{ih}$ represent the value of covariate $h \in 1,...,H$ for individual $i \in 1,..,N$.  Since some individuals are not captured, the covariate information for these individuals is lost.  Let $\mathcal{X}_{obs}=(\boldsymbol{x_i},...,\boldsymbol{x_n})$ be the covariate data on the $i,...,n$ individuals that are observed and let $\mathcal{X}_{mis}=(\boldsymbol{x_{n+1}},...,\boldsymbol{x_N})$ be the covariate data on the $n+1,...,N$ individuals that are not observed.
+
+We update the joint likelihood in \autoref{eqn:jointlikelihoodequation1} to include these covariates,
+
+\begin{align}
+\label{eqn:jointlikelihoodequation2}
+\nonumber p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|N,\theta,\boldsymbol{\phi},\mathcal{X}_{mis}) & = p(\mathcal{Y}_{obs}|N,\theta,\boldsymbol{\phi},\mathcal{X}_{obs},\mathcal{X}_{mis})p(\mathcal{X}_{obs}|\boldsymbol{\phi})\\
+& ={N\choose n} \prod_{i=1}^n f(\boldsymbol{y_i}|\boldsymbol{\theta},\mathcal{X}_{obs})\prod_{n+1}^N f(\boldsymbol{0}|\boldsymbol{\theta},\mathcal{X}_{mis})I(N\ge n)\cdot g(\mathcal{X}_{obs}|\boldsymbol{\phi}).
+\end{align}
+
+Once again, in order to complete the Bayesian model, priors must be assigned to the unknown parameters $\boldsymbol{\theta}$ and N; however, we also must consider the distribution of the observed and missing covariates along with the parameter(s) governing their distribution, $\boldsymbol{\phi}$. The joint posterior can be written as,
+
+\begin{align}
+\label{eqn:fullposteriorderive}
+\nonumber p(N,\boldsymbol{\theta},\boldsymbol{\phi},\mathcal{X}_{mis}|\mathcal{Y}_{obs},\mathcal{X}_{obs}) & \propto p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|N,\boldsymbol{\theta},\boldsymbol{\phi},\mathcal{X}_{mis})p(N,\boldsymbol{\theta},\boldsymbol{\phi},\mathcal{X}_{mis}) \\
+& = p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|N,\boldsymbol{\theta},\boldsymbol{\phi},\mathcal{X}_{mis})p(\mathcal{X}_{mis}|N,\boldsymbol{\phi})p(N,\boldsymbol{\theta},\boldsymbol{\phi})
+\end{align}
+
+Unfortunately, \autoref{eqn:fullposteriorderive} does not allow us to simply compute the posterior by conditioning on the covariates as in classical regression. Let $\mathcal{Y} = [\mathcal{Y}_{obs},\mathcal{Y}_{mis}]_{N \times J}$ and $\mathcal{X} = [\mathcal{X}_{obs},\mathcal{X}_{mis}]_{N \times H}$ represent the complete data; however, the unobserved portions of each of these matrices are fundamentally different. Conceptually, $\mathcal{Y} = [\mathcal{Y}_{obs},\mathcal{Y}_{mis}]$ is decomposed into observed and unobserved components; however, $\boldsymbol{y_{i}=0}$ for all $\boldsymbol{y_{i}}\in \mathcal{Y}_{mis}$,i.e., the values of each row are known. On the other hand, we do not know the values of the missing covariates, $\mathcal{X}_{mis}$.  This complicates our ability to compute the posterior, which could have been a simple case of conditioning on the covariates as in classical regression.  Because of the missing covariates, we specify a distribution for all covariates,
+
+\begin{equation}
+\label{eqn:covariatedistribution}
+\boldsymbol{x_i}\stackrel{iid}{\sim}\boldsymbol{g}(\boldsymbol{\phi}).
+\end{equation}
+
+To further complicate matters, the observed and unobserved covariates almost surely do not follow the same distribution as they are not missing at random. While $\boldsymbol{x_i}\in\mathcal{X}_{obs}$ or $\boldsymbol{x_i}\in\mathcal{X}_{mis}$ is defined through the observational status of its corresponding $\boldsymbol{y_i}$, all $\boldsymbol{x_i}$ in each set is drawn independently from \autoref{eqn:covariatedistribution}. Nevertheless, it is not the case that  $\boldsymbol{x_{i}|y_i\ne 0}$ or $\boldsymbol{x_{i}|y_i=0}$ will necessarily have this same distribution. In other words, if we desire samples of our missing covariates, it would be incorrect to sample simply from $g(\boldsymbol{\phi})$, but instead these values must sampled conditioned on the individual being missing.
+
+
+
