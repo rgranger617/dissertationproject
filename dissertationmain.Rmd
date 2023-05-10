@@ -62,9 +62,6 @@ op = function(x, d=2) sprintf(paste0("%1.",d,"f"), x) #allows display of decimal
 ```{r example2, child = 'sections/example2.Rmd'}
 ```
 
-```{r simulations, child = 'sections/simulations.Rmd'}
-```
-
 ```{r conclusion, child = 'sections/conclusion.Rmd'}
 ```
 
