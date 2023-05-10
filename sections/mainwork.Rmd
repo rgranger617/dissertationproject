@@ -3,7 +3,7 @@ title: ''
 output: pdf_document
 ---
 
-\section{Proposed Work: Capture-Recapture with Covariates: The Bayesian Logistic Capture-Recapture Model with Extensions}
+\section{Capture-Recapture with Covariates: The Bayesian Logistic Capture-Recapture Model with Extensions}
 \label{sec:CRwithCovariates}
 
 In this section, we develop a Bayesian procedure for the CR problem with covariates that has a number of desirable characteristics:
@@ -27,17 +27,17 @@ A key concern of any capture-recapture framework is that the estimation is highl
 Section \ref{Sec:CRbackground} begins with a Bayesian framework for the capture-recapture problem with covariates. We propose in subsection \ref{Sec:BLRCRmodel} a specific model following this procedure which we call the Bayesian Logistic Regression Capture-Recapture (BLRCR) model and estimate the posterior through a Markov Chain Monte Carlo (MCMC) algorithm. The remaining three subsections discuss extensions to specifying the distribution of the covariates (subsection \ref{Sec:selectcovariates}), discovering unobserved heterogeneity (subsection \ref{Sec:condindependence}), and variable selection (subsection \ref{Sec:variableselection}).  
 
 
-```{r CRmodels, child = 'proposedworksubsections/CRmodels.Rmd'}
+```{r CRmodels, child = 'mainworksubsections/CRmodels.Rmd'}
 ```
 
-```{r selectcovariates, child = 'proposedworksubsections/BLRCRmodel.Rmd'}
+```{r selectcovariates, child = 'mainworksubsections/BLRCRmodel.Rmd'}
 ```
 
-```{r selectcovariates, child = 'proposedworksubsections/selectcovariates.Rmd'}
+```{r selectcovariates, child = 'mainworksubsections/selectcovariates.Rmd'}
 ```
 
-```{r hiddencovariates, child = 'proposedworksubsections/hiddencovariates.Rmd'}
+```{r hiddencovariates, child = 'mainworksubsections/hiddencovariates.Rmd'}
 ```
 
-```{r hiddencovariates, child = 'proposedworksubsections/variableselection.Rmd'}
+```{r hiddencovariates, child = 'mainworksubsections/variableselection.Rmd'}
 ```

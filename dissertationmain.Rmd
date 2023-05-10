@@ -53,14 +53,19 @@ op = function(x, d=2) sprintf(paste0("%1.",d,"f"), x) #allows display of decimal
 ```{r litreview, child = 'sections/litreview.Rmd'}
 ```
 
-```{r simulations, child = 'sections/proposedwork.Rmd'}
+```{r mainwork, child = 'sections/mainwork.Rmd'}
 ```
 
-
-```{r proposedwork, child = 'sections/simulations.Rmd'}
+```{r example1, child = 'sections/example1.Rmd'}
 ```
 
-```{r timeline, child = 'sections/timeline.Rmd'}
+```{r example2, child = 'sections/example2.Rmd'}
+```
+
+```{r simulations, child = 'sections/simulations.Rmd'}
+```
+
+```{r conclusion, child = 'sections/conclusion.Rmd'}
 ```
 
 \newpage

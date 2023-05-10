@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.5.10)  10 MAY 2023 00:40
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.5.10)  10 MAY 2023 14:25
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -588,11 +588,11 @@ Overfull \hbox (5.93246pt too wide) in paragraph at lines 125--143
 [][] 
  []
 
-[2] [3] (./dissertationmain.toc [4])
+[2] [3] (./dissertationmain.toc [4] [5])
 \tf@toc=\write5
 \openout5 = `dissertationmain.toc'.
 
-[5] [1] [2] [3] [4{c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}] [5] [6] [7{c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}]
+[6] [1] [2] [3] [4{c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}] [5] [6] [7{c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}]
 LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 461.
 (c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
@@ -614,74 +614,74 @@ Overfull \vbox (106.3798pt too high) has occurred while \output is active []
 Overfull \vbox (428.64433pt too high) has occurred while \output is active []
 
 [33]
-<dissertationmain_files/figure-latex/plotNvalues-1.pdf, id=720, 578.16pt x 433.62pt>
+<dissertationmain_files/figure-latex/plotNvalues-1.pdf, id=734, 578.16pt x 433.62pt>
 File: dissertationmain_files/figure-latex/plotNvalues-1.pdf Graphic file (type pdf)
 <use dissertationmain_files/figure-latex/plotNvalues-1.pdf>
-Package pdftex.def Info: dissertationmain_files/figure-latex/plotNvalues-1.pdf  used on input line 1468.
+Package pdftex.def Info: dissertationmain_files/figure-latex/plotNvalues-1.pdf  used on input line 1474.
 (pdftex.def)             Requested size: 469.75385pt x 352.31538pt.
 [34 <./dissertationmain_files/figure-latex/plotNvalues-1.pdf>] [35] [36]
-<dissertationmain_files/figure-latex/posteriornormalplots-1.pdf, id=741, 650.43pt x 686.565pt>
+<dissertationmain_files/figure-latex/posteriornormalplots-1.pdf, id=755, 650.43pt x 686.565pt>
 File: dissertationmain_files/figure-latex/posteriornormalplots-1.pdf Graphic file (type pdf)
 <use dissertationmain_files/figure-latex/posteriornormalplots-1.pdf>
-Package pdftex.def Info: dissertationmain_files/figure-latex/posteriornormalplots-1.pdf  used on input line 1571.
+Package pdftex.def Info: dissertationmain_files/figure-latex/posteriornormalplots-1.pdf  used on input line 1577.
 (pdftex.def)             Requested size: 469.76817pt x 495.86641pt.
 [37] [38 <./dissertationmain_files/figure-latex/posteriornormalplots-1.pdf>]
-<dissertationmain_files/figure-latex/posteriormixtureplots-1.pdf, id=761, 650.43pt x 325.215pt>
+<dissertationmain_files/figure-latex/posteriormixtureplots-1.pdf, id=775, 650.43pt x 325.215pt>
 File: dissertationmain_files/figure-latex/posteriormixtureplots-1.pdf Graphic file (type pdf)
 <use dissertationmain_files/figure-latex/posteriormixtureplots-1.pdf>
-Package pdftex.def Info: dissertationmain_files/figure-latex/posteriormixtureplots-1.pdf  used on input line 1622.
+Package pdftex.def Info: dissertationmain_files/figure-latex/posteriormixtureplots-1.pdf  used on input line 1628.
 (pdftex.def)             Requested size: 469.76817pt x 234.88408pt.
 [39] [40 <./dissertationmain_files/figure-latex/posteriormixtureplots-1.pdf>] [41] [42]
 Overfull \vbox (202.36967pt too high) has occurred while \output is active []
 
 [43]
-<dissertationmain_files/figure-latex/heterogeneitydiff-1.pdf, id=799, 650.43pt x 505.89pt>
+<dissertationmain_files/figure-latex/heterogeneitydiff-1.pdf, id=814, 650.43pt x 505.89pt>
 File: dissertationmain_files/figure-latex/heterogeneitydiff-1.pdf Graphic file (type pdf)
 <use dissertationmain_files/figure-latex/heterogeneitydiff-1.pdf>
-Package pdftex.def Info: dissertationmain_files/figure-latex/heterogeneitydiff-1.pdf  used on input line 1784.
+Package pdftex.def Info: dissertationmain_files/figure-latex/heterogeneitydiff-1.pdf  used on input line 1790.
 (pdftex.def)             Requested size: 469.76817pt x 365.37524pt.
 [44 <./dissertationmain_files/figure-latex/heterogeneitydiff-1.pdf>] [45] [46]
-Overfull \hbox (5.83737pt too wide) in paragraph at lines 1887--1887
+Overfull \hbox (5.83737pt too wide) in paragraph at lines 1893--1893
 []|\T1/lmr/m/n/12 Priority| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1889--1889
+Underfull \hbox (badness 10000) in paragraph at lines 1895--1895
 []|\T1/lmr/m/n/12 Stick Break-ing
  []
 
 
-Underfull \hbox (badness 1502) in paragraph at lines 1891--1891
+Underfull \hbox (badness 1502) in paragraph at lines 1897--1897
 []|\T1/lmr/m/n/12 Distribution for
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1895--1895
+Underfull \hbox (badness 10000) in paragraph at lines 1901--1901
 []|\T1/lmr/m/n/12 Create an R
  []
 
 
-Underfull \hbox (badness 1939) in paragraph at lines 1897--1897
+Underfull \hbox (badness 1939) in paragraph at lines 1903--1903
 []|\T1/lmr/m/n/12 Missing Co-vari-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1901--1901
+Underfull \hbox (badness 10000) in paragraph at lines 1907--1907
 []|\T1/lmr/m/n/12 Conditional
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1903--1903
+Underfull \hbox (badness 10000) in paragraph at lines 1909--1909
 []|\T1/lmr/m/n/12 Conditional
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1903--1903
+Underfull \hbox (badness 10000) in paragraph at lines 1909--1909
 \T1/lmr/m/n/12 Like-li-hood
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1905--1905
+Underfull \hbox (badness 10000) in paragraph at lines 1911--1911
 []|\T1/lmr/m/n/12 Model La-tent
  []
 
@@ -694,25 +694,25 @@ LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 75
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [56{c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}] [57] [58] [59] [60]) [61] [62] (./dissertationmain.aux)
 Package rerunfilecheck Info: File `dissertationmain.out' has not changed.
-(rerunfilecheck)             Checksum: 26921249D1E38BB1D41019374F44E6C5;9838.
+(rerunfilecheck)             Checksum: C33AB6A04E7D7B31C67638E9F6A54CE5;9821.
  )
 (\end occurred inside a group at level 1)
 
 ### semi simple group (level 1) entered at line 56 (\begingroup)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 15930 strings out of 478007
- 263353 string characters out of 5837478
+ 15937 strings out of 478007
+ 263435 string characters out of 5837478
  1880242 words of memory out of 5000000
- 35600 multiletter control sequences out of 15000+600000
+ 35604 multiletter control sequences out of 15000+600000
  576478 words of font info for 74 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  75i,21n,76p,1237b,11721s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbsy10.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx6.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx8.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmcsc10.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi12.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi6.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi8.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmib10.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmib7.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr6.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri12.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy6.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb><c:/Users/Rob/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt12.pfb>
-Output written on dissertationmain.pdf (67 pages, 1888565 bytes).
+Output written on dissertationmain.pdf (68 pages, 1889149 bytes).
 PDF statistics:
- 1088 PDF objects out of 1200 (max. 8388607)
- 959 compressed objects within 10 object streams
- 226 named destinations out of 1000 (max. 500000)
- 317 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1103 PDF objects out of 1200 (max. 8388607)
+ 973 compressed objects within 10 object streams
+ 229 named destinations out of 1000 (max. 500000)
+ 333 words of extra memory for PDF output out of 10000 (max. 10000000)
 
