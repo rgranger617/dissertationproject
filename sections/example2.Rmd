@@ -1,2 +1,2 @@
-\section{Example 2}
+\section{Example 2 (find something real even if we don't know the answer)}
 \label{Sec:example2}

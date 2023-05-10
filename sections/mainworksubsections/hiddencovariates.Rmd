@@ -47,7 +47,7 @@ where $n_{\omega}$ is the number of individuals belonging to each latent class m
 The current setup uses a finite number of latent classes with a prior specification of a Dirichlet($1/H_\omega$,...,$1/H_\omega$).While it may be reasonable in some cases to know the number of latent classes, it may be advantageous to utilize the stick-breaking prior. Of course, with a sufficiently large $H_\omega$ the current construction will approximate the solution under the stick-breaking prior.  Nevertheless, the current construction uses the concentration parameter, $\alpha_\omega$, as a hyperparameter.  Adding some flexibility by placing a prior on $\alpha_\omega$ could prove beneficial.
 
 
-\subsection{Simulations with Unobserved Heterogeneity}
+\subsubsection{Simulations with Unobserved Heterogeneity}
 \label{Sec:simsunobservedheterogeneity}
 
 The final set of simulations is to demonstrate the importance of accounting for both the observed and unobserved heterogeneity. While the cMLCR model has performed well in the prior sections, it has no method of detecting unobservable heterogeneity and hence produces biased estimation. Interestingly, a model like the LCMCR, which is designed to account for unobservable heterogeneity, performs much better, but still struggles as considerable information can be gained by including the covariates. The BLRCR model when extended to include latent intercepts ($H_\omega>1$) can utilize the covariates to detect the observable heterogeneity, but also accounts for the additional unobservable heterogeneity.  As a result, it is the only model that performs well in this subsection.

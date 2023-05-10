@@ -1,9 +1,0 @@
-mybeta = matrix(c(-2.5,-1.5,3.0,
-                      -2.5,-1.5,3.0,
-                      0.5,-1.5,-3.0),nrow=J,byrow=TRUE)
-
-omegapi = c(0.65, 0.35)
-
-x = normal(0,1)
-
-We used one latent variable, omega, and one continuous covariate, x.
