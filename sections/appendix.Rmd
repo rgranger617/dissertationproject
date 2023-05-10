@@ -3,9 +3,11 @@ title: ''
 output: pdf_document
 ---
 
-\begin{appendices}
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%% Appendix A %%%%%%%%%%%%%%%%%%%%%%%%% -->
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 
-\section{Conditional Maximum Likelihood Estimation}
+\section{Appendix A: Conditional Maximum Likelihood Estimation}
 
 \label{Sec:conditionalmaximumlike}
 
@@ -41,8 +43,11 @@ Taking the first derivative with respect to $\boldsymbol{\beta_j}$ gives the gra
 
 Notice in the equation above that only the observed data appears.  This convenience occurs due to the fact that E[$y_{ij}|\boldsymbol{y_i}= \boldsymbol{0}$] = 0 for all individuals \citep{alho_logistic_1990}.  Using the gradient, apply the gradient ascent algorithm until convergence to obtain $\boldsymbol{\beta}_{MAP}$.  
 
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%% Appendix B %%%%%%%%%%%%%%%%%%%%%%%%% -->
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 
-\section{Dirichlet Process of Mixture Normals}
+\section{Appendix B: Dirichlet Process of Mixture Normals}
 \label{DPnormalmix}
 
 The generative process for each observation's covariate is,
@@ -111,8 +116,11 @@ Set $V_{K*}=1$.  Then, $\pi_k = V_k\prod_{l<k}(1-V_l)$ for all $k=1,...,K^*$.
 
 \end{list}
 
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%% Appendix C %%%%%%%%%%%%%%%%%%%%%%%%% -->
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 
-\section{LCMCR Model}
+\section{Appendix C: LCMCR Model}
 \label{LCMCRmodel}
 
 This section summarizes the Bayesian Non-Parametric Latent-Class Capture-Recapture (LCMCR) derivation and explanations provided in \cite{manriquevallier_bayesian_2016}.
@@ -145,6 +153,3 @@ z_i & \sim \text{Discrete}(\{1,2,...\},(\pi_1,\pi_2,...)) \hspace{10px} \text{fo
 (\pi_1,\pi_2,...) & \sim \text{SB}(\alpha) \\ 
 \alpha & \sim \text{Gamma}(a,b).
 \end{align}
-
-
-\end{appendices}

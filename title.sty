@@ -1,53 +1,81 @@
 \pagenumbering{gobble}
+\allsectionsfont{\normalsize\bfseries}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %\begin{titlepage}
 \begin{center}
-\LARGE{\textbf{Capture-Recapture with Covariates: The Bayesian Logistic Capture-Recapture Model with Extensions}}\\
-\vspace*{2\baselineskip}
-\normalsize{A dissertation proposal submitted in partial satisfaction of the requirements for the degree of \\}
+\vspace*{.5in} %this seems to work to get the 2in margin on title page
+\doublespacing
+\Large{\textsc{Capture-Recapture with Covariates: The Bayesian Logistic Capture-Recapture Model with Extensions}}\\
+\vspace*{5\baselineskip}
+\normalsize{Robert Edward Granger}\\
+\vspace*{7.5\baselineskip}
+\singlespacing
+\normalsize{Submitted to the faculty of the Univesity Graduate School \\
+in partial fulfillment of the requirements \\
+for the degree \\
 Doctor of Philosophy \\
-in \\
-Statistical Science \\
-\vspace*{2\baselineskip}
-\Large{Robert Granger}\\
-\vspace*{3\baselineskip}
-\Large{\textbf{Research Committee Members}}\\
-Dr. Daniel Manrique-Vallier \\
-Dr. Julia Fukuyama \\
-Dr. Roni Khardon \\
-Dr. Amanda Mejia \\
-\vspace*{3\baselineskip}
-
-\today
-
-\vspace*{1\baselineskip}
-Department of Statistics \\
+in the Department of Statistics, \\
 Indiana University \\
-Bloomington, Indiana \\
+May 2024 (set this to month in which all requirements are fulfilled in title.sty)}
 \end{center}
 % \end{titlepage}
 
 \hypersetup{linkcolor = black}
+\pagenumbering{roman}
+\thispagestyle{empty}
 \newpage
 
-\begin{center}
-\LARGE{Abstract}
-\end{center}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\singlespacing
 
-\vspace*{2\baselineskip}
+Accepted by the Graduate Faculty, Indiana University, in partial fulfillment of the requirements for the degree of Doctor of Philosophy.
+
+\vspace*{6\baselineskip}
+
+\begin{tabular}
+{>{\raggedright\arraybackslash}p{1.5in}
+ >{\raggedleft\arraybackslash}p{4.75in}}
+Doctoral Committee: & \hrulefill \\
+& Daniel Manrique-Vallier, Ph.D. \\
+\\
+\\
+& \hrulefill \\
+& Julia Fukuyama, Ph.D. \\
+\\
+\\
+& \hrulefill \\
+& Amanda Mejia, Ph.D. \\
+\\
+\\
+& \hrulefill \\
+& Roni Khardon, Ph.D. \\
+\end{tabular}
+
+\vspace*{20\baselineskip}
+
+\raggedright
+
+May 1, 2024 (change this to defense date, it's in title.sty)
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\doublespacing
+\begin{center}
+Robert Edward Granger\\
+\textsc{Capture-Recapture with Covariates: The Bayesian Logistic Capture-Recapture Model with Extensions}\\
+\end{center}
 
 \normalsize
 
 Capture-recapture refers to a series of methods that are used to estimate the size of a population from at least two incomplete, matched lists.  With human populations, heterogeneity in the capture probability is a serious concern as it can impact the estimation process. This proposal outlines a framework for incorporating heterogeneity through known covariates into the estimation process and develops an extensible model under this framework which we call the Bayesian Logistic Regression model for Capture-Recapture (BLRCR). The posterior distribution is estimated using the complete likelihood through a Markov Chain Monte Carlo (MCMC) algorithm.  Through a careful examination of the problem and a series of demonstrations, three important areas of future research become apparent for the dissertation project. First, we should consider the impact of the specification of the covariate distribution and explore additional non-parametric solutions.  Second, we should consider the unobserved heterogeneity and specifically how to implement a procedure that accounts for this violation in the conditional independence assumption.  Third, we should consider the impact of variable selection.
 
-
 \newpage
-
-\pagenumbering{roman}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \tableofcontents
-\addcontentsline{toc}{section}{\contentsname}
-
 \newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \pagenumbering{arabic}
 \hypersetup{linkcolor = blue}
