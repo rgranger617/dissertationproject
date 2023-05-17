@@ -13,7 +13,7 @@ output: pdf_document
 
 \subsubsection{The BLRCR Model}
 
-A key assumption of the model is that the list captures are independent given the covariates, i.e, $p(\boldsymbol{y_i}|\boldsymbol{x_i}) = \prod_{i=j}^J p(y_{ij}|x_{i},\theta)$. Using the framework from subsection \ref{sec:CRwithcovariates}, we implement the Bayesian Logistic Regression Capture-Recapture (BLRCR) model which uses independent logistic regressions to estimate the capture probabilities on each list. Suppose $y_{ij}$ and $x_{ih}$ are generated in the following way:
+Using the framework from subsection \ref{sec:CRwithcovariates}, we implement the Bayesian Logistic Regression Capture-Recapture (BLRCR) model which uses independent logistic regressions to estimate the capture probabilities on each list. Suppose $y_{ij}$ and $x_{ih}$ are generated in the following way:
 
 \begin{align} 
 \label{eqn:logitdatacreation}
@@ -28,14 +28,16 @@ where
 \lambda_{ij}(\boldsymbol{x_i})=\sigma(\boldsymbol{x_i}^T\boldsymbol{\beta_j}) = \frac{1}{1+e^{-\boldsymbol{x_i}^T\boldsymbol{\beta_j}}},
 \end{equation}
 
-and $\boldsymbol{g}(\boldsymbol{\phi})$ is the distribution of the $H$ covariates.  The capture probability that individual $i$ appears on list $j$ is equal to $\lambda_{ij}$, and this value can be calculated with a nonstochastic transformation of $\boldsymbol{x_i}$ and $\boldsymbol{\beta_j}$ through the sigmoid function (see \autoref{eqn:sigmoidfunc}). In the linear term, $\boldsymbol{x_i}^T\boldsymbol{\beta_j}$, a different set of $\boldsymbol{\beta_j}$ covariates are used to determine each $\lambda_{ij}$ implying a total of $k\times(h+1)$ coefficients with the inclusion of an intercept.  Notice this setup implies each individual's capture pattern is independent conditional on the covariates. 
+and $\boldsymbol{g}(\boldsymbol{\phi})$ is the distribution of the $H$ covariates.  The capture probability that individual $i$ appears on list $j$ is equal to $\lambda_{ij}$, and this value can be calculated with a nonstochastic transformation of $\boldsymbol{x_i}$ and $\boldsymbol{\beta_j}$ through the sigmoid function (see \autoref{eqn:sigmoidfunc}). In the linear term, $\boldsymbol{x_i}^T\boldsymbol{\beta_j}$, a different set of $\boldsymbol{\beta_j}$ covariates are used to determine each $\lambda_{ij}$ implying a total of $k\times(h+1)$ coefficients with the inclusion of an intercept.  Notice this setup implies each individual's capture pattern is independent conditional on the covariates, i.e, $p(\boldsymbol{y_i}|\boldsymbol{x_i}) = \prod_{i=j}^J p(y_{ij}|x_{i},\theta)$. 
 
-In order to complete the Bayesian model, priors must be assigned to unknown parameters $\boldsymbol{\beta_j}$ and N. For now, assume $\boldsymbol{\phi}$ is known and are thus treated as hyperparameters (this will be further addressed in subsection \ref{Sec:selectcovariates}).  For $\boldsymbol{\beta_j}$, a multivariate normal prior is assigned to the set of coefficients for each list with mean of $\boldsymbol{b}\in \mathcal{R}^{H+1}$ and covariance of $\boldsymbol{B}\in \mathcal{R}^{(H+1) \times (H+1)}$.  For $N$, we use the Jeffrey's prior \citep{jeffreys_theory_1967}, $p(N) = \frac{1}{N}$, which provides a covenient form for the conditional posterior distribution of $N$.  
+\cite{king_capturerecapture_2016} proposes a similar model in their first example titled "Continuous individual covariates." An important distinction though is the allowance, for each covariate, to have a different set of coefficients, $\boldsymbol{\beta_j}$. \cite{king_capturerecapture_2016} justifies a single coefficient per covariate as the model they develop is in the context of animal populations. In animal populations, each list is a different capturing from the same population but at various time points. In order to assume a closed population, the lists should be collected in a relatively short time period. As a result, the author argues that any time varying effect from the covariates should be limited. On the other hand, we approach this problem in the context of human populations, where lists are not necessarily different time points but instead different data collectors or databases. As a result, we expect individual characteristics (covariates) to have different impacts on the capture probability depending on the list.
+
+In order to complete the Bayesian model, priors must be assigned to unknown parameters $N$, $\boldsymbol{\beta_j}$, and $\boldsymbol{\phi_h}$. For $N$, we use the Jeffrey's prior \citep{jeffreys_theory_1967}, $p(N) = \frac{1}{N}$, which conveniently results in a negative binomial distribution for the conditional posterior distribution of $N$. Other choices of priors typically result in more complicated estimation, especially with data augmentation (see \cite{king_capturerecapture_2016} for a discussion). For the $\boldsymbol{\beta_j}$ coefficients, we assign a multivariate normal prior to the set of coefficients for each list with mean of $\boldsymbol{b}\in \mathcal{R}^{H+1}$ and covariance of $\boldsymbol{B}\in \mathcal{R}^{(H+1) \times (H+1)}$. Other choices of prior can be used as the problem reduces to Bayesian logistic regression after augmenting the missing data. We select the multivariate normal prior as it is the same prior used in the Bayesian logistic regression Monte Carlo Markov Chain (MCMC) sampling scheme proposed in \citep{polson_bayesian_2013}, which makes implementation simple. We can be flexible in our choice of prior distribution for the $\boldsymbol{\beta_j}$ coefficients as long as a suitable method exists for drawing samples from the conditional posterior distribution for $\boldsymbol{\beta_j}$. Lastly, for now, assume $\boldsymbol{\phi_h}$ is known and thus can be treated as a hyperparameter (this will be further addressed in subsection \ref{Sec:selectcovariates}).
 
 Plugging in the likelihood distribution as described in \autoref{eqn:logitdatacreation} and the aforementioned priors into \autoref{eqn:fullposteriorderive} yields the posterior
 \begin{align}
 \label{eqn:fullposteriorderivevalues}
-\nonumber p(N,\boldsymbol{\beta},\mathcal{X}_{mis}|\mathcal{Y}_{obs},\mathcal{X}_{obs}) \propto &  \left[{N\choose n}\prod_{i=1}^n \prod_{j=1}^J \lambda_{ij}(\boldsymbol{x_i})^{y_{ij}}(1-\lambda_{ij}(\boldsymbol{x_i}))^{1-y_{ij}}\prod_{i=n+1}^N \prod_{j=1}^J (1-\lambda_{ij}(\boldsymbol{x_i})) \right] \\
+\nonumber p(N,\boldsymbol{\beta},\mathcal{X}_{mis}|\mathcal{Y}_{obs},\mathcal{X}_{obs}) \propto &  \left[\binom{N}{n}\prod_{i=1}^n \prod_{j=1}^J \lambda_{ij}(\boldsymbol{x_i})^{y_{ij}}(1-\lambda_{ij}(\boldsymbol{x_i}))^{1-y_{ij}}\prod_{i=n+1}^N \prod_{j=1}^J (1-\lambda_{ij}(\boldsymbol{x_i})) \right] \\
 \nonumber \times & \left[ \prod_{i=1}^n \boldsymbol{g}(\boldsymbol{x_i}|\boldsymbol{\phi_h}) \right] \times \left[ \prod_{i=n+1}^N \boldsymbol{g}(\boldsymbol{x_i}|\boldsymbol{\phi_h}) \right] \times \left[\frac{1}{N}\right] \\
 \times & \left[ \prod_{j=1}^J \left(\frac{1}{2\pi}\right)^{H/2}|\boldsymbol{B}|^{-1/2}e^{-\frac{1}{2}(\boldsymbol{b}-\boldsymbol{\beta_j})^T\boldsymbol{B}^{-1}(\boldsymbol{b}-\boldsymbol{\beta_j})}\right].
 \end{align}
@@ -49,7 +51,7 @@ Plugging in the likelihood distribution as described in \autoref{eqn:logitdatacr
 \subsubsection{Estimation of the BLRCR}
 \label{sec:estimationBLRCRMCMC}
 
-An exact analytic solution for the posterior is intractable, so we implement the Monte Carlo Markov Chain (MCMC) algorithm of Gibbs Sampling, where sequential draws from $\boldsymbol{\beta}$, $N$, and $\mathcal{X}_{mis}$ are taken conditional on all other parameters.
+An exact analytic solution for the posterior is intractable, so we implement the MCMC algorithm of Gibbs Sampling, where sequential draws from $\boldsymbol{\beta}$, $N$, and $\mathcal{X}_{mis}$ are taken conditional on all other parameters.
 
 \begin{list}{}{}
 
@@ -66,24 +68,27 @@ which is simply the posterior distribution of Bayesian logistic regression.   Po
 \label{eqn:gibbsNandXmis}
 p(N,\mathcal{X}_{mis}|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs})\propto p(N|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs})p(\mathcal{X}_{mis}|N,\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs}).
 \end{equation}
+
 From \autoref{eqn:gibbsNandXmis}, observe the joint distribution of $N$ and $\mathcal{X}_{obs}$ can be decomposed into two parts from which can be sampled.  The first part of this equation is the joint distribution of $N$ and $\mathcal{X}_{mis}$ marginalized over the missing covariates.  The second part is the distribution of the missing covariates where the number of missing covariates, $n_0$, is known.
 
-  \begin{list}{}{}
-    \item[i.] Sample $N \sim  p(N|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs})$. 
+\begin{list}{}{}
+  \item[i.] Sample $N \sim  p(N|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs})$. 
     \begin{align}
     \label{eqn:deriveNdistribution}
-\nonumber    p(N|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs}) & = \int_{\boldsymbol{x_{n+1}}} \hspace{-10px}\cdots \int_{\boldsymbol{x_{N}}} p(N,\mathcal{X}_{mis}|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs}) d\boldsymbol{x_{n+1}}\cdots d\boldsymbol{x_{N}}\\
-\nonumber    & \propto \int_{\boldsymbol{x_{n+1}}} \hspace{-10px}\cdots \int_{\boldsymbol{x_{N}}}\left[{N\choose n} \prod_{i=n+1}^N \prod_{j=1}^J (1-\lambda_{ij}) \right]\left[ \prod_{i=n+1}^N\boldsymbol{g}(\boldsymbol{x_i}|\boldsymbol{\phi}) \right]\left[\frac{1}{N}\right]d\boldsymbol{x_{n+1}}\cdots d\boldsymbol{x_{N}}\\
+    \nonumber p(N|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs}) & = \int_{\boldsymbol{x_{n+1}}} \hspace{-10px}\cdots    \int_{\boldsymbol{x_{N}}} p(N,\mathcal{X}_{mis}|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs}) d\boldsymbol{x_{n+1}}\cdots d\boldsymbol{x_{N}}\\
+\nonumber    & \propto \int_{\boldsymbol{x_{n+1}}} \hspace{-10px}\cdots \int_{\boldsymbol{x_{N}}}\left[\binom{N}{n} \prod_{i=n+1}^N \prod_{j=1}^J (1-\lambda_{ij}) \right]\left[ \prod_{i=n+1}^N\boldsymbol{g}(\boldsymbol{x_i}|\boldsymbol{\phi}) \right]\left[\frac{1}{N}\right]d\boldsymbol{x_{n+1}}\cdots d\boldsymbol{x_{N}}\\
 \nonumber    & = \frac{(N-1)!}{(N-n)!n!} \left[ \int_{\boldsymbol{x}}\boldsymbol{g}(\boldsymbol{x_i}|\boldsymbol{\phi})\prod_{j=1}^J (1-\lambda_{ij}) d\boldsymbol{x}\right]^{N-n}\\
-    & \propto {N - 1\choose n-1} \left[\underbrace{ E_{\boldsymbol{g}(\boldsymbol{\theta_h})}\left[\prod_{j=1}^J (1-\lambda_{ij})\right]}_{\equiv \rho} \right]^{N-n}
+    & \propto \binom{N-1}{n-1} \left[\underbrace{ E_{\boldsymbol{g}(\boldsymbol{\theta_h})}\left[\prod_{j=1}^J (1-\lambda_{ij})\right]}_{\equiv \rho} \right]^{N-n}
     \end{align}
     
-    Instead of sampling $N$, sample $n_0$.
+Instead of sampling $N$, sample $n_0 = N - n$.
+    
+    \vspace{-20px}
     
     \begin{align}
     \label{eqn:deriven0distribution}
-\nonumber    p(n_0|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs}) \propto & {n_0 + n -1 \choose n-1}\rho^{n_0} \\
-\nonumber \propto & {n_0 + n -1 \choose n-1} \rho^{n_0} \underbrace{(1-\rho)^{n}}_{\text =constant}\\
+\nonumber    p(n_0|\mathcal{Y},\boldsymbol{\beta},\mathcal{X}_{obs}) \propto & \binom{n_0 + n -1}{n-1}\rho^{n_0} \\
+\nonumber \propto & \binom{n_0 + n -1}{n-1} \rho^{n_0} \underbrace{(1-\rho)^{n}}_{\text =constant}\\
 =& \text{NegativeBinomial}(n, 1-\rho).
     \end{align}
     

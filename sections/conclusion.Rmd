@@ -5,7 +5,7 @@ output: pdf_document
 
 ```{=tex}
 \section{Conclusion}
-\label{Sec:timeline}
+\label{Sec:Conclusion}
 ```
 The objective of this dissertation project is to develop a Bayesian capture-recapture (CR) method that can utilize covariate information to understand the heterogeneity between individuals. Presented in this proposal is a framework for modelling capture-recapture with covariates.  Specifically, we develop the Bayesian Logistic Regression Capture Recapture (BLRCR) that utilizes the covariate information directly in estimating individual capture rates. Further, we account for unobserved heterogeneity with the use of latent classes.  This model is solved using an MCMC algorithm to approximate the posterior distribution of our population size, $N$. I propose three primary areas of interest that will be addressed as the focus of the dissertation: unobserved heterogeneity, modelling the covariate distribution, and covariate selection.
 

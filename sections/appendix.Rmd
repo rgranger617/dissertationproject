@@ -139,7 +139,7 @@ Inserting \autoref{eqn:bernmix} into \autoref{eqn:jointlikelihoodequation1} yiel
 
 \begin{equation}
 \label{eqn:LCMCRlikelihood}
-p(\mathcal{Y}|\boldsymbol{\lambda},\boldsymbol{\pi},N)={N\choose n} \left[ \sum_{k=1}^K \pi_k \prod_{j=1}^J (1-\lambda_{jk}) \right]^{N-n} \times \prod_{i=1}^n \sum_{k=1}^K \pi_k \prod_{j=1}^J \lambda_{jk}^{y_{ij}}(1-\lambda_{jk})^{1-y_{ij}}.
+p(\mathcal{Y}|\boldsymbol{\lambda},\boldsymbol{\pi},N)=\binom{N}{n} \left[ \sum_{k=1}^K \pi_k \prod_{j=1}^J (1-\lambda_{jk}) \right]^{N-n} \times \prod_{i=1}^n \sum_{k=1}^K \pi_k \prod_{j=1}^J \lambda_{jk}^{y_{ij}}(1-\lambda_{jk})^{1-y_{ij}}.
 \end{equation}
 
 The number of latent classes is endogenized with the probability of belonging to each latent class, $\pi_k$, being drawn from a "stick-breaking" process \citep{sethuraman_constructive_1991}.  The parameter, $\alpha$, controls the amount of concentration of the probability mass.  In other words, larger values of $\alpha$ will lead to a larger number of relevant latent classes.  A Beta(1,1) prior distribution is placed on each of the $J \times K^*$ probabilities, and a Gamma($a,b$) prior is placed on $\alpha$.

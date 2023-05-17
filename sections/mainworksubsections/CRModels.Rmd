@@ -20,7 +20,7 @@ Each individual's capture vector, $\boldsymbol{y_i}$, is generated from probabil
 
 \begin{equation}
 \label{eqn:jointlikelihoodequation1}
-p(\mathcal{Y}_{obs}|N,\boldsymbol{\theta})={N\choose n} f(\boldsymbol{0}|\boldsymbol{\theta})^{N-n}\prod_{i=1}^n f(\boldsymbol{y_i}|\boldsymbol{\theta})I(N\ge n),
+p(\mathcal{Y}_{obs}|N,\boldsymbol{\theta})=\binom{N}{n} f(\boldsymbol{0}|\boldsymbol{\theta})^{N-n}\prod_{i=1}^n f(\boldsymbol{y_i}|\boldsymbol{\theta})I(N\ge n),
 \end{equation}
 
 where $\mathcal{Y}_{obs} = (\boldsymbol{y}_1,...,\boldsymbol{y_n})$, the observed capture vectors. For the classical CR problem, the only data is the observed capture histories, $\mathcal{Y}_{obs}$.  The parameters of interest are $N$ and $\boldsymbol{\theta}$.  We place a prior distribution, $p(N,\boldsymbol{\theta})$, on the parameters with the objective of computing the posterior distribution,
@@ -45,7 +45,7 @@ We update the joint likelihood in \autoref{eqn:jointlikelihoodequation1} to incl
 \begin{align}
 \label{eqn:jointlikelihoodequation2}
 \nonumber p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|N,\theta,\boldsymbol{\phi},\mathcal{X}_{mis}) & = p(\mathcal{Y}_{obs}|N,\theta,\boldsymbol{\phi},\mathcal{X}_{obs},\mathcal{X}_{mis})p(\mathcal{X}_{obs}|\boldsymbol{\phi})\\
-& ={N\choose n} \prod_{i=1}^n f(\boldsymbol{y_i}|\boldsymbol{\theta},\mathcal{X}_{obs})\prod_{n+1}^N f(\boldsymbol{0}|\boldsymbol{\theta},\mathcal{X}_{mis})I(N\ge n)\cdot g(\mathcal{X}_{obs}|\boldsymbol{\phi}).
+& \propto \binom{N}{n} \prod_{i=1}^n f(\boldsymbol{y_i}|\boldsymbol{\theta},\mathcal{X}_{obs})\prod_{n+1}^N f(\boldsymbol{0}|\boldsymbol{\theta},\mathcal{X}_{mis})I(N\ge n)\cdot g(\mathcal{X}_{obs}|\boldsymbol{\phi}).
 \end{align}
 
 Once again, in order to complete the Bayesian model, priors must be assigned to the unknown parameters $\boldsymbol{\theta}$ and N; however, we also must consider the distribution of the observed and missing covariates along with the parameter(s) governing their distribution, $\boldsymbol{\phi}$. The joint posterior can be written as,
@@ -64,6 +64,4 @@ Unfortunately, \autoref{eqn:fullposteriorderive} does not allow us to simply com
 \end{equation}
 
 To further complicate matters, the observed and unobserved covariates almost surely do not follow the same distribution as they are not missing at random. While $\boldsymbol{x_i}\in\mathcal{X}_{obs}$ or $\boldsymbol{x_i}\in\mathcal{X}_{mis}$ is defined through the observational status of its corresponding $\boldsymbol{y_i}$, all $\boldsymbol{x_i}$ in each set is drawn independently from \autoref{eqn:covariatedistribution}. Nevertheless, it is not the case that  $\boldsymbol{x_{i}|y_i\ne 0}$ or $\boldsymbol{x_{i}|y_i=0}$ will necessarily have this same distribution. In other words, if we desire samples of our missing covariates, it would be incorrect to sample simply from $g(\boldsymbol{\phi})$, but instead these values must sampled conditioned on the individual being missing.
-
-
 

@@ -3,12 +3,13 @@ output:
   pdf_document:
     includes:
       before_body: title.sty
-    keep_tex: FALSE
+    keep_tex: TRUE
     number_sections: TRUE
 fontsize: 12pt
 geometry: "left=1in,right=1in,top=1in,bottom=1in"
 urlcolor: blue
 header-includes:
+- \usepackage{sectsty}
 - \usepackage{setspace}\spacing{1}
 - \usepackage{float}
 - \usepackage{fancyhdr}
@@ -18,11 +19,9 @@ header-includes:
 - \usepackage[nottoc, numbib]{tocbibind}
 - \usepackage{paralist}
 - \usepackage{verbatim}
-- \usepackage{amsthm}
 - \usepackage{comment}
 - \usepackage{soul}
 - \usepackage{array}
-- \usepackage{sectsty}
 bibliography: dissertationbibliography.bib
 biblio-style: apalike
 ---
