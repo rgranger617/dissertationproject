@@ -3,6 +3,7 @@ title: ''
 output: pdf_document
 ---
 
+\newpage
 \section{Capture-Recapture with Covariates: The Bayesian Logistic Capture-Recapture Model with Extensions}
 \label{sec:CRwithCovariates}
 
@@ -14,7 +15,7 @@ Unlike most popular existing methods, the method presented here introduces the a
 
 Finally, a key concern of any capture-recapture framework is that the estimation is highly dependent on how the model is structured. Different situations may present important characteristics of the problem that need to be carefully considered by the practioner. With that in mind, the desire is to create a methodology that is extensible. Through the use of the full likelihood and a data augmentation approach, we are able to add extensions more readily including more robust ways of handling heterogeneity. In particular, we may be concerned with both "observable" heterogeneity, i.e. the heterogeneity that can be detected through the use of covariates, but we may also be concerned with "unobservable" heterogeneity, i.e, the heterogeneity that persists but for which no covariate information exists. One such method, presented in subsection \ref{Sec:condindependence}, allows for the modeling of this unobservable heterogeneity through the use of latent classes. This assumption also happens to break the perhaps unpalatable assumption of conditional independence mentioned before. Similarly, the covariates that are present may be numerous or may affect the estimation procedure in non-linear ways, so we extend the model to include a variable selection procedure (see subsection \ref{Sec:variableselection}). Additional extensions may be warranted given the problem, but the estimation procedure that uses data augmentation allows for extensions to be added relatively easily.
 
-To summarize, we begin with a Bayesian framework for the capture-recapture problem with covariates (see subsection \ref{Sec:CRbackground}). Next, we propose a specific model following this procedure which we call the Bayesian Logistic Regression Capture-Recapture (BLRCR) model and estimate the posterior through a Markov Chain Monte Carlo (MCMC) algorithm (see subsection \ref{Sec:BLRCRmodel}). The three remaining subsections discuss extensions to specifying the distribution of the covariates (subsection \ref{Sec:selectcovariates}), discovering unobserved heterogeneity (subsection \ref{Sec:condindependence}), and variable selection (subsection \ref{Sec:variableselection}). Within each of these subsections, simulation analysis is presented showcasing the estimation ability of the methodology.
+To summarize, we begin with a Bayesian framework for the capture-recapture problem with covariates (see subsection \ref{Sec:CRbackground}). Next, we propose a specific model following this procedure which we call the Bayesian Logistic Regression Capture-Recapture (BLRCR) model and estimate the posterior through a Markov Chain Monte Carlo (MCMC) algorithm (see subsection \ref{Sec:BLRCRmodel}). The three remaining subsections discuss extensions to specifying the distribution of the covariates (subsection \ref{Sec:selectcovariates}), discovering unobserved heterogeneity (subsection \ref{Sec:condindependence}), and variable selection (subsection \ref{Sec:variableselection}). 
 
 
 ```{r CRmodels, child = 'mainworksubsections/CRmodels.Rmd'}

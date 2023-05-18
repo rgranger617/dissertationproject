@@ -169,6 +169,7 @@ Capture-recapture refers to a series of methods that are used to estimate the si
 
 \pagenumbering{arabic}
 
+\newpage
 \section{Introduction}
 \label{sec:Introduction}
 
@@ -283,13 +284,15 @@ are addressed in subsequent sections.
 The dissertation proceeds as follows: Section \ref{Sec:litreview}
 partially reviews the relevant capture-recapture literature. Section
 \ref{sec:CRwithCovariates} details the BLRCR model along with the three
-extensions described above. This includes derivation of the posterior, a
-Markov Chain Monte Carlo (MCMC) estimation procedure, and anaylis on a
-series of simulations. Section \ref{Sec:example1} looks at Example 1.
-Section \ref{Sec:example2} looks at Example 2. Section
-\ref{Sec:Conclusion} concludes with a summary of the dissertation and
-future directions of work in this area.
+extensions described above. This includes the derivation of the
+posterior and a Markov Chain Monte Carlo (MCMC) estimation procedure.
+Section \ref{sec:simulationanalysis} contains an analysis of the
+procedure using a series of simulations. Section \ref{Sec:example1}
+looks at Example 1. Section \ref{Sec:example2} looks at Example 2.
+Section \ref{Sec:Conclusion} concludes with a summary of the
+dissertation and future directions of work in this area.
 
+\newpage
 \section{Literature Review}
 \label{Sec:litreview}
 
@@ -551,6 +554,7 @@ These alternative distributions do reveal some sensitivity to the choice
 of covariate distribution, which will be explored further in subsection
 \ref{Sec:selectcovariates}.
 
+\newpage
 \section{Capture-Recapture with Covariates: The Bayesian Logistic Capture-Recapture Model with Extensions}
 \label{sec:CRwithCovariates}
 
@@ -636,9 +640,7 @@ Markov Chain Monte Carlo (MCMC) algorithm (see subsection
 extensions to specifying the distribution of the covariates (subsection
 \ref{Sec:selectcovariates}), discovering unobserved heterogeneity
 (subsection \ref{Sec:condindependence}), and variable selection
-(subsection \ref{Sec:variableselection}). Within each of these
-subsections, simulation analysis is presented showcasing the estimation
-ability of the methodology.
+(subsection \ref{Sec:variableselection}).
 
 \subsection{Background and Preliminaries}
 \label{Sec:CRbackground}
@@ -913,379 +915,6 @@ To sample from \autoref{eqn:conditionalXmis}, we use rejection sampling of a tru
 
 \end{list}
 
-\subsubsection{Simulation Analysis}
-\label{Sec:simulationanalysis}
-
-In this section, we run numerous simulations covering a number of
-different types of situations including varying levels of list
-dependency, sizes of population, non-normal covariate distributions, and
-unobservable heterogeneity. The primary objective is to examine the
-results of the Bayesian Logistic Regression Capture-Recapture (BLRCR)
-model. Along with the BLRCR algorithm, we compare our results using four
-other capture-recapture algorithms. The first algorithm we use is
-conditional maximum likelihood logistic regression (cMLCR) which is
-implemented using the \texttt{VGAM} package in \texttt{R} (see
-subsection \ref{Sec:selectcovariates}). Instead of using the asymptotic
-estimates for the standard error and assuming normality, we use a
-semiparametric bootstrap for the confidence intervals
-\citep{zwane_implementing_2003}. Second, we implement the ubiquitous
-hierarchical log-linear (Log Linear) modelling technique
-\citep{fienberg_multiple_1972} using the the \texttt{Rcapture} package
-in \texttt{R}. Keep in mind that this approach does not use covariates,
-but attempts to model list dependency directly through list
-interactions. Since the approach is hierarchical with \(2^J\) different
-model constructions, all are calculated and the one with the lowest BIC
-is selected. Third, we use the Bayesian Non-Parametric Latent-Class
-Capture-Recapture (LCMCR) algorithm in
-\cite{manriquevallier_bayesian_2016} which is another technique that
-does not allow covariates but uses a Bayesian nonparametric approach to
-account for unobserved heterogeneity (see appendix \ref{LCMCRmodel} for
-a summary of this approach). The fourth technique is a simple
-independence model (Independent) where it is assumed there is no list or
-individual heterogeneity. Conveniently, when the number of latent
-classes is set equal to one, the LCMCR model collapses into an
-independence model, effectively giving a Bayesian independence sampler
-(Independent).
-
-We estimate \(N\) using the BLRCR model under three different
-specifications. First, we consider a single multivariate normal to
-describe the covariate distribution (\(K=1\)) and no hidden
-heterogeneity (\(H_\omega\)=1). Second, we allow for a mixture of
-multivariate normal distributions under the stick-breaking prior with a
-sufficiently large number of classes, \(K=20\), but still do not allow
-for additional unobserved heterogeneity. The third specification is
-similar to the second but now allows hidden heterogeneity with up to
-\(H_\omega=20\) different latent intercepts. Also, the BLRCR model
-requires a prior mean and covariance for the coefficients, which are set
-to
-\[\boldsymbol{b}=\boldsymbol{0} \text{ and } \boldsymbol{B}=\begin{bmatrix}
-1 & 0 & 0\\
-0 & 1 & 0\\
-0 & 0 & 1
-\end{bmatrix}.\]
-
-In addition to priors on the coefficients, BLRCR and LCMCR require
-additional hyperparameter specifications for the mixture distributions
-which can be found in \autoref{table:hyperparams}. The number of samples
-in each simulation for each algorithm is set to 10,000 unless otherwise
-stated.
-
-\begin{table}[H]
-\centering
-\begin{tabular}{||r r r||} 
-\hline
-& \multicolumn{2}{ c |}{Algorithm}\\
-\hline\hline
-Hyperparameter & SP-BLRCR & LCMCR   \\ [0.5ex] 
-\hline\hline
-$a$                      & 0.25  & 0.25  \\ 
-$b$                      & 0.25  & 0.25  \\ 
-$\nu_0$                  & 3     &  \\ 
-$\kappa_0$               & 1     &  \\ 
-$\boldsymbol{\mu_0}$     & (0,0) &  \\ [1ex]
-$\boldsymbol{\Lambda_0}$ & $\begin{bmatrix}
-1 & 0 \\
-0 & 1 
-\end{bmatrix}$ &  \\
-&&\\ [-0.25ex]
- \hline
-
-\end{tabular}
-\caption{Hyperparameter specifications for the SP-BLRCR and LCMCR algorithms.}
-\label{table:hyperparams}
-\end{table}
-
-The following subsections run simulations on data generated from
-different characteristics including levels of list dependency
-(subsection \ref{Sec:simslistdepend}), size of population (subsection
-\ref{Sec:simspopsize}), various covariate distributions (subsection
-\ref{Sec:simscovdists}), and unobservable heterogeneity (subsection
-\ref{Sec:simsunobservedheterogeneity}). The objective is to compare and
-contrast the BLRCR model with the other approaches described above. For
-each algorithm a point estimate of the population size, \(N\), is
-computed. We have some options for what to use as the point estimate,
-\(\hat{N}\), for the MCMC algorithms, but we elect to use median of the
-sampled posterior. In order to get a measure on the precision and
-accuracy model, we also compute the 95\(\%\) confidence/credible
-interval.
-
-In each subsection a table with results can be found. The column \(N\%\)
-computes the average \(\hat{N}\) across the simulations and takes it as
-a percentage of \(N\). Hence, a score of 1.000 would indicate an
-unbiased estimate. In addition, we consider the accuracy of the point
-estimate by computing the mean squared error (MSE) of the simulated
-\(\hat{N}\). We also look to the accuracy of the \(95\%\) interval
-estimate by checking whether \(N\) fell inside that interval (CI\(\%\)).
-Of course, the precision of the interval must also be considered so we
-computed the average of the simulated 95\(\%\) confidence/credible
-interval widths as a percentage of \(N\) (CI Width). Ideally, we would
-want a model with a small interval width (high precision) but maintains
-the ability to find the true population size often (high accuracy).
-
-\subsubsection{Simulations with Varying Levels of List Dependency }
-\label{Sec:simslistdepend}
-
-The objective of this subsection is to evaluate the BLRCR and other
-models under varying coefficients that induce different levels of list
-dependency. All of this list dependency is really just heterogeneity in
-the capture probabilities that can be fully explained by the covariates.
-The models that do not use covariates (Log Linear, LCMCR, and
-Independent) will not or will struggle to detect the heterogeneity
-leading to biased results. On the other hand, the BLRCR and cMLCR will
-perform well as they incorporate the covariates into their modelling.
-
-We simulate data in accordance with \autoref{eqn:logitdatacreation}
-using two covariates (\(H\)=2) and four lists (\(J=4\)). The covariates
-are drawn from two independent standard normal distributions. Three sets
-of \(\beta\) coefficients are chosen that create ``negative'',
-``moderate'', and ``positive'' dependency between the lists and are
-described in \autoref{table:1}. To clarify, all of the lists regardless
-of the coefficients are conditionally independent given the covariates.
-We simulate an additional dataset with all of the slope coefficients set
-to 0, thereby creating lists with independent capture probabilities.
-
-\begin{table}[H]
-\centering
-\begin{tabular}{||c c c c||} 
- \hline
- \multicolumn{4}{||c||}{"Negative"}\\
- \hline
- List ($j$) & $\beta_{0j}$ & $\beta_{1j}$ & $\beta_{2j}$   \\ [0.5ex] 
- \hline\hline
- 1 & -2 &  -1  & 1 \\ 
- 2 & -2 & 1  &  -1 \\
- 3 & -2 & 1  &  1 \\
- 4 & -2 &  -1  &  -1 \\
- \hline
-\end{tabular}
-\begin{tabular}{||c c c c||} 
-\hline
- \multicolumn{4}{||c||}{"Moderate"}\\
- \hline
- List ($j$) & $\beta_{0j}$ & $\beta_{1j}$ & $\beta_{2j}$   \\ [0.5ex] 
- \hline\hline
- 1 & -2 &  -1  & 1 \\ 
- 2 & -2 & 1  &  -1 \\
- 3 & -2 & -1  &  1 \\
- 4 & -2 &  1  &  -1 \\
- \hline
-\end{tabular}
-\begin{tabular}{||c c c c||} 
- \hline
- \multicolumn{4}{||c||}{"Positive"}\\
- \hline
- List ($j$) & $\beta_{0j}$ & $\beta_{1j}$ & $\beta_{2j}$   \\ [0.5ex] 
- \hline\hline
- 1 & -2 &  -1  & 1 \\ 
- 2 & -2 & -1  &  1 \\
- 3 & -2 & -1  &  1 \\
- 4 & -2 &  -1  &  1 \\
- \hline
-\end{tabular}
-\caption{Coefficients for Simulated Data}
-\label{table:1}
-\end{table}
-
-\begin{table}[H]
-\centering
-\begin{tabular}{||r l r r r r||} 
- \hline
-$\boldsymbol{\beta}$ & Method & N$\%$ &MSE & CI Width & CI $\%$   \\ [0.5ex] 
- \hline\hline
- "Moderate"    & BLRCR($K=1$, $H_\omega=1$)  & 0.983   & 82.5   & 0.156   & 94.0 \\ 
-               &  BLRCR($K=20$, $H_\omega=1$)   & 0.988     & 82.6     & 0.162     & 95.0 \\ 
-               & BLRCR($K=20$, $H_\omega=20$)    & 0.997     & 84.9     & 0.204     & 99.0 \\                
-               & cMLCR       & 1.002       & 87.1      & 0.163      & 92.0 \\
-               & Log Linear (BIC)  & 1.399      & 1669.3     & 0.458     & 0.0 \\ 
-               & LCMCR       & 0.851       & 303.4      & 0.148      & 11.0 \\ 
-               & Independent & 1.035 & 103.1& 0.157& 90.0 \\ 
-               
-
-                                  
- \hline
-"Negative"    & BLRCR($K=1$, $H_\omega=1$)  & 0.987   & 79.0   & 0.149   & 97.0 \\ 
-               & BLRCR($K=20$, $H_\omega=1$)    & 0.990     & 76.3     & 0.151     & 100.0 \\ 
-                              & BLRCR($K=20$, $H_\omega=20$)    & 1.006     & 80.5     & 0.189     & 99.0 \\                
-               & cMLCR       & 1.000       & 77.1      & 0.150      & 99.0 \\
-               & Log Linear (BIC)  & 0.999      & 81.0     & 0.159     & 98.0 \\ 
-               & LCMCR       & 1.008       & 99.3      & 0.284      & 98.0 \\ 
-               & Independent & 1.208 & 426.7& 0.206& 0.0 \\
-
- \hline
- "Positive"    & BLRCR($K=1$, $H_\omega=1$)  & 0.942   & 188.0   & 0.350   & 91.0 \\ 
-               & BLRCR($K=20$, $H_\omega=1$)    & 0.952     & 168.1     & 0.354     & 93.0 \\ 
-               & BLRCR($K=20$, $H_\omega=20$)    & 0.978     & 158.0     & 0.385     & 97.0 \\                
-               & cMLCR       & 1.025       & 207.3      & 0.389      & 94.0 \\
-               & Log Linear (BIC)  & 0.899      & 301.4     & 0.322     & 77.0 \\ 
-               & LCMCR       & 0.699       & 608.1      & 0.236      & 4.0 \\ 
-               & Independent & 0.566 & 868.4& 0.048& 0.0 \\ 
-
- \hline
- "Independent" & BLRCR($K=1$, $H_\omega=1$)  & 0.981   & 120.2   & 0.247   & 96.0 \\ 
-               & BLRCR($K=20$, $H_\omega=1$)    & 0.980     & 119.2     & 0.247     & 96.0 \\ 
-               & BLRCR($K=20$, $H_\omega=20$)    & 1.009     & 128.6     & 0.370     & 100.0 \\                
-               & cMLCR       & 1.011       & 126.6      & 0.261      & 97.0 \\
-               & Log Linear (BIC)  & 1.002      & 121.5     & 0.256     & 98.0 \\ 
-               & LCMCR       & 0.993       & 115.7      & 0.260      & 99.0 \\ 
-               & Independent & 0.989 & 115.9& 0.247& 97.0 \\ 
- \hline
-\end{tabular}
-\caption{Results of 100 capture-recapture simulations per coefficient set using $N=2000$ with "Moderate", "Negative", "Positive", and "Independent" list dependency with two standard normal covariates. }
-\label{table:diffcoefs}
-\end{table}
-
-\autoref{table:diffcoefs} shows the results from 100 simulated datasets
-for each set of coefficients, \(\beta\). While all of the models
-performed well when the slope coefficients were set to 0,
-i.e.~``Independent'', the methods using covariates (BLRCR and cMLRCR)
-showed substantially less bias than the other methods when coefficients
-impacted the capture probability, i.e.~``Moderate'', ``Negative'', and
-``Positive''. This illustrates the importance of including covariates in
-the estimation process. Nevertheless, the two methods that account for
-unknown heterogeneity, log linear and LCMCR, still performed remarkably
-well when the list dependency was set to be ``negative.'' Unfortunately,
-``positively'' induced list dependency led to a substantial decline in
-performance.
-
-\subsubsection{Simulations with Different Sized Populations}
-\label{Sec:simspopsize}
-
-In this subsection, we examine the effects of differing population sizes
-on the estimations with two objectives to evaluate in mind: performance
-and consistency. For the most part, we will see that all models will
-become less biased as the population size increases (except assuming
-independence). We will also see that using the BLRCR will tend to have a
-lower MSE than the cMLCR approach, especially with smaller population
-sizes.
-
-Data was simulated with varying population sizes,
-\(N=\){[}200,500,1000,2000,5000,10000{]}, with the results summarized in
-\autoref{table:diffsizes}. For consistency, all datasets were contructed
-using the coefficients yielding ``moderate'' dependency and with two
-standard normal covariates. Before examining the results, it should be
-pointed out that there were considerable issues with using the log
-linear approach with the smaller sample sizes. While a point estimate
-was always able to be obtained, often times, the \texttt{Rcapture}
-package would simply report a lower bound on the upper limit of the
-confidence interval. Instead of making a decision on whether to use that
-bound as the upper limit, we simply report the interval width as not
-available (NA).
-
-With this consideration in mind, we highlight a few interesting
-observations. Most importantly, the BLRCR and cMLCR methods tended to
-outperform the other methods in terms of mean squared error (MSE), 95
-\(\%\) credible interval width (CI width), and the 95\(\%\) credible
-interval capture percentage (CI \(\%\)). There were a handful of
-occasions where that was not the case but appears to be attributed to
-the choice of simulation parameters. Noteably, the independence model
-outperformed all other models when \(N=1000\), but as the population
-grew, it became substantially worse and is actually the worst option
-when \(N=10000\). Additional simulations (not shown) performed with
-different sets of coefficients revealed the independence model to be a
-substantially worse choice than BLRCR regardless of population size.
-
-A comparison of the three BLRCR methods and cMLCR reveal relatively
-similar performances across population sizes. Keep in mind, the
-simulation used in \autoref{table:diffcoefs} simply used a single
-multivariate normal with no heterogeneity. The additional noise of
-assuming an infinite mixture of normal distributions and/or
-heterogeneity in capture probabilities seems to have had little to no
-impact on the estimation.\autoref{fig:plotNvalues} shows a correlation
-plot between the 100 estimates for \(N\) using the three BLRCR methods
-and cMLCR with the true population size set to \(N=2000\). Notice, the
-estimates are highly correlated, and BLRCR tends to return smaller
-estimated values than cMLCR. An important result of
-\cite{alho_logistic_1990}, is that the cMLCR estimator is consistent but
-may be biased with small sample sizes. From the simulations, it
-certainly appears this is true for N=200, but the level of bias quickly
-disappears with N=500 and above. Similarly, the BLRCR seems to share
-this quality of consistency but the bias is greater albeit the opposite
-direction. Nevertheless, as we would expect with Bayesian methods, we
-are trading some bias for a reduction in variance. The mean squared
-error (MSE) tends to be smaller than the other methods.
-
-\begin{table}[H]
-\centering
-\begin{tabular}{||r l r r r r||} 
- \hline
-$N$ & Method & N$\%$ &MSE & CI Width & CI $\%$   \\ [0.5ex] 
- \hline\hline
- 200    & BLRCR($K=1$, $H_\omega=1$)  & 0.887   & 28.8   & 0.374   & 78.0 \\ 
-               & BLRCR($K=20$, $H_\omega=1$)    & 0.883     & 29.4     & 0.375     & 78.0 \\ 
-               & BLRCR($K=20$, $H_\omega=20$)    & 0.914     & 26.4     & 0.459     & 92.0 \\  
-               & cMLCR       & 1.057       & 36.7      & 0.635      & 96.0 \\
-               & Log Linear (BIC)  & 2.316      & 472.6     & NA     & 23.0 \\ 
-               & LCMCR       & 0.854       & 35.7      & 0.434      & 74.0 \\ 
-               & Independent & 1.004 & 22.0& 0.481& 97.0 \\ 
-
-\hline
-500    & BLRCR($K=1$, $H_\omega=1$)  & 0.940   & 44.0   & 0.271   & 91.0 \\ 
-               & BLRCR($K=20$, $H_\omega=20$)    & 0.943     & 42.7     & 0.280     & 90.0 \\ 
-               & BLRCR($K=20$, $H_\omega=20$)    & 0.966     & 37.6     & 0.342     & 96.0 \\  
-               & cMLCR       & 1.010       & 41.0      & 0.340      & 95.0 \\
-               & Log Linear (BIC)  & 2.084      & 690.8     & 1.826     & 1.0 \\ 
-               & LCMCR       & 0.840       & 84.1      & 0.253      & 43.0 \\ 
-               & Independent & 1.017 & 35.4& 0.306& 96.0 \\ 
-
-
-
-\hline
-1000    & BLRCR($K=1$, $H_\omega=1$)  & 0.972   & 58.3   & 0.210   & 93.0 \\ 
-               & BLRCR($K=$, $H_\omega=20$)    & 0.976     & 56.9     & 0.217     & 94.0 \\ 
-               & BLRCR($K=20$, $H_\omega=20$)    & 0.991     & 57.9     & 0.267     & 97.0 \\  
-               & cMLCR       & 1.008       & 60.1      & 0.235      & 95.0 \\
-               & Log Linear (BIC)  & 1.808      & 1106.6     & 0.957     & 0.0 \\ 
-               & LCMCR       & 0.852       & 154.5      & 0.190      & 20.0 \\ 
-               & Independent & 1.033 & 62.8& 0.222& 92.0 \\ 
-
-
-\hline
-2000    & BLRCR($K=1$, $H_\omega=1$)  & 0.983   & 82.5   & 0.156   & 94.0 \\ 
-               & BLRCR($K=20$, $H_\omega=1$)   & 0.988     & 82.6     & 0.162     & 95.0 \\ 
-               & BLRCR($K=20$, $H_\omega=20$)    & 0.997     & 84.9     & 0.204     & 99.0 \\  
-               & cMLCR       & 1.002       & 87.1      & 0.163      & 92.0 \\
-               & Log Linear (BIC)  & 1.399      & 1669.3     & 0.458     & 0.0 \\ 
-               & LCMCR       & 0.851       & 303.4      & 0.148      & 11.0 \\ 
-               & Independent & 1.035 & 103.1& 0.157& 90.0 \\ 
-
-
-\hline
-5000    & BLRCR($K=1$, $H_\omega=1$)  & 0.993   & 123.7   & 0.107   & 96.0 \\ 
-               & BLRCR($K=20$, $H_\omega=1$)    & 0.997     & 120.2     & 0.112     & 98.0 \\ 
-               & BLRCR($K=20$, $H_\omega=20$)    & 1.002     & 127.2     & 0.145     & 100.0 \\  
-               & cMLCR       & 1.001       & 122.1      & 0.102      & 96.0 \\
-               & Log Linear (BIC)  & 1.024      & 1651.3     & 0.326     & 62.0 \\ 
-               & LCMCR       & 0.898       & 763.4      & 0.277      & 37.0 \\ 
-               & Independent & 1.039 & 224.4& 0.100& 65.0 \\ 
-
-
-\hline
-10000    & BLRCR($K=1$, $H_\omega=1$)  & 0.996   & 174.0   & 0.084   & 97.0 \\ 
-               & BLRCR($K=20$, $H_\omega=1$)    & 0.998     & 177.0     & 0.087     & 98.0 \\ 
-               & BLRCR($K=20$, $H_\omega=20$)    & 0.997     & 197.0     & 0.109     & 99.0 \\  
-               & cMLCR       & 0.999       & 178.9      & 0.072      & 94.0 \\
-               & Log Linear (BIC)  & 1.000      & 801.5     & 0.278     & 95.0 \\ 
-               & LCMCR       & 0.957       & 1491.2      & 0.385      & 64.0 \\ 
-               & Independent & 1.039 & 420.8& 0.071& 35.0 \\ 
-\hline
-\end{tabular}
-\caption{Results of 100 capture-recapture simulations per varying population sizes using "Moderate" list dependency and two standard normal covariates. }
-\label{table:diffsizes}
-\end{table}
-
-\begin{figure}[H]
-
-{\centering \includegraphics{dissertationmain_files/figure-latex/plotNvalues-1} 
-
-}
-
-\caption{\label{fig:normalx} Correlation Plot of the 100 estimates for N using BLRCR and cMLCR when simulating from two independent standard normal distributions with moderate dependency between lists and a true population size of N=2000.}\label{fig:plotNvalues}
-\end{figure}
-
-Overall, the BLRCR model is shown to be consistent. It also tends to
-outperform or equally perform the other methods in terms of MSE, CI
-width, and CI\(\%\).
-
 \subsection{Selecting a Distribution for the Covariates}
 \label{Sec:selectcovariates}
 
@@ -1430,161 +1059,6 @@ be made more general by using Dirichlet process mixtures. As shown in
 parameter, \(\alpha \rightarrow \infty\), converges to the empirical
 distribution.
 
-\subsubsection{Simulations using Different Covariate Distributions}
-\label{Sec:simscovdists}
-
-In this subsection, we examine the impact of different covariate
-distributions and how they impact the BLRCR model's estimation. Recall,
-the BLRCR requires the specification of a covariate distribution,
-whereas the cMLCR does not. Hence, as we will see below, a
-misspecification of the covariate distribution can lead to bias in the
-inference. This bias will be reduced when using a more flexible
-covariate distribution like the infinite mixture of normal distributions
-(K=20).
-
-\autoref{table:diffdists} presents the results of 100 simulations for
-three different sets of covariate distributions. The first set of
-simulations uses the two standard normal distributions seen in the
-previous subsections. While the cMLCR algorithm is unbiased, all three
-specifications of the BLRCR algorithm yield a lower MSE. Since the
-distribution of the covariates is actually normal, it is not surprising
-that the BLRCR performs well with these simulations. On the other hand,
-we would expect the second set of covariates, two independent
-chi-square(1) distributions, to be particularly challenging. The
-chi-square distribution only has probability mass for nonnegative
-values, which creates an abrupt cutoff at 0. The third set of covariates
-includes two different Gamma distributions, Gamma(1,1) and Gamma(3,1).
-This set of covariates cuts off abruptly on one axis at 0, but not the
-other. We can therefore think of the three sets of covariates as
-``normal'', ``not normal'', and ``near/approximately normal'',
-respectively.
-
-\begin{table}[H]
-\centering
-\begin{tabular}{||r l r r r r||} 
- \hline
-Distribution & Method & N$\%$ &MSE & CI Width & CI $\%$   \\ [0.5ex] 
- \hline\hline
- Normal(0,1)   & BLRCR($K=1$, $H_\omega=1$)  & 0.983   & 82.5   & 0.156   & 94.0 \\ 
- Normal(0,1)   & BLRCR($K=20$, $H_\omega=1$)    & 0.988     & 82.6     & 0.162     & 95.0 \\ 
-               & BLRCR($K=20$, $H_\omega=20$)    & 0.997     & 84.9     & 0.204     & 99.0 \\
-               & cMLCR       & 1.002       & 87.1      & 0.163      & 92.0 \\
-               & Log Linear (BIC)  & 1.399      & 1669.3     & 0.458     & 0.0 \\ 
-               & LCMCR       & 0.851       & 303.4      & 0.148      & 11.0 \\ 
-               & Independent & 1.035 & 103.1& 0.157& 90.0 \\ 
-
-
- \hline
- Chi-Square(1)   & BLRCR($K=1$, $H_\omega=1$)  & 1.656   & 1383.4   & 0.950   & 0.0 \\ 
- Chi-Square(1)   & BLRCR($K=20$, $H_\omega=1$)    & 0.967     & 117.6     & 0.178     & 89.0 \\ 
-                 & BLRCR($K=20$, $H_\omega=20$)    & 0.986     & 148.5     & 0.241     & 90.0 \\
-               & cMLCR       & 1.008       & 104.8      & 0.183      & 92.0 \\
-               & Log Linear (BIC)  & 0.892      & 973.3     & 0.217     & 6.0 \\ 
-               & LCMCR       & 0.774       & 467.0      & 0.229      & 31.0 \\ 
-               & Independent & 0.924 & 162.8& 0.118& 32.0 \\ 
-
-
- \hline
- Gamma(1,1)    & BLRCR($K=1$,$H_\omega=1$)  & 1.020   & 90.7   & 0.156   & 94.0 \\ 
- Gamma(3,1)    & BLRCR($K=20$, $H_\omega=1$)    & 0.986     & 63.4     & 0.132     & 99.0 \\ 
-               & BLRCR($K=20$,$H_\omega=20$)    & 0.996     & 69.6     & 0.170     & 100.0 \\
-               & cMLCR       & 0.999       & 55.3      & 0.123      & 96.0 \\
-               & Log Linear (BIC)  & 1.247      & 1443.3     & 0.409     & 0.0 \\ 
-               & LCMCR       & 0.852       & 299.3      & 0.106      & 7.0 \\ 
-               & Independent & 0.863 & 276.6& 0.054& 0.0 \\ 
- \hline
-\end{tabular}
-\caption{Results of capture-recapture algorithms with simulations using different covariate distributions with "moderate" dependency between lists and N=2000.}
-\label{table:diffdists}
-\end{table}
-
-As we saw in the previous section, the BLRCR algorithm handles the
-normally distributed covariates well. For the chi-square distributed
-covariates, using a single multivariate normal for the covariates
-results in poor performance with with an approximate bias of 1.656\(\%\)
-of \(N\) when \(N=2000\). Even though the covariates are not normally
-distributed, modeling them as a mixture of normal distributions results
-in a substantial reduction in the bias for \(N\).
-\autoref{fig:covariatedists} illustrates why this may be the case
-through a partial plotting of the simulated covariates. In all plots,
-the black dots represent the individuals that are captured at least once
-in a list. The blue dots represent the individuals that are missing. In
-the first and second plot in each row, the individuals that are missing
-are simulated using the BLRCR(\(K=1\), \(H_\omega=1\)) and
-BLRCR(\(K=20\), \(H_\omega=1\)) algorithms, respectively. The third
-panel shows the true missing individuals that are unknown to the
-algorithm. With the chi-square distribution, there is no good way to fit
-a single normal variable that well represents the space. As a result,
-many missing covariates are populated into low probability density areas
-resulting in an overestimate of the missing covariates. On the other
-hand, the BLRCR(\(K=20\), \(H_\omega=1\)) with it's less rigid covariate
-assumption, populates the space much better.
-
-\begin{figure}[H]
-
-{\centering \includegraphics{dissertationmain_files/figure-latex/posteriornormalplots-1} 
-
-}
-
-\caption{\label{fig:covariatedists}Posterior Distribution of X when simulating various covariate distributions with moderate dependency between lists and N=2000.}\label{fig:posteriornormalplots}
-\end{figure}
-
-The parameters of the covariate distribution are sampled based on
-augmented covariates, not just the observed covariates. This results in
-uncertainty regarding the ability for the algorithm to correctly
-identify the covariate distribution. To put the algorithm to the test,
-we simulate an example with a mixture of three multivariate normal
-distributions. We use a population of size 2000 and the ``moderate''
-coefficients. The results of the 100 simulations can be found in
-\autoref{table:mixdist}. Despite on average nearly 50\(\%\) of
-observations being missing, the algorithm when allowing for up to
-\(K=20\) mixture normal distributions performs well. Of course, the
-cMLCR outperforms the algorithm in terms of MSE, but the BLRCR (without
-also trying to account for heterogeneity) is more precise with a smaller
-average credible interal width.
-
-\begin{table}[H]
-\centering
-\begin{tabular}{||r l r r r r||} 
- \hline
-Distribution & Method & N$\%$ &MSE & CI Width & CI $\%$   \\ [0.5ex] 
- \hline\hline
- Mixture Normal& BLRCR($K=1$,$H_\omega=1$)  & 0.931   & 160.1   & 0.163   & 67.0 \\ 
-               & BLRCR($K=20$,$H_\omega=1$)    & 0.977     & 97.9     & 0.183     & 96.0 \\ 
-               & BLRCR($K=20$,$H_\omega=20$)    & 0.989     & 96.3     & 0.228     & 99.0 \\  
-               & cMLCR       & 1.003       & 90.3      & 0.191      & 96.0 \\
-               & Log Linear (BIC)  & 1.331      & 1331.4     & 0.427     & 0.0 \\ 
-               & LCMCR       & 0.851       & 305.5      & 0.218      & 25.0 \\ 
-               & Independent & 1.007 & 80.0& 0.173& 96.0 \\ 
-
- \hline
-\end{tabular}
-\caption{Results of capture-recapture algorithms with simulations using different covariate distributions with "moderate" dependency between lists.}
-\label{table:mixdist}
-\end{table}
-
-A look at the simulated posterior of the covariates in
-\autoref{fig:mixx} shows once again the benefits of using the mixture of
-normal distributions. Using a single multivariate normal results in an
-imputation of covariates in low probability mass spaces, especially
-between the lower two mixtures. When a mixture of normal distributions
-is used, the imputation of the covariates is fairly consistent with the
-true distribution.
-
-\begin{figure}[H]
-
-{\centering \includegraphics{dissertationmain_files/figure-latex/posteriormixtureplots-1} 
-
-}
-
-\caption{\label{fig:mixx}Posterior Distribution of the missing X values using algorithm SP-BLRCR.}\label{fig:posteriormixtureplots}
-\end{figure}
-
-From this subsection, we saw that depending on the level of the
-covariate distribution misspecification, the BLRCR model may perform
-poorly. However, using a non-parametric distribution like the mixture of
-normal distributions considerably reduced the bias.
-
 \subsection{Conditional Independence and Unobserved Heterogeneity}
 \label{Sec:condindependence}
 
@@ -1695,7 +1169,571 @@ the current construction uses the concentration parameter,
 \(\alpha_\omega\), as a hyperparameter. Adding some flexibility by
 placing a prior on \(\alpha_\omega\) could prove beneficial.
 
-\subsubsection{Simulations with Unobserved Heterogeneity}
+\subsection{Proposed Extension 3: Covariate Selection}
+\label{Sec:variableselection}
+
+The covariates play an important role in how they affect the estimated
+capture probabilities that ultimately influence the estimate of the
+population size \(N\). If many covariates are present, we need a method
+for determining which covariates should be used along with possible
+interactions, which would relax the independence assumption between
+covariates. Even in the presence of a single covariate, how that
+covariate is used can have a major effect on the inference process.
+Perhaps some sort of non-linear transformation such as the log would
+give a better linear fit. A couple of strategies come to mind. First, we
+could consider some form of model averaging where multiple models are
+considered with various combinations of covariates. Alternatively, we
+could implement a prior that induces variables selection such as the
+horseshoe prior or spike and slab prior. A third possible solution is to
+perform some sort of post-hoc analysis between various fits and compute
+the Bayes factor.
+
+\newpage
+\section{Simulation Analysis}
+\label{sec:simulationanalysis}
+
+In this section, we run numerous simulations covering a number of
+different types of situations including varying levels of list
+dependency, sizes of population, non-normal covariate distributions, and
+unobservable heterogeneity. The primary objective is to examine the
+results of the Bayesian Logistic Regression Capture-Recapture (BLRCR)
+model. Along with the BLRCR algorithm, we compare our results using four
+other capture-recapture algorithms. The first algorithm we use is
+conditional maximum likelihood logistic regression (cMLCR) which is
+implemented using the \texttt{VGAM} package in \texttt{R} (see
+subsection \ref{Sec:selectcovariates}). Instead of using the asymptotic
+estimates for the standard error and assuming normality, we use a
+semiparametric bootstrap for the confidence intervals
+\citep{zwane_implementing_2003}. Second, we implement the ubiquitous
+hierarchical log-linear (Log Linear) modelling technique
+\citep{fienberg_multiple_1972} using the the \texttt{Rcapture} package
+in \texttt{R}. Keep in mind that this approach does not use covariates,
+but attempts to model list dependency directly through list
+interactions. Since the approach is hierarchical with \(2^J\) different
+model constructions, all are calculated and the one with the lowest BIC
+is selected. Third, we use the Bayesian Non-Parametric Latent-Class
+Capture-Recapture (LCMCR) algorithm in
+\cite{manriquevallier_bayesian_2016} which is another technique that
+does not allow covariates but uses a Bayesian nonparametric approach to
+account for unobserved heterogeneity (see Section \ref{LCMCRmodel}:
+Appendix C for a summary of this approach). The fourth technique is a
+simple independence model (Independent) where it is assumed there is no
+list or individual heterogeneity. Conveniently, when the number of
+latent classes is set equal to one, the LCMCR model collapses into an
+independence model, effectively giving a Bayesian independence sampler
+(Independent).
+
+We estimate \(N\) using the BLRCR model under three different
+specifications. First, we consider a single multivariate normal to
+describe the covariate distribution (\(K=1\)) and no hidden
+heterogeneity (\(H_\omega\)=1). Second, we allow for a mixture of
+multivariate normal distributions under the stick-breaking prior with a
+sufficiently large number of classes, \(K=20\), but still do not allow
+for additional unobserved heterogeneity. The third specification is
+similar to the second but now allows hidden heterogeneity with up to
+\(H_\omega=20\) different latent intercepts. Also, the BLRCR model
+requires a prior mean and covariance for the coefficients, which are set
+to
+
+\singlespacing
+
+\[\boldsymbol{b}=\boldsymbol{0} \text{ and } \boldsymbol{B}=\begin{bmatrix}
+1 & 0 & 0\\
+0 & 1 & 0\\
+0 & 0 & 1
+\end{bmatrix}.\] \doublespacing
+
+\vspace{10px}
+
+In addition to priors on the coefficients, BLRCR and LCMCR require
+additional hyperparameter specifications for the mixture distributions
+which can be found in \autoref{table:hyperparams}. The number of samples
+in each simulation for each method is set to 10,000 unless otherwise
+stated.
+
+\singlespacing
+\begin{table}[H]
+\centering
+\begin{tabular}{||r r r||} 
+\hline
+& \multicolumn{2}{ c ||}{Method}\\
+\hline
+Hyperparameter & SP-BLRCR & LCMCR   \\ [0.5ex] 
+\hline
+$a$                      & 0.25  & 0.25  \\ 
+$b$                      & 0.25  & 0.25  \\ 
+$\nu_0$                  & 3     &  \\ 
+$\kappa_0$               & 1     &  \\ 
+$\boldsymbol{\mu_0}$     & (0,0) &  \\ 
+$\boldsymbol{\Lambda_0}$ & $\begin{bmatrix}
+1 & 0 \\
+0 & 1 
+\end{bmatrix}$ &  \\
+&&\\ [-0.25ex]
+ \hline
+\end{tabular}
+\caption{Hyperparameter specifications for the SP-BLRCR and LCMCR methodologies.}
+\label{table:hyperparams}
+\end{table}
+\doublespacing
+
+The following subsections run simulations on data generated from
+different characteristics including levels of list dependency
+(subsection \ref{Sec:simslistdepend}), size of population (subsection
+\ref{Sec:simspopsize}), various covariate distributions (subsection
+\ref{Sec:simscovdists}), and unobservable heterogeneity (subsection
+\ref{Sec:simsunobservedheterogeneity}). The objective is to compare and
+contrast the BLRCR model with the other approaches described above. For
+each algorithm a point estimate of the population size, \(N\), is
+computed. We have some options for what to use as the point estimate,
+\(\hat{N}\), for the MCMC algorithms, but we elect to use median of the
+sampled posterior. In order to get a measure on the precision and
+accuracy model, we also compute the 95\(\%\) confidence/credible
+interval.
+
+In each subsection a table with results can be found. The column \(N\%\)
+computes the average \(\hat{N}\) across the simulations and takes it as
+a percentage of \(N\). Hence, a score of 1.000 would indicate an
+unbiased estimate. In addition, we consider the accuracy of the point
+estimate by computing the mean squared error (MSE) of the simulated
+\(\hat{N}\). We also look to the accuracy of the \(95\%\) interval
+estimate by checking whether \(N\) fell inside that interval (CI\(\%\)).
+Of course, the precision of the interval must also be considered so we
+computed the average of the simulated 95\(\%\) confidence/credible
+interval widths as a percentage of \(N\) (CI Width). Ideally, we would
+want a model with a small interval width (high precision) but maintains
+the ability to find the true population size often (high accuracy).
+
+\subsection{Simulations with Different Sized Populations}
+\label{Sec:simspopsize}
+
+In this subsection, we examine the effects of differing population sizes
+on the estimations with two objectives to evaluate in mind: performance
+and consistency. For the most part, we will see that all models will
+become less biased as the population size increases (except assuming
+independence). We will also see that using the BLRCR will tend to have a
+lower MSE than the cMLCR approach, especially with smaller population
+sizes.
+
+Data was simulated with varying population sizes,
+\(N=\){[}200,500,1000,2000,5000,10000{]}, with the results summarized in
+\autoref{table:diffsizes}. For consistency, all datasets were contructed
+using the coefficients yielding ``moderate'' dependency and with two
+standard normal covariates. Before examining the results, it should be
+pointed out that there were considerable issues with using the log
+linear approach with the smaller sample sizes. While a point estimate
+was always able to be obtained, often times, the \texttt{Rcapture}
+package would simply report a lower bound on the upper limit of the
+confidence interval. Instead of making a decision on whether to use that
+bound as the upper limit, we simply report the interval width as not
+available (NA).
+
+With this consideration in mind, we highlight a few interesting
+observations. Most importantly, the BLRCR and cMLCR methods tended to
+outperform the other methods in terms of mean squared error (MSE), 95
+\(\%\) credible interval width (CI width), and the 95\(\%\) credible
+interval capture percentage (CI \(\%\)). There were a handful of
+occasions where that was not the case but appears to be attributed to
+the choice of simulation parameters. Noteably, the independence model
+outperformed all other models when \(N=1000\), but as the population
+grew, it became substantially worse and is actually the worst option
+when \(N=10000\). Additional simulations (not shown) performed with
+different sets of coefficients revealed the independence model to be a
+substantially worse choice than BLRCR regardless of population size.
+
+A comparison of the three BLRCR methods and cMLCR reveal relatively
+similar performances across population sizes. Keep in mind, the
+simulation used in \autoref{table:diffcoefs} simply used a single
+multivariate normal with no heterogeneity. The additional noise of
+assuming an infinite mixture of normal distributions and/or
+heterogeneity in capture probabilities seems to have had little to no
+impact on the estimation.\autoref{fig:plotNvalues} shows a correlation
+plot between the 100 estimates for \(N\) using the three BLRCR methods
+and cMLCR with the true population size set to \(N=2000\). Notice, the
+estimates are highly correlated, and BLRCR tends to return smaller
+estimated values than cMLCR. An important result of
+\cite{alho_logistic_1990}, is that the cMLCR estimator is consistent but
+may be biased with small sample sizes. From the simulations, it
+certainly appears this is true for N=200, but the level of bias quickly
+disappears with N=500 and above. Similarly, the BLRCR seems to share
+this quality of consistency but the bias is greater albeit the opposite
+direction. Nevertheless, as we would expect with Bayesian methods, we
+are trading some bias for a reduction in variance. The mean squared
+error (MSE) tends to be smaller than the other methods.
+
+\singlespacing
+\begin{table}[H]
+\centering
+\begin{tabular}{||r l r r r r||} 
+ \hline
+$N$ & Method & N$\%$ &MSE & CI Width & CI $\%$   \\ [0.5ex] 
+ \hline\hline
+ 200    & BLRCR($K=1$, $H_\omega=1$)  & 0.887   & 28.8   & 0.374   & 78.0 \\ 
+               & BLRCR($K=20$, $H_\omega=1$)    & 0.883     & 29.4     & 0.375     & 78.0 \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & 0.914     & 26.4     & 0.459     & 92.0 \\  
+               & cMLCR       & 1.057       & 36.7      & 0.635      & 96.0 \\
+               & Log Linear (BIC)  & 2.316      & 472.6     & NA     & 23.0 \\ 
+               & LCMCR       & 0.854       & 35.7      & 0.434      & 74.0 \\ 
+               & Independent & 1.004 & 22.0& 0.481& 97.0 \\ 
+
+\hline
+500    & BLRCR($K=1$, $H_\omega=1$)  & 0.940   & 44.0   & 0.271   & 91.0 \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & 0.943     & 42.7     & 0.280     & 90.0 \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & 0.966     & 37.6     & 0.342     & 96.0 \\  
+               & cMLCR       & 1.010       & 41.0      & 0.340      & 95.0 \\
+               & Log Linear (BIC)  & 2.084      & 690.8     & 1.826     & 1.0 \\ 
+               & LCMCR       & 0.840       & 84.1      & 0.253      & 43.0 \\ 
+               & Independent & 1.017 & 35.4& 0.306& 96.0 \\ 
+
+
+
+\hline
+1000    & BLRCR($K=1$, $H_\omega=1$)  & 0.972   & 58.3   & 0.210   & 93.0 \\ 
+               & BLRCR($K=$, $H_\omega=20$)    & 0.976     & 56.9     & 0.217     & 94.0 \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & 0.991     & 57.9     & 0.267     & 97.0 \\  
+               & cMLCR       & 1.008       & 60.1      & 0.235      & 95.0 \\
+               & Log Linear (BIC)  & 1.808      & 1106.6     & 0.957     & 0.0 \\ 
+               & LCMCR       & 0.852       & 154.5      & 0.190      & 20.0 \\ 
+               & Independent & 1.033 & 62.8& 0.222& 92.0 \\ 
+
+
+\hline
+2000    & BLRCR($K=1$, $H_\omega=1$)  & 0.983   & 82.5   & 0.156   & 94.0 \\ 
+               & BLRCR($K=20$, $H_\omega=1$)   & 0.988     & 82.6     & 0.162     & 95.0 \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & 0.997     & 84.9     & 0.204     & 99.0 \\  
+               & cMLCR       & 1.002       & 87.1      & 0.163      & 92.0 \\
+               & Log Linear (BIC)  & 1.399      & 1669.3     & 0.458     & 0.0 \\ 
+               & LCMCR       & 0.851       & 303.4      & 0.148      & 11.0 \\ 
+               & Independent & 1.035 & 103.1& 0.157& 90.0 \\ 
+
+
+\hline
+5000    & BLRCR($K=1$, $H_\omega=1$)  & 0.993   & 123.7   & 0.107   & 96.0 \\ 
+               & BLRCR($K=20$, $H_\omega=1$)    & 0.997     & 120.2     & 0.112     & 98.0 \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & 1.002     & 127.2     & 0.145     & 100.0 \\  
+               & cMLCR       & 1.001       & 122.1      & 0.102      & 96.0 \\
+               & Log Linear (BIC)  & 1.024      & 1651.3     & 0.326     & 62.0 \\ 
+               & LCMCR       & 0.898       & 763.4      & 0.277      & 37.0 \\ 
+               & Independent & 1.039 & 224.4& 0.100& 65.0 \\ 
+
+
+\hline
+10000    & BLRCR($K=1$, $H_\omega=1$)  & 0.996   & 174.0   & 0.084   & 97.0 \\ 
+               & BLRCR($K=20$, $H_\omega=1$)    & 0.998     & 177.0     & 0.087     & 98.0 \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & 0.997     & 197.0     & 0.109     & 99.0 \\  
+               & cMLCR       & 0.999       & 178.9      & 0.072      & 94.0 \\
+               & Log Linear (BIC)  & 1.000      & 801.5     & 0.278     & 95.0 \\ 
+               & LCMCR       & 0.957       & 1491.2      & 0.385      & 64.0 \\ 
+               & Independent & 1.039 & 420.8& 0.071& 35.0 \\ 
+\hline
+\end{tabular}
+\caption{Results of 100 capture-recapture simulations per varying population sizes using "Moderate" list dependency and two standard normal covariates. }
+\label{table:diffsizes}
+\end{table}
+\doublespacing
+
+\begin{figure}[H]
+
+{\centering \includegraphics{dissertationmain_files/figure-latex/plotNvalues-1} 
+
+}
+
+\caption{\label{fig:normalx} Correlation Plot of the 100 estimates for N using BLRCR and cMLCR when simulating from two independent standard normal distributions with moderate dependency between lists and a true population size of N=2000.}\label{fig:plotNvalues}
+\end{figure}
+
+Overall, the BLRCR model is shown to be consistent. It also tends to
+outperform or equally perform the other methods in terms of MSE, CI
+width, and CI\(\%\).
+
+\subsection{Simulations with Varying Levels of List Dependency }
+\label{Sec:simslistdepend}
+
+The objective of this subsection is to evaluate the BLRCR and other
+models under varying coefficients that induce different levels of list
+dependency. All of this list dependency is really just heterogeneity in
+the capture probabilities that can be fully explained by the covariates.
+The models that do not use covariates (Log Linear, LCMCR, and
+Independent) will not or will struggle to detect the heterogeneity
+leading to biased results. On the other hand, the BLRCR and cMLCR will
+perform well as they incorporate the covariates into their modelling.
+
+We simulate data in accordance with \autoref{eqn:logitdatacreation}
+using two covariates (\(H\)=2) and four lists (\(J=4\)). The covariates
+are drawn from two independent standard normal distributions. Three sets
+of \(\beta\) coefficients are chosen that create ``negative'',
+``moderate'', and ``positive'' dependency between the lists and are
+described in \autoref{table:1}. To clarify, all of the lists regardless
+of the coefficients are conditionally independent given the covariates.
+We simulate an additional dataset with all of the slope coefficients set
+to 0, thereby creating lists with independent capture probabilities.
+
+\singlespacing
+\begin{table}[H]
+\centering
+\begin{tabular}{||c c c c||} 
+ \hline
+ \multicolumn{4}{||c||}{"Negative"}\\
+ \hline
+ List ($j$) & $\beta_{0j}$ & $\beta_{1j}$ & $\beta_{2j}$   \\ [0.5ex] 
+ \hline\hline
+ 1 & -2 &  -1  & 1 \\ 
+ 2 & -2 & 1  &  -1 \\
+ 3 & -2 & 1  &  1 \\
+ 4 & -2 &  -1  &  -1 \\
+ \hline
+\end{tabular}
+\begin{tabular}{||c c c c||} 
+\hline
+ \multicolumn{4}{||c||}{"Moderate"}\\
+ \hline
+ List ($j$) & $\beta_{0j}$ & $\beta_{1j}$ & $\beta_{2j}$   \\ [0.5ex] 
+ \hline\hline
+ 1 & -2 &  -1  & 1 \\ 
+ 2 & -2 & 1  &  -1 \\
+ 3 & -2 & -1  &  1 \\
+ 4 & -2 &  1  &  -1 \\
+ \hline
+\end{tabular}
+\begin{tabular}{||c c c c||} 
+ \hline
+ \multicolumn{4}{||c||}{"Positive"}\\
+ \hline
+ List ($j$) & $\beta_{0j}$ & $\beta_{1j}$ & $\beta_{2j}$   \\ [0.5ex] 
+ \hline\hline
+ 1 & -2 &  -1  & 1 \\ 
+ 2 & -2 & -1  &  1 \\
+ 3 & -2 & -1  &  1 \\
+ 4 & -2 &  -1  &  1 \\
+ \hline
+\end{tabular}
+\caption{Coefficients for Simulated Data}
+\label{table:1}
+\end{table}
+\doublespacing
+
+\singlespacing
+\begin{table}[H]
+\centering
+\begin{tabular}{||r l r r r r||} 
+ \hline
+$\boldsymbol{\beta}$ & Method & N$\%$ &MSE & CI Width & CI $\%$   \\ [0.5ex] 
+ \hline\hline
+ "Moderate"    & BLRCR($K=1$, $H_\omega=1$)  & 0.983   & 82.5   & 0.156   & 94.0 \\ 
+               &  BLRCR($K=20$, $H_\omega=1$)   & 0.988     & 82.6     & 0.162     & 95.0 \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & 0.997     & 84.9     & 0.204     & 99.0 \\                
+               & cMLCR       & 1.002       & 87.1      & 0.163      & 92.0 \\
+               & Log Linear (BIC)  & 1.399      & 1669.3     & 0.458     & 0.0 \\ 
+               & LCMCR       & 0.851       & 303.4      & 0.148      & 11.0 \\ 
+               & Independent & 1.035 & 103.1& 0.157& 90.0 \\ 
+               
+
+                                  
+ \hline
+"Negative"    & BLRCR($K=1$, $H_\omega=1$)  & 0.987   & 79.0   & 0.149   & 97.0 \\ 
+               & BLRCR($K=20$, $H_\omega=1$)    & 0.990     & 76.3     & 0.151     & 100.0 \\ 
+                              & BLRCR($K=20$, $H_\omega=20$)    & 1.006     & 80.5     & 0.189     & 99.0 \\                
+               & cMLCR       & 1.000       & 77.1      & 0.150      & 99.0 \\
+               & Log Linear (BIC)  & 0.999      & 81.0     & 0.159     & 98.0 \\ 
+               & LCMCR       & 1.008       & 99.3      & 0.284      & 98.0 \\ 
+               & Independent & 1.208 & 426.7& 0.206& 0.0 \\
+
+ \hline
+ "Positive"    & BLRCR($K=1$, $H_\omega=1$)  & 0.942   & 188.0   & 0.350   & 91.0 \\ 
+               & BLRCR($K=20$, $H_\omega=1$)    & 0.952     & 168.1     & 0.354     & 93.0 \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & 0.978     & 158.0     & 0.385     & 97.0 \\                
+               & cMLCR       & 1.025       & 207.3      & 0.389      & 94.0 \\
+               & Log Linear (BIC)  & 0.899      & 301.4     & 0.322     & 77.0 \\ 
+               & LCMCR       & 0.699       & 608.1      & 0.236      & 4.0 \\ 
+               & Independent & 0.566 & 868.4& 0.048& 0.0 \\ 
+
+ \hline
+ "Independent" & BLRCR($K=1$, $H_\omega=1$)  & 0.981   & 120.2   & 0.247   & 96.0 \\ 
+               & BLRCR($K=20$, $H_\omega=1$)    & 0.980     & 119.2     & 0.247     & 96.0 \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & 1.009     & 128.6     & 0.370     & 100.0 \\                
+               & cMLCR       & 1.011       & 126.6      & 0.261      & 97.0 \\
+               & Log Linear (BIC)  & 1.002      & 121.5     & 0.256     & 98.0 \\ 
+               & LCMCR       & 0.993       & 115.7      & 0.260      & 99.0 \\ 
+               & Independent & 0.989 & 115.9& 0.247& 97.0 \\ 
+ \hline
+\end{tabular}
+\caption{Results of 100 capture-recapture simulations per coefficient set using $N=2000$ with "Moderate", "Negative", "Positive", and "Independent" list dependency with two standard normal covariates. }
+\label{table:diffcoefs}
+\end{table}
+\doublespacing
+
+\autoref{table:diffcoefs} shows the results from 100 simulated datasets
+for each set of coefficients, \(\beta\). While all of the models
+performed well when the slope coefficients were set to 0,
+i.e.~``Independent'', the methods using covariates (BLRCR and cMLRCR)
+showed substantially less bias than the other methods when coefficients
+impacted the capture probability, i.e.~``Moderate'', ``Negative'', and
+``Positive''. This illustrates the importance of including covariates in
+the estimation process. Nevertheless, the two methods that account for
+unknown heterogeneity, log linear and LCMCR, still performed remarkably
+well when the list dependency was set to be ``negative.'' Unfortunately,
+``positively'' induced list dependency led to a substantial decline in
+performance.
+
+\subsection{Simulations using Different Covariate Distributions}
+\label{Sec:simscovdists}
+
+In this subsection, we examine the impact of different covariate
+distributions and how they impact the BLRCR model's estimation. Recall,
+the BLRCR requires the specification of a covariate distribution,
+whereas the cMLCR does not. Hence, as we will see below, a
+misspecification of the covariate distribution can lead to bias in the
+inference. This bias will be reduced when using a more flexible
+covariate distribution like the infinite mixture of normal distributions
+(K=20).
+
+\autoref{table:diffdists} presents the results of 100 simulations for
+three different sets of covariate distributions. The first set of
+simulations uses the two standard normal distributions seen in the
+previous subsections. While the cMLCR algorithm is unbiased, all three
+specifications of the BLRCR algorithm yield a lower MSE. Since the
+distribution of the covariates is actually normal, it is not surprising
+that the BLRCR performs well with these simulations. On the other hand,
+we would expect the second set of covariates, two independent
+chi-square(1) distributions, to be particularly challenging. The
+chi-square distribution only has probability mass for nonnegative
+values, which creates an abrupt cutoff at 0. The third set of covariates
+includes two different Gamma distributions, Gamma(1,1) and Gamma(3,1).
+This set of covariates cuts off abruptly on one axis at 0, but not the
+other. We can therefore think of the three sets of covariates as
+``normal'', ``not normal'', and ``near/approximately normal'',
+respectively.
+
+\singlespacing
+\begin{table}[H]
+\centering
+\begin{tabular}{||r l r r r r||} 
+ \hline
+Distribution & Method & N$\%$ &MSE & CI Width & CI $\%$   \\ [0.5ex] 
+ \hline\hline
+ Normal(0,1)   & BLRCR($K=1$, $H_\omega=1$)  & 0.983   & 82.5   & 0.156   & 94.0 \\ 
+ Normal(0,1)   & BLRCR($K=20$, $H_\omega=1$)    & 0.988     & 82.6     & 0.162     & 95.0 \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & 0.997     & 84.9     & 0.204     & 99.0 \\
+               & cMLCR       & 1.002       & 87.1      & 0.163      & 92.0 \\
+               & Log Linear (BIC)  & 1.399      & 1669.3     & 0.458     & 0.0 \\ 
+               & LCMCR       & 0.851       & 303.4      & 0.148      & 11.0 \\ 
+               & Independent & 1.035 & 103.1& 0.157& 90.0 \\ 
+
+
+ \hline
+ Chi-Square(1)   & BLRCR($K=1$, $H_\omega=1$)  & 1.656   & 1383.4   & 0.950   & 0.0 \\ 
+ Chi-Square(1)   & BLRCR($K=20$, $H_\omega=1$)    & 0.967     & 117.6     & 0.178     & 89.0 \\ 
+                 & BLRCR($K=20$, $H_\omega=20$)    & 0.986     & 148.5     & 0.241     & 90.0 \\
+               & cMLCR       & 1.008       & 104.8      & 0.183      & 92.0 \\
+               & Log Linear (BIC)  & 0.892      & 973.3     & 0.217     & 6.0 \\ 
+               & LCMCR       & 0.774       & 467.0      & 0.229      & 31.0 \\ 
+               & Independent & 0.924 & 162.8& 0.118& 32.0 \\ 
+
+
+ \hline
+ Gamma(1,1)    & BLRCR($K=1$,$H_\omega=1$)  & 1.020   & 90.7   & 0.156   & 94.0 \\ 
+ Gamma(3,1)    & BLRCR($K=20$, $H_\omega=1$)    & 0.986     & 63.4     & 0.132     & 99.0 \\ 
+               & BLRCR($K=20$,$H_\omega=20$)    & 0.996     & 69.6     & 0.170     & 100.0 \\
+               & cMLCR       & 0.999       & 55.3      & 0.123      & 96.0 \\
+               & Log Linear (BIC)  & 1.247      & 1443.3     & 0.409     & 0.0 \\ 
+               & LCMCR       & 0.852       & 299.3      & 0.106      & 7.0 \\ 
+               & Independent & 0.863 & 276.6& 0.054& 0.0 \\ 
+ \hline
+\end{tabular}
+\caption{Results of capture-recapture algorithms with simulations using different covariate distributions with "moderate" dependency between lists and N=2000.}
+\label{table:diffdists}
+\end{table}
+\doublespacing
+
+As we saw in the previous section, the BLRCR algorithm handles the
+normally distributed covariates well. For the chi-square distributed
+covariates, using a single multivariate normal for the covariates
+results in poor performance with with an approximate bias of 1.656\(\%\)
+of \(N\) when \(N=2000\). Even though the covariates are not normally
+distributed, modeling them as a mixture of normal distributions results
+in a substantial reduction in the bias for \(N\).
+\autoref{fig:covariatedists} illustrates why this may be the case
+through a partial plotting of the simulated covariates. In all plots,
+the black dots represent the individuals that are captured at least once
+in a list. The blue dots represent the individuals that are missing. In
+the first and second plot in each row, the individuals that are missing
+are simulated using the BLRCR(\(K=1\), \(H_\omega=1\)) and
+BLRCR(\(K=20\), \(H_\omega=1\)) algorithms, respectively. The third
+panel shows the true missing individuals that are unknown to the
+algorithm. With the chi-square distribution, there is no good way to fit
+a single normal variable that well represents the space. As a result,
+many missing covariates are populated into low probability density areas
+resulting in an overestimate of the missing covariates. On the other
+hand, the BLRCR(\(K=20\), \(H_\omega=1\)) with it's less rigid covariate
+assumption, populates the space much better.
+
+\begin{figure}[H]
+
+{\centering \includegraphics{dissertationmain_files/figure-latex/posteriornormalplots-1} 
+
+}
+
+\caption{\label{fig:covariatedists}Posterior Distribution of X when simulating various covariate distributions with moderate dependency between lists and N=2000.}\label{fig:posteriornormalplots}
+\end{figure}
+
+The parameters of the covariate distribution are sampled based on
+augmented covariates, not just the observed covariates. This results in
+uncertainty regarding the ability for the algorithm to correctly
+identify the covariate distribution. To put the algorithm to the test,
+we simulate an example with a mixture of three multivariate normal
+distributions. We use a population of size 2000 and the ``moderate''
+coefficients. The results of the 100 simulations can be found in
+\autoref{table:mixdist}. Despite on average nearly 50\(\%\) of
+observations being missing, the algorithm when allowing for up to
+\(K=20\) mixture normal distributions performs well. Of course, the
+cMLCR outperforms the algorithm in terms of MSE, but the BLRCR (without
+also trying to account for heterogeneity) is more precise with a smaller
+average credible interal width.
+
+\singlespacing
+\begin{table}[H]
+\centering
+\begin{tabular}{||r l r r r r||} 
+ \hline
+Distribution & Method & N$\%$ &MSE & CI Width & CI $\%$   \\ [0.5ex] 
+ \hline\hline
+ Mixture Normal& BLRCR($K=1$,$H_\omega=1$)  & 0.931   & 160.1   & 0.163   & 67.0 \\ 
+               & BLRCR($K=20$,$H_\omega=1$)    & 0.977     & 97.9     & 0.183     & 96.0 \\ 
+               & BLRCR($K=20$,$H_\omega=20$)    & 0.989     & 96.3     & 0.228     & 99.0 \\  
+               & cMLCR       & 1.003       & 90.3      & 0.191      & 96.0 \\
+               & Log Linear (BIC)  & 1.331      & 1331.4     & 0.427     & 0.0 \\ 
+               & LCMCR       & 0.851       & 305.5      & 0.218      & 25.0 \\ 
+               & Independent & 1.007 & 80.0& 0.173& 96.0 \\ 
+
+ \hline
+\end{tabular}
+\caption{Results of capture-recapture algorithms with simulations using different covariate distributions with "moderate" dependency between lists.}
+\label{table:mixdist}
+\end{table}
+\doublespacing
+
+A look at the simulated posterior of the covariates in
+\autoref{fig:mixx} shows once again the benefits of using the mixture of
+normal distributions. Using a single multivariate normal results in an
+imputation of covariates in low probability mass spaces, especially
+between the lower two mixtures. When a mixture of normal distributions
+is used, the imputation of the covariates is fairly consistent with the
+true distribution.
+
+\begin{figure}[H]
+
+{\centering \includegraphics{dissertationmain_files/figure-latex/posteriormixtureplots-1} 
+
+}
+
+\caption{\label{fig:mixx}Posterior Distribution of the missing X values using algorithm SP-BLRCR.}\label{fig:posteriormixtureplots}
+\end{figure}
+
+From this subsection, we saw that depending on the level of the
+covariate distribution misspecification, the BLRCR model may perform
+poorly. However, using a non-parametric distribution like the mixture of
+normal distributions considerably reduced the bias.
+
+\subsection{Simulations with Unobserved Heterogeneity}
 \label{Sec:simsunobservedheterogeneity}
 
 The final set of simulations is to demonstrate the importance of
@@ -1722,6 +1760,7 @@ probabilities would still be conditionally independent; however, since
 these covariates are unobserved, the list probabilities are no longer
 conditionally independent given the observed data.
 
+\singlespacing
 \begin{table}[H]
 \centering
 \begin{tabular}{||c c c c||} 
@@ -1736,6 +1775,7 @@ conditionally independent given the observed data.
 \caption{Coefficients for Heterogeneity Simulated Data}
 \label{table:heterocoefs}
 \end{table}
+\doublespacing
 
 \autoref{table:heterodist} shows the results of 100 simulations on four
 different population sizes. It becomes obvious that not accounting for
@@ -1780,6 +1820,7 @@ detect the heterogeneity, it will induce bias. When the heterogeneity is
 stronger, the model is more likely to detect this heterogeneity and
 account for it properly.
 
+\singlespacing
 \begin{table}[H]
 \centering
 \begin{tabular}{||r l r r r r||} 
@@ -1842,6 +1883,7 @@ N & Method & N$\%$ &MSE & CI Width & CI $\%$   \\ [0.5ex]
 \caption{Results of 100 capture-recapture simulations per algorithm using a standard normal distribution distribution for the known covariate and 0.35 probability of belonging to the latent class.}
 \label{table:heterodist}
 \end{table}
+\doublespacing
 
 \begin{figure}[H]
 
@@ -1876,30 +1918,15 @@ well. On the other hand, When the unobserved heterogeneity is strong,
 the bias in \(N\) will be relatively larger, but the ability to detect
 and properly account for this heterogeneity increases.
 
-\subsection{Proposed Extension 3: Covariate Selection}
-\label{Sec:variableselection}
-
-The covariates play an important role in how they affect the estimated
-capture probabilities that ultimately influence the estimate of the
-population size \(N\). If many covariates are present, we need a method
-for determining which covariates should be used along with possible
-interactions, which would relax the independence assumption between
-covariates. Even in the presence of a single covariate, how that
-covariate is used can have a major effect on the inference process.
-Perhaps some sort of non-linear transformation such as the log would
-give a better linear fit. A couple of strategies come to mind. First, we
-could consider some form of model averaging where multiple models are
-considered with various combinations of covariates. Alternatively, we
-could implement a prior that induces variables selection such as the
-horseshoe prior or spike and slab prior. A third possible solution is to
-perform some sort of post-hoc analysis between various fits and compute
-the Bayes factor.
-
+\newpage
 \section{Example 1 (probably superhero)}
 \label{Sec:example1}
 
+\newpage
 \section{Example 2 (find something real even if we don't know the answer)}
 \label{Sec:example2}
+
+\newpage
 
 \section{Conclusion}
 \label{Sec:Conclusion}

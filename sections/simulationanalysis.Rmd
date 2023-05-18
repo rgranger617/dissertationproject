@@ -1,0 +1,95 @@
+---
+title: ''
+output: pdf_document
+---
+
+\newpage
+\section{Simulation Analysis}
+\label{sec:simulationanalysis}
+
+ 
+```{r simulatedata}
+library(mvtnorm) #needed for multivariate normal
+library(MCMCpack) #needed for inverse wishart
+library(BayesLogit) #pollygamma sampling
+library(cubature) #numerical integration
+library(MASS)
+library(LCMCR)
+library(ellipse) #helpful for plotting ellipses
+library(ggplot2)
+library(GGally)
+library(dplyr)
+
+RMSE <- function(x,N){
+  sqrt(mean((x-N)^2))
+}
+
+#Load simdata
+simdat<-readRDS("simulationsubsections/simdata/simdata11122022.rds")
+simdat=simdat[complete.cases(simdat),]
+simdat$N = as.numeric(simdat$N)
+simdat$n = as.numeric(simdat$n)
+
+
+#remove NA
+#simdat=simdat[-which(is.na(simdat$N)),]
+```
+
+In this section, we run numerous simulations covering a number of different types of situations including varying levels of list dependency, sizes of population, non-normal covariate distributions, and unobservable heterogeneity. The primary objective is to examine the results of the Bayesian Logistic Regression Capture-Recapture (BLRCR) model. Along with the BLRCR algorithm, we compare our results using four other capture-recapture algorithms. The first algorithm we use is conditional maximum likelihood logistic regression (cMLCR) which is implemented using the \texttt{VGAM} package in \texttt{R} (see subsection \ref{Sec:selectcovariates}).  Instead of using the asymptotic estimates for the standard error and assuming normality, we use a semiparametric bootstrap for the confidence intervals \citep{zwane_implementing_2003}. Second, we implement the ubiquitous hierarchical log-linear (Log Linear) modelling technique \citep{fienberg_multiple_1972} using the the \texttt{Rcapture} package in \texttt{R}. Keep in mind that this approach does not use covariates, but attempts to model list dependency directly through list interactions. Since the approach is hierarchical with $2^J$ different model constructions, all are calculated and the one with the lowest BIC is selected. Third, we use the Bayesian Non-Parametric Latent-Class Capture-Recapture (LCMCR) algorithm in \cite{manriquevallier_bayesian_2016} which is another technique that does not allow covariates but uses a Bayesian nonparametric approach to account for unobserved heterogeneity (see Section \ref{LCMCRmodel}: Appendix C for a summary of this approach). The fourth technique is a simple independence model (Independent) where it is assumed there is no list or individual heterogeneity. Conveniently, when the number of latent classes is set equal to one, the LCMCR model collapses into an independence model, effectively giving a Bayesian independence sampler (Independent).
+
+We estimate $N$ using the BLRCR model under three different specifications.  First, we consider a single multivariate normal to describe the covariate distribution ($K=1$) and no hidden heterogeneity ($H_\omega$=1).  Second, we allow for a mixture of multivariate normal distributions under the stick-breaking prior with a sufficiently large number of classes, $K=20$, but still do not allow for additional unobserved heterogeneity.  The third specification is similar to the second but now allows hidden heterogeneity with up to $H_\omega=20$ different latent intercepts. Also, the BLRCR model requires a prior mean and covariance for the coefficients, which are set to
+
+\singlespacing
+$$\boldsymbol{b}=\boldsymbol{0} \text{ and } \boldsymbol{B}=\begin{bmatrix}
+1 & 0 & 0\\
+0 & 1 & 0\\
+0 & 0 & 1
+\end{bmatrix}.$$
+\doublespacing
+
+\vspace{10px}
+
+In addition to priors on the coefficients, BLRCR and LCMCR require additional hyperparameter specifications for the mixture distributions which can be found in \autoref{table:hyperparams}.  The number of samples in each simulation for each method is set to 10,000 unless otherwise stated. 
+
+\singlespacing
+\begin{table}[H]
+\centering
+\begin{tabular}{||r r r||} 
+\hline
+& \multicolumn{2}{ c ||}{Method}\\
+\hline
+Hyperparameter & SP-BLRCR & LCMCR   \\ [0.5ex] 
+\hline
+$a$                      & 0.25  & 0.25  \\ 
+$b$                      & 0.25  & 0.25  \\ 
+$\nu_0$                  & 3     &  \\ 
+$\kappa_0$               & 1     &  \\ 
+$\boldsymbol{\mu_0}$     & (0,0) &  \\ 
+$\boldsymbol{\Lambda_0}$ & $\begin{bmatrix}
+1 & 0 \\
+0 & 1 
+\end{bmatrix}$ &  \\
+&&\\ [-0.25ex]
+ \hline
+\end{tabular}
+\caption{Hyperparameter specifications for the SP-BLRCR and LCMCR methodologies.}
+\label{table:hyperparams}
+\end{table}
+\doublespacing
+
+The following subsections run simulations on data generated from different characteristics including levels of list dependency (subsection \ref{Sec:simslistdepend}), size of population (subsection \ref{Sec:simspopsize}), various covariate distributions (subsection \ref{Sec:simscovdists}), and unobservable heterogeneity (subsection \ref{Sec:simsunobservedheterogeneity}).  The objective is to compare and contrast the BLRCR model with the other approaches described above. For each algorithm a point estimate of the population size, $N$, is computed. We have some options for what to use as the point estimate, $\hat{N}$, for the MCMC algorithms, but we elect to use median of the sampled posterior. In order to get a measure on the precision and accuracy model, we also compute the 95$\%$ confidence/credible interval.
+
+In each subsection a table with results can be found. The column $N\%$ computes the average $\hat{N}$ across the simulations and takes it as a percentage of $N$.  Hence, a score of 1.000 would indicate an unbiased estimate. In addition, we consider the accuracy of the point estimate by computing the mean squared error (MSE) of the simulated $\hat{N}$. We also look to the accuracy of the $95\%$ interval estimate by checking whether $N$ fell inside that interval (CI$\%$). Of course, the precision of the interval must also be considered so we computed the average of the simulated 95$\%$ confidence/credible interval widths as a percentage of $N$ (CI Width).  Ideally, we would want a model with a small interval width (high precision) but maintains the ability to find the true population size often (high accuracy).
+
+
+```{r selectcovariates, child = 'simulationsubsections/diffpopsizes.Rmd'}
+```
+
+```{r selectcovariates, child = 'simulationsubsections/difflevelsdependency.Rmd'}
+```
+
+```{r selectcovariates, child = 'simulationsubsections/diffcovariatedistributions.Rmd'}
+```
+
+```{r selectcovariates, child = 'simulationsubsections/unobservedheterogeneity.Rmd'}
+```

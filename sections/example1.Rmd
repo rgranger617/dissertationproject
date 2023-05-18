@@ -1,2 +1,3 @@
+\newpage
 \section{Example 1 (probably superhero)}
 \label{Sec:example1}
