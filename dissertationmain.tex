@@ -983,12 +983,12 @@ Deciding on a proposal distribution based upon the observed distribution
 can be also dangerous or misleading as the observed distribution is a
 truncation of the true distribution. Not only are the missing covariates
 not missing at random but we do not even know how many are missing. As
-we will shown in section \ref{Sec:simulations}, mispecifying the
+we will shown in subsection \ref{Sec:simscovdists}, mispecifying the
 distribution can lead to inaccurate estimations.
 
 \subsubsection{Conditional Likelihood}
 
-One approach to this problem is to estimate the coefficients using
+One approach to the problem is estimating the coefficients using the
 conditional maximum likelihood, where the likelihood function to be
 maximized is conditioned on the probability an individual is observed at
 least once \citep{alho_logistic_1990,huggins_statistical_1989}. This
@@ -1006,58 +1006,192 @@ estimator \citep{horvitz_generalization_1952} to estimate the population
 size, N. One could take a Bayesian approach to the logistic regression
 and assign prior distributions to the parameters and estimate the
 population in a similar way. We derive equations for finding the maximum
-a posteriori (MAP) estimate in Appendix \ref{Sec:conditionalmaximumlike}
-using gradient ascent.
+a posteriori (MAP) estimate in Section \ref{Sec:conditionalmaximumlike}:
+Appendix A using gradient ascent.
 
-\subsubsection{Proposed Extension 1: Nonparametric Distributions}
+\subsubsection{Nonparametric Distributions}
 
-We propose an alternative approach which is to specify a flexible
-distribution to the covariates such as a Dirichlet process mixture of
-normal distributions. Using stick-breaking priors
-\citep{ishwaran_gibbs_2001}, this nonparametric approach fits a
-potentially infinite number of multivariate normal distributions to the
-data. The implementation is adapted from \cite{gelman_bayesian_2014}.
-This model introduces a latent variable, \(z\), which is a latent
-parameter determining the mean and covariance matrix from which the
-observed covariate, \(\boldsymbol{x_i}\), is drawn. The generative
-process for each observation's covariate can be summarized,
+An alternative approach to the methods described above is to specify a
+nonparametric distribution for the covariates. Using a nonparametric
+method has the added consequence of increasing the complexity of the
+model which may lead to additional difficulties in the mixing of the
+posterior. Nevertheless, it comes with multiple benefits in allowing us
+to maintain use of a full likelihood approach, continued extensibility,
+and (most importantly) flexibility in the fitting of the covariates. In
+this subsection, we present two methods for modeling the covariates in a
+non-parametric fashion: The Dirichlet Process Mixture of Normal
+Distributions and the Bayesian Bootstrap.
+
+\paragraph{Dirichlet Process Mixture of Normal Distributions}\hspace{5px} \newline
+
+The first method is to fit a Dirichlet process mixture of normal
+distributions. This nonparametric approach fits a potentially infinite
+number of multivariate normal distributions to the data. The following
+is a description of the methodology and is adapted from
+\cite{gelman_bayesian_2014}. This model introduces a latent variable,
+\(z\), which is a latent parameter determining the mean and covariance
+matrix from which the observed covariate, \(\boldsymbol{x_i}\), is
+drawn. The generative process for each observation's covariate can then
+be summarized as,
 
 \begin{align}
 \boldsymbol{x_i}|z_i \stackrel{ind}{\sim} & \text{ MVNormal}(\boldsymbol{\mu_k},\boldsymbol{\Sigma_k}) \hspace{5px} \text{for } i=1,...,N\\
 z_i \stackrel{iid}{\sim} & \text{ Discrete}(\{1,2,...\},(\pi_1,\pi_2,...)) \hspace{5px} \text{for } i=1,...,N.
 \end{align}
 
+Therefore, the probability density function of the covariates can be
+formally written as,
+
+\begin{equation}
+g(\boldsymbol{x}|\boldsymbol{\mu},\boldsymbol{\Sigma}) = \prod_{i=1}^N \prod_{k=1}^\infty \pi_k \text{ MVNormal}(\boldsymbol{x_i}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k}).
+\end{equation}
+
+In order to have a fully Bayesian approach, we assign priors to the
+unknown parameters.
+
+\begin{align}
+\boldsymbol{\Sigma_k} \sim & \text{InvWishart}(\nu_{0},\boldsymbol{\Lambda_{0}^{-1}}) \\
+\boldsymbol{\mu_k}|\boldsymbol{\Sigma_k} \sim & \text{ MVNormal}(\boldsymbol{\mu_{0}},\boldsymbol{\Sigma_k}/\kappa_{0}) \\
+(\pi_1,\pi_2,...) \sim & SB(\alpha) \\
+\alpha \sim & \text{ Gamma}(a_{\alpha},b_{\beta}),
+\end{align}
+
+where SB(\(\alpha\)) is the stick breaking process,
+\citep{ishwaran_gibbs_2001}. While we model the number of latent classes
+as infinite, we can approximate this infinite mixture problem by setting
+a sufficiently large upperbound to the number of latent classes,
+\(K^*\), and solving this finite-dimensional problem. The stick breaking
+prior can therefore be defined as \(\pi_k = V_k \prod_{l<k}(1-V_l)\),
+where \(V_1, ..., V_{K^*-1} \sim \text{Beta}(1,\alpha)\) and
+\(V_{K^*}=1\). This upper bound, \(K^*\), should not be thought of as a
+parameter as it should have no impact on the estimation process as long
+as the value is set sufficiently large enough.
+
 Using this generative scheme adds five additional sampling stages to the
-algorithm presented in subsection \ref{Sec:BLRCRmodel}. The full details
-including the prior specifications are provided in Appendix
-\ref{DPnormalmix}. While the number of latent classes is infinite, we
-approximate this problem by truncating the number of latent classes,
-\(K^*\), and solving this finite-dimensional problem. This upper bound,
-\(K^*\), should not be thought of as a parameter as it should have no
-impact on the estimation process as long as the value is set
-sufficiently large enough. It should be noted that the normal
-distribution specified in subsection
+algorithm presented in subsection \ref{Sec:BLRCRmodel}.
+
+\begin{list}{}{}
+
+\item[1)] Sample $z_i$ for $i=1,...,N$. The latent class label takes integer values from $1,...,K^*$.  To compute the probability of each latent class label for each $i$,
+
+\begin{equation}
+P(z_i=k) = \frac{\pi_k \text{ MVNormal}(\boldsymbol{x_i}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k})}{\sum_{l=1}^{K^*}\pi_l \text{ MVNormal}(\boldsymbol{x_i}|\boldsymbol{\mu_l},\boldsymbol{\Sigma_l})}.
+\end{equation}
+
+\item[2)] Sample $\boldsymbol{\Sigma_k}$ for $k=1,...,K^*$. Define $N_k=\sum_{i=1}1_{z_i=k}$ which is a count of the number of individuals in the population belonging to latent class, $k$.  Also, define the sufficient statistics, $\boldsymbol{\bar{x}_k}=\frac{1}{N_k}\sum_{i=1}^{N_k}\boldsymbol{x_{ik}}$ and $\boldsymbol{S_k} = \sum_{i=1}^{N_k}(\boldsymbol{x_{ik}}-\boldsymbol{\bar{x}_k})(\boldsymbol{x_{ik}}-\boldsymbol{\bar{x}_k})^T$.  Then,
+
+\begin{equation}
+\boldsymbol{\Sigma_k} \sim \text{InvWishart}(\nu_{N_k},\boldsymbol{\Lambda_{N_k}^{-1}}),
+\end{equation}
+
+where $\nu_{N_k} = \nu_{0}+N_k$ and $\boldsymbol{\Lambda_{N_k}}=\boldsymbol{\Lambda_{0}}+\boldsymbol{S_k}+\frac{\kappa_{0}N_k}{\kappa_{0}+N_k}(\boldsymbol{\bar{x}_k}-\boldsymbol{\mu_{0}})(\boldsymbol{\bar{x}_k}-\boldsymbol{\mu_{0}})^T$.
+
+\item[3)] Sample $\boldsymbol{\mu_k|\Sigma_k}$ for $k=1,...,K^*$.  Using the same defined terms in the previous step,
+
+\begin{equation}
+\boldsymbol{\mu_k}|\boldsymbol{\Sigma_k} \sim \text{MVNormal}(\boldsymbol{\mu_{N_k}},\boldsymbol{\Sigma_k}/\kappa_{N_k} ),
+\end{equation}
+
+where $\boldsymbol{\mu_{N_k}}=\frac{\kappa_{0}}{\kappa_{0}+N_k}\boldsymbol{\mu_{0}} + \frac{N_k}{\kappa_{0}+N_k}\boldsymbol{\bar{x}_k} $ and $\kappa_{N_k}=\kappa_{0}+N_k$.
+
+\item[4)] Sample $(\pi_1,\pi_2,...,\pi_{K^*})$ for $k=1,...,K^*$.  Begin by drawing a sample from each of the stochastic components,
+
+\begin{equation}
+ V_k \sim \text{ Beta}\left(1+N_k, \alpha+\sum_{l=k+1}^K N_l\right) \hspace{5px} \text{for } k=1,...,K^*-1.
+\end{equation}
+
+Set $V_{K*}=1$.  Then, $\pi_k = V_k\prod_{l<k}(1-V_l)$ for all $k=1,...,K^*$.
+
+\item[5)] Sample $\alpha$.
+
+\begin{equation}
+  \alpha \sim \text{ Gamma}\left(a_\alpha + K^* -1, b_\alpha - \ln(\pi_{K^*}) \right).
+\end{equation}
+
+\end{list}
+
+It should be noted that the normal distribution specified in subsection
 \ref{sec:normaldistributioncovariate} is a special case of this
-specification where \(K^*=1\).
+specification where \(K^*=1\). We will show in section
+\ref{Sec:simscovdists} that the assumption of a single normal may lead
+to bias in the estimation process when the actual distribution is not
+normal. Using an infinite mixture of normal distributions tends to
+perform better, but still struggles when the distribution is discrete or
+is far from normally distributed.
 
-\subsubsection{Future Work: Dirichlet Process}
+\paragraph{The Bayesian Bootstrap} \hspace{5px} \newline
 
-In the previous subsections, we considered a single multivariate normal
-distribution but also an infinite mixture of normal distributions with
-membership determined through a stick-breaking process. We will show in
-section \ref{Sec:simulations} that the assumption of a single normal may
-lead to bias in the estimation process when the actual distribution is
-not normal. The infinite mixture of normal distributions tends to
-perform better, but struggles when the distribution is discrete or is
-far from normally distributed. An alternative approach would be using
-the empirical distribution of the covariate. This has a similar
-intuition as the mechanic behind the Horvitz-Thompson estimator in the
-frequentist approach where each covariate essentially gets magnified
-based on its estimated probability of being missing. This approach could
-be made more general by using Dirichlet process mixtures. As shown in
-\cite{gelman_bayesian_2014}, a sufficiently large concentration
-parameter, \(\alpha \rightarrow \infty\), converges to the empirical
-distribution.
+\vspace{-10px}
+
+An alternative approach would be to apply a discrete distribution with
+support at the observed, distinct values, \(\boldsymbol{d_k}\), of the
+covariates,
+
+\begin{equation}
+P(\boldsymbol{x_i}=\boldsymbol{d_k}) = \psi_k, \hspace{10px} \sum_{i=1}^K \psi_k = 1.
+\end{equation}
+
+We attach a Dirichlet prior to the probabilities, \(\psi_k\), such that
+
+\begin{equation}
+(\psi_1, ..., \psi_K) \sim Dirichlet(\alpha_1,...,\alpha_K)
+\end{equation}
+
+The posterior distribution for the \(\psi_k\) is then,
+
+\begin{equation}
+\label{eqn:bayesbootstrapposterior}
+(\psi_1, ..., \psi_K|\mathcal{X}) \sim Dirichlet(\alpha_1+\sum_{i=1}^N I_{d_1}(\boldsymbol{x_i}),...,\alpha_K+\sum_{i=1}^N I_{d_K}(\boldsymbol{x_i}))
+\end{equation}
+
+where \(I_{d_k}(\boldsymbol{x_i})=1\) is an indicator function for
+\(\boldsymbol{x_i} = \boldsymbol{d_i}\) and
+\(I_{d_k}(\boldsymbol{x_i})=0\) otherwise.
+
+Although we are not performing an actual bootstrapping procedure, we
+refer to this modelling setup as the Bayesian Bootstrap
+\citep{rubin_bayesian_1981} for a couple of reasons. First, the
+construction is quite similar to the theory behind the Bayesian
+Bootstrap in terms of placing a Dirichlet distribution on the observed
+values in the sample. Second, this methodology samples values for the
+missing observations in the same spirit as bootstrapping. Using the
+\(n\) observed covariates, we sample \(n_0\) values from the observed
+distribution with replacement and use these values in place of the
+missing covariates.
+
+To implement this model construction for the covariates, we only need to
+add one additional sampling stage to our estimation procedure. Noting
+that we use all covariates, not just the observed, we draw the
+probabilities, (\(\psi_1, ..., \psi_K\)) in accordance to equation
+\ref{eqn:bayesbootstrapposterior}. When
+\((\alpha_1, ..., \alpha_K) = \alpha = 0\), one can skip the adding of
+this sampling stage and simply draw, with replacement, from the current
+complete covariate data, \(\mathcal{X}\). As along as you remember to
+still condition on the probability of being missing as in equation
+equation \ref{eqn:conditionalXmis}, these sampling techniques would be
+trivially the same.
+
+This method addresses some of the potential issues in the covariate
+specification, but it also introduces new issues as well. These issues
+tend to align closely with those of the Bayesian Bootstrap. For example,
+the missing values are essentially being sampled from the observed
+empirical distribution. What happens if some of the potential values
+that are missing do not appear in the observed distribution? This is a
+concern for when the covariate distribution is discrete but a
+probabilistic certainty when the distribution is continuous.
+\cite{rubin_bayesian_1981} states that no method, even the bootstrap, is
+without constraints and any ``serious data analysis should always
+include serious consideration of model constraints.'' Furthermore, we
+note that the end goal is to estimate the size of the population, so the
+exact modelling of the covariate distribution is not as important as
+long as it does not bias the estimation. Using the rejection sampler
+based on equation \ref{eqn:conditionalXmis} combined with
+\((\alpha_1, ..., \alpha_K) = \alpha = 0\), the probability of each draw
+is appropriately weighted based on the probability of going unobserved.
+This has similar intuition as the mechanic behind the Horvitz-Thompson
+estimator in the conditional likelihood approach where each covariate
+essentially gets magnified based on its estimated probability of being
+missing.
 
 \subsection{Conditional Independence and Unobserved Heterogeneity}
 \label{Sec:condindependence}
@@ -1216,7 +1350,7 @@ Capture-Recapture (LCMCR) algorithm in
 \cite{manriquevallier_bayesian_2016} which is another technique that
 does not allow covariates but uses a Bayesian nonparametric approach to
 account for unobserved heterogeneity (see Section \ref{LCMCRmodel}:
-Appendix C for a summary of this approach). The fourth technique is a
+Appendix B for a summary of this approach). The fourth technique is a
 simple independence model (Independent) where it is assumed there is no
 list or individual heterogeneity. Conveniently, when the number of
 latent classes is set equal to one, the LCMCR model collapses into an
@@ -2092,88 +2226,7 @@ individuals \citep{alho_logistic_1990}. Using the gradient, apply the
 gradient ascent algorithm until convergence to obtain
 \(\boldsymbol{\beta}_{MAP}\).
 
-\section{Appendix B: Dirichlet Process of Mixture Normals}
-\label{DPnormalmix}
-
-The generative process for each observation's covariate is,
-
-\begin{align}
-\boldsymbol{x_i}|z_i \stackrel{ind}{\sim} & \text{ MVNormal}(\boldsymbol{\mu_k},\boldsymbol{\Sigma_k}) \hspace{5px} \text{for } i=1,...,N\\
-z_i \stackrel{iid}{\sim} & \text{ Discrete}(\{1,2,...\},(\pi_1,\pi_2,...)) \hspace{5px} \text{for } i=1,...,N.
-\end{align}
-
-The probability density function of the covariates can be formally
-written as,
-
-\begin{equation}
-g(\boldsymbol{x}|\boldsymbol{\mu},\boldsymbol{\Sigma}) = \prod_{i=1}^N \prod_{k=1}^\infty \pi_k \text{ MVNormal}(\boldsymbol{x_i}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k})
-\end{equation}
-
-In order to have a fully Bayesian approach, we assign priors to the
-unknown parameters.
-
-\begin{align}
-\boldsymbol{\Sigma_k} \sim & \text{InvWishart}(\nu_{0},\boldsymbol{\Lambda_{0}^{-1}}) \\
-\boldsymbol{\mu_k}|\boldsymbol{\Sigma_k} \sim & \text{ MVNormal}(\boldsymbol{\mu_{0}},\boldsymbol{\Sigma_k}/\kappa_{0}) \\
-(\pi_1,\pi_2,...) \sim & SB(\alpha) \\
-\alpha \sim & \text{ Gamma}(a_{\alpha},b_{\beta}),
-\end{align}
-
-where SB(\(\alpha\)) is the stick breaking process
-\citep{dunson_nonparametric_2009}. While the problem is defined as
-having an infinite number of mixture components, we solve the
-finite-dimension problem with the number of mixtures truncated at an
-upper bound, \(K^*\). Because the stick breaking process orders the
-number of mixtures, as long as \(K^*\) is set sufficently large, this
-construction approximates the infinite-dimensional problem. The stick
-breaking prior can therefore be defined as
-\(\pi_k = V_k \prod_{l<k}(1-V_l)\), where
-\(V_1, ..., V_{K^*-1} \sim \text{Beta}(1,\alpha)\) and \(V_{K^*}=1\).
-
-Using this generative scheme adds five additional sampling stages to the
-algorithm presented in section \ref{sec:CRwithCovariates}.
-
-\begin{list}{}{}
-
-\item[1)] Sample $z_i$ for $i=1,...,N$. The latent class label takes integer values from $1,...,K^*$.  To compute the probability of each latent class label for each $i$,
-
-\begin{equation}
-P(z_i=k) = \frac{\pi_k \text{ MVNormal}(\boldsymbol{x_i}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k})}{\sum_{l=1}^{K^*}\pi_l \text{ MVNormal}(\boldsymbol{x_i}|\boldsymbol{\mu_l},\boldsymbol{\Sigma_l})}.
-\end{equation}
-
-\item[2)] Sample $\boldsymbol{\Sigma_k}$ for $k=1,...,K^*$. Define $N_k=\sum_{i=1}1_{z_i=k}$ which is a count of the number of individuals in the population belonging to latent class, $k$.  Also, define the sufficient statistics, $\boldsymbol{\bar{x}_k}=\frac{1}{N_k}\sum_{i=1}^{N_k}\boldsymbol{x_{ik}}$ and $\boldsymbol{S_k} = \sum_{i=1}^{N_k}(\boldsymbol{x_{ik}}-\boldsymbol{\bar{x}_k})(\boldsymbol{x_{ik}}-\boldsymbol{\bar{x}_k})^T$.  Then,
-
-\begin{equation}
-\boldsymbol{\Sigma_k} \sim \text{InvWishart}(\nu_{N_k},\boldsymbol{\Lambda_{N_k}^{-1}}),
-\end{equation}
-
-where $\nu_{N_k} = \nu_{0}+N_k$ and $\boldsymbol{\Lambda_{N_k}}=\boldsymbol{\Lambda_{0}}+\boldsymbol{S_k}+\frac{\kappa_{0}N_k}{\kappa_{0}+N_k}(\boldsymbol{\bar{x}_k}-\boldsymbol{\mu_{0}})(\boldsymbol{\bar{x}_k}-\boldsymbol{\mu_{0}})^T$.
-
-\item[3)] Sample $\boldsymbol{\mu_k|\Sigma_k}$ for $k=1,...,K^*$.  Using the same defined terms in the previous step,
-
-\begin{equation}
-\boldsymbol{\mu_k}|\boldsymbol{\Sigma_k} \sim \text{MVNormal}(\boldsymbol{\mu_{N_k}},\boldsymbol{\Sigma_k}/\kappa_{N_k} ),
-\end{equation}
-
-where $\boldsymbol{\mu_{N_k}}=\frac{\kappa_{0}}{\kappa_{0}+N_k}\boldsymbol{\mu_{0}} + \frac{N_k}{\kappa_{0}+N_k}\boldsymbol{\bar{x}_k} $ and $\kappa_{N_k}=\kappa_{0}+N_k$.
-
-\item[4)] Sample $(\pi_1,\pi_2,...,\pi_{K^*})$ for $k=1,...,K^*$.  Begin by drawing a sample from each of the stochastic components,
-
-\begin{equation}
- V_k \sim \text{ Beta}\left(1+N_k, \alpha+\sum_{l=k+1}^K N_l\right) \hspace{5px} \text{for } k=1,...,K^*-1.
-\end{equation}
-
-Set $V_{K*}=1$.  Then, $\pi_k = V_k\prod_{l<k}(1-V_l)$ for all $k=1,...,K^*$.
-
-\item[5)] Sample $\alpha$.
-
-\begin{equation}
-  \alpha \sim \text{ Gamma}\left(a_\alpha + K^* -1, b_\alpha - \ln(\pi_{K^*}) \right).
-\end{equation}
-
-\end{list}
-
-\section{Appendix C: LCMCR Model}
+\section{Appendix B: LCMCR Model}
 \label{LCMCRmodel}
 
 This section summarizes the Bayesian Non-Parametric Latent-Class

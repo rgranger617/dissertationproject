@@ -43,84 +43,13 @@ Taking the first derivative with respect to $\boldsymbol{\beta_j}$ gives the gra
 
 Notice in the equation above that only the observed data appears.  This convenience occurs due to the fact that E[$y_{ij}|\boldsymbol{y_i}= \boldsymbol{0}$] = 0 for all individuals \citep{alho_logistic_1990}.  Using the gradient, apply the gradient ascent algorithm until convergence to obtain $\boldsymbol{\beta}_{MAP}$.  
 
-<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
-<!-- %%%%%%%%%%%%%%%%%%%%%%%%% Appendix B %%%%%%%%%%%%%%%%%%%%%%%%% -->
-<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 
-\section{Appendix B: Dirichlet Process of Mixture Normals}
-\label{DPnormalmix}
-
-The generative process for each observation's covariate is,
-
-\begin{align}
-\boldsymbol{x_i}|z_i \stackrel{ind}{\sim} & \text{ MVNormal}(\boldsymbol{\mu_k},\boldsymbol{\Sigma_k}) \hspace{5px} \text{for } i=1,...,N\\
-z_i \stackrel{iid}{\sim} & \text{ Discrete}(\{1,2,...\},(\pi_1,\pi_2,...)) \hspace{5px} \text{for } i=1,...,N.
-\end{align}
-
-The probability density function of the covariates can be formally written as,
-
-\begin{equation}
-g(\boldsymbol{x}|\boldsymbol{\mu},\boldsymbol{\Sigma}) = \prod_{i=1}^N \prod_{k=1}^\infty \pi_k \text{ MVNormal}(\boldsymbol{x_i}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k})
-\end{equation}
-
-In order to have a fully Bayesian approach, we assign priors to the unknown parameters.
-
-\begin{align}
-\boldsymbol{\Sigma_k} \sim & \text{InvWishart}(\nu_{0},\boldsymbol{\Lambda_{0}^{-1}}) \\
-\boldsymbol{\mu_k}|\boldsymbol{\Sigma_k} \sim & \text{ MVNormal}(\boldsymbol{\mu_{0}},\boldsymbol{\Sigma_k}/\kappa_{0}) \\
-(\pi_1,\pi_2,...) \sim & SB(\alpha) \\
-\alpha \sim & \text{ Gamma}(a_{\alpha},b_{\beta}),
-\end{align}
-
-where SB($\alpha$) is the stick breaking process \citep{dunson_nonparametric_2009}. While the problem is defined as having an infinite number of mixture components, we solve the finite-dimension problem with the number of mixtures truncated at an upper bound, $K^*$.  Because the stick breaking process orders the number of mixtures, as long as $K^*$ is set sufficently large, this construction approximates the infinite-dimensional problem.    The stick breaking prior can therefore be defined as $\pi_k = V_k \prod_{l<k}(1-V_l)$, where $V_1, ..., V_{K^*-1} \sim \text{Beta}(1,\alpha)$ and $V_{K^*}=1$.  
-
-Using this generative scheme adds five additional sampling stages to the algorithm presented in section \ref{sec:CRwithCovariates}.
-
-\begin{list}{}{}
-
-\item[1)] Sample $z_i$ for $i=1,...,N$. The latent class label takes integer values from $1,...,K^*$.  To compute the probability of each latent class label for each $i$,
-
-\begin{equation}
-P(z_i=k) = \frac{\pi_k \text{ MVNormal}(\boldsymbol{x_i}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k})}{\sum_{l=1}^{K^*}\pi_l \text{ MVNormal}(\boldsymbol{x_i}|\boldsymbol{\mu_l},\boldsymbol{\Sigma_l})}.
-\end{equation}
-
-\item[2)] Sample $\boldsymbol{\Sigma_k}$ for $k=1,...,K^*$. Define $N_k=\sum_{i=1}1_{z_i=k}$ which is a count of the number of individuals in the population belonging to latent class, $k$.  Also, define the sufficient statistics, $\boldsymbol{\bar{x}_k}=\frac{1}{N_k}\sum_{i=1}^{N_k}\boldsymbol{x_{ik}}$ and $\boldsymbol{S_k} = \sum_{i=1}^{N_k}(\boldsymbol{x_{ik}}-\boldsymbol{\bar{x}_k})(\boldsymbol{x_{ik}}-\boldsymbol{\bar{x}_k})^T$.  Then,
-
-\begin{equation}
-\boldsymbol{\Sigma_k} \sim \text{InvWishart}(\nu_{N_k},\boldsymbol{\Lambda_{N_k}^{-1}}),
-\end{equation}
-
-where $\nu_{N_k} = \nu_{0}+N_k$ and $\boldsymbol{\Lambda_{N_k}}=\boldsymbol{\Lambda_{0}}+\boldsymbol{S_k}+\frac{\kappa_{0}N_k}{\kappa_{0}+N_k}(\boldsymbol{\bar{x}_k}-\boldsymbol{\mu_{0}})(\boldsymbol{\bar{x}_k}-\boldsymbol{\mu_{0}})^T$.
-
-\item[3)] Sample $\boldsymbol{\mu_k|\Sigma_k}$ for $k=1,...,K^*$.  Using the same defined terms in the previous step,
-
-\begin{equation}
-\boldsymbol{\mu_k}|\boldsymbol{\Sigma_k} \sim \text{MVNormal}(\boldsymbol{\mu_{N_k}},\boldsymbol{\Sigma_k}/\kappa_{N_k} ),
-\end{equation}
-
-where $\boldsymbol{\mu_{N_k}}=\frac{\kappa_{0}}{\kappa_{0}+N_k}\boldsymbol{\mu_{0}} + \frac{N_k}{\kappa_{0}+N_k}\boldsymbol{\bar{x}_k} $ and $\kappa_{N_k}=\kappa_{0}+N_k$.
-
-\item[4)] Sample $(\pi_1,\pi_2,...,\pi_{K^*})$ for $k=1,...,K^*$.  Begin by drawing a sample from each of the stochastic components,
-
-\begin{equation}
- V_k \sim \text{ Beta}\left(1+N_k, \alpha+\sum_{l=k+1}^K N_l\right) \hspace{5px} \text{for } k=1,...,K^*-1.
-\end{equation}
-
-Set $V_{K*}=1$.  Then, $\pi_k = V_k\prod_{l<k}(1-V_l)$ for all $k=1,...,K^*$.
-
-\item[5)] Sample $\alpha$.
-
-\begin{equation}
-  \alpha \sim \text{ Gamma}\left(a_\alpha + K^* -1, b_\alpha - \ln(\pi_{K^*}) \right).
-\end{equation}
-
-\end{list}
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
-<!-- %%%%%%%%%%%%%%%%%%%%%%%%% Appendix C %%%%%%%%%%%%%%%%%%%%%%%%% -->
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%% Appendix B %%%%%%%%%%%%%%%%%%%%%%% -->
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 
-\section{Appendix C: LCMCR Model}
+\section{Appendix B: LCMCR Model}
 \label{LCMCRmodel}
 
 This section summarizes the Bayesian Non-Parametric Latent-Class Capture-Recapture (LCMCR) derivation and explanations provided in \cite{manriquevallier_bayesian_2016}.
