@@ -1,0 +1,67 @@
+---
+title: ''
+output: pdf_document
+---
+
+\section{Conditional Independence and Unobserved Heterogeneity}
+\label{Sec:condindependence}
+
+
+The model construction of subsection \ref{Sec:BLRCRmodel} assumes conditional independence based on the covariates.  In other words, given the information provided by the covariates, the probability of capture on one list is unaffected by another list.  If the assumption does not hold, it may lead to biased parameter estimates.  One reason the conditional independence may be violated is because the capture probabilities upon a list are directly related to the probability of being on another list, i.e., the assumption of list dependency.  This may occur if, for example, one list uses another list as a reference or data is shared between various documentation projects \citep{manrique-vallier_capture-recapture_2020}.  This would lead to heavy positive dependence between these two lists.  While this is a serious issue, we assume the lists used in the analysis are collected independently.
+
+A second reason conditional independence may be violated is that underlying heterogeneity exists within the population that is not fully accounted for by covariates. Recall, the example cited in subsection \ref{sec:earlyapproachlitreview} of individual heterogeneity masquerading as list dependency in the study analyzing extrajudicial killings during the Guatemalan Civil War \citep{ball_making_2000}.  Researchers found that people who were part of Catholic religious communities were more likely to trust Catholic researchers with their stories than with NGO researchers associated with the political left.  Similarly, people located in areas associated with the rebel groups were more likely to do the opposite.  If this trait is unobserved and not taken into account, it will result in biased $\boldsymbol{\beta_j}$ coefficients.  Further, because of the biased coefficients, the probabilities of capture and the estimate for the population size will be biased as well.
+
+\subsection{Modelling the Unobserved Heterogeneity with Latent Classes}
+
+We view the problem of unobserved heterogeneity through the lens of a missing covariates problem.  There are multiple ways one can induce additional heterogeneity into the modelling. For example, \cite{king_bayesian_2008} uses individual random effects following a normal distribution, while \cite{manriquevallier_bayesian_2016} induces heterogeneity by assigning different capture probabilities according to latent group membership. In this subsection, we model hidden heterogeneity also through the use of latent group membership, but instead of each group being assigned a different probability, each group is instead given a different value for an intercept in the linear equation.
+
+Define an indicator vector, $\boldsymbol{\omega_i}$, indicating membership to one of potentially infinite latent groups. As we saw in subsection \ref{sec:normaldistributioncovariate} with the infinite mixture of normal distributions, we again make use of the stick-breaking procedure in order to avoid self-selecting the number of the classes to uses. Hence, 
+
+\vspace{-10px}
+\begin{equation}
+\boldsymbol{\phi_\omega}\sim \text{SB}(\boldsymbol{\alpha_\omega})
+\end{equation}
+\begin{equation}
+\alpha_\omega \sim \text{Gamma}(a_\omega,b_\omega).
+\end{equation}
+
+An additional intercept term is added to the linear equation with the value dependent on the individual's latent class membership. As such, equation \ref{eqn:sigmoidfunc} then becomes,
+
+\begin{equation}
+\label{eqn:sigmoidfunclatentvariable}
+\lambda_{ij}=\sigma(\boldsymbol{x_i}^T\boldsymbol{\beta_j} + \boldsymbol{\omega_i}^T\boldsymbol{\beta_\omega}) = \frac{1}{1+e^{-(\boldsymbol{x_i}^T\boldsymbol{\beta_j}+\boldsymbol{\omega_i}^T\boldsymbol{\beta_\omega}))}}.
+\end{equation}
+
+This construction leads to four new types of parameters to sample: $\boldsymbol{\omega_i}$, $\alpha_\omega$, $\boldsymbol{\phi_\omega}$, and  $\boldsymbol{\beta_\omega}$.
+
+\subsection{Updating the Estimation}
+
+Since we have four new parameters: $\boldsymbol{\omega_i}$, $\alpha_\omega$, $\boldsymbol{\phi_\omega}$, and $\boldsymbol{\beta_\omega}$; we might expect to need just four new sampling methods. Unfortunately, complications once again arise from the missing covariates of the unobserved individuals.  If the individual is observed, the latent group membership, $\boldsymbol{\omega_i}$, can be sampled with corresponding discrete probability,
+
+\begin{equation}
+\label{eqn:latentvariableomega}
+p(\boldsymbol{\omega_i}|\boldsymbol{\phi_\omega},N,\mathcal{Y},\boldsymbol{\beta},\boldsymbol{X}) \propto \phi_\omega\prod_{j=1}^J\lambda_{ij}^{y_{ij}}(1-\lambda_{ij})^{1-y_{ij}}.
+\end{equation}
+
+For the individuals that are not observed, we draw the latent class membership during the missing covariate imputation stage. Recall, because of the complications mentioned in subsection \ref{sec:estimationBLRCRMCMC}, the Gibbs sampler requires $N$ and $\mathcal{X}_{mis}$ to be sampled simultaneously.  In order to implement this stage, the latent class membership, $\boldsymbol{\omega_i}$ of each unobserved individual must be drawn along with, presumably independently, the missing covariates, $\mathcal{X}_{mis}$. Whereas the distribution from which the covariates is drawn is dependent on the covariate distribution selected (see subsection \ref{Sec:selectcovariates}), the $\omega_i$'s are drawn from the discrete distribution with probability vector $\boldsymbol{\phi_\omega}$.
+
+Once again, we use a finite representation of the stick-breaking process for estimation purposes with a sufficiently large upperbound, $H_\omega^*$. Under this construction, the stick-breaking process is defined as $(\phi_{1},\phi_{2},...,\phi_{H_\omega^*}) = V_{h} \prod_{{h'}<h}(1-V_{{h'}})$, where $V_{1}, V_{2}, ..., V_{H_\omega^*-1} \sim \text{Beta}(1,\alpha_\omega)$ and $V_{H_\omega^*}=1$. To obtain samples from the conditional posterior distribution, $p(\phi_\omega|...)$, we first sample $V_h$ by,
+
+\vspace{-10px}
+\begin{equation}
+\label{eqn:latentvariablePHIomega}
+V_h \sim \text{Beta}\Big(1+N_h,\alpha_\omega + \sum_{h'=h+1}^{H^*_\omega} N_{h'}\Big),
+\end{equation}
+
+for all $h=1,...,H_\omega^*-1$ where $N_{h}$ is the number of individuals belonging to each latent class. Then compute $\phi_{h} = V_h \prod_{{h'}<h}(1-V_{h'})$ for $h=1,...,H^*_\omega.$ The conditional posterior distribution, $p(\alpha_\omega|...)$ can be sampled by
+
+\vspace{-10px}
+\begin{equation}
+\label{eqn:alphaomegacondsampling}
+\alpha_\omega \sim \text{Gamma}\Big(a_\omega + H_\omega^* - 1, b_\omega - \sum_{h=1}^{H^*_\omega-1}\ln (1-V_h)\Big),
+\end{equation}
+
+Lastly, the coefficient vector of latent intercepts, $\boldsymbol{\beta_\omega}$, can be sampled in the same manner as the other coefficients, $\boldsymbol{\beta_j}$. 
+
+```{r hiddencovsims, child = 'hiddencovariatesimulations.Rmd'}
+```

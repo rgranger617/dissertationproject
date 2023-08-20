@@ -1,0 +1,28 @@
+---
+title: ''
+output: pdf_document
+---
+\newpage
+```{=tex}
+\section{Conclusion}
+\label{Sec:Conclusion}
+```
+The objective of this dissertation project is to develop a Bayesian capture-recapture (CR) method that can utilize covariate information to understand the heterogeneity between individuals. Presented in this proposal is a framework for modelling capture-recapture with covariates.  Specifically, we develop the Bayesian Logistic Regression Capture Recapture (BLRCR) that utilizes the covariate information directly in estimating individual capture rates. Further, we account for unobserved heterogeneity with the use of latent classes.  This model is solved using an MCMC algorithm to approximate the posterior distribution of our population size, $N$. I propose three primary areas of interest that will be addressed as the focus of the dissertation: unobserved heterogeneity, modelling the covariate distribution, and covariate selection.
+
+\subsection{Unobserved Heterogeneity}
+
+
+This extension concerns the issue of unobserved heterogeneity described in subsection \ref{Sec:condindependence}.  To account for this heterogeneity, the algorithm detects latent groups and applies different intercepts in the linear term that defines the capture probability. Currently the number of latent classes is fixed and must be selected by the practitioner.  An extension would be to include some method for determining the number of latent classes to include.  While it may be reasonable in some cases to know the number of latent classes, an obvious approach would be to incorporate a stick-breaking prior on the number of latent classes.
+
+\subsection{Modelling the Covariate Distribution}
+
+A requirement of the algorithm is the necessity of specifying a distribution for the missing covariates, discussed in subsection \ref{Sec:selectcovariates}. Typically this distribution is unknown so utilizing a distribution that is fairly flexible is ideal.  In this proposal, we implemented the non-parametric approach of using an infinite mixture of normals with membership determiend through a stick-breaking process (and additionally a single multivariate normal which is a special case). While the infinite mixture of normal distributions tends to perform well when the distribution is at least somewhat normal, it struggles when presented with certain non-normal distributions.  Alternatively, I propose using Dirichlet process mixtures as described in \cite{gelman_bayesian_2014}. A sufficiently large concentration parameter, $\alpha \rightarrow \infty$, would be in essence the same thing as the empirical distribution.
+
+\subsection{Covariate Selection}
+
+If many covariates are present, we need a method for determining which covariates should be used while also considering interaction effects.  Along these same lines, we need to consider how a variable affects the capture probability as some sort of transformation may be required.  We suggest three possible routes including model averaging, variable selection through priors, or even post-hoc analysis like computing the Bayes factor.
+
+
+
+
+

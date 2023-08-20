@@ -1,6 +1,0 @@
----
-title: ''
-output: pdf_document
----
-\renewcommand{\bibname}{References}
-\bibliography{dissertationbibliography}
