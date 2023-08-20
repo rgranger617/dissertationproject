@@ -43,7 +43,7 @@ Taking the first derivative with respect to $\boldsymbol{\beta_j}$ gives the gra
 
 Notice in the equation above that only the observed data appears.  This convenience occurs due to the fact that E[$y_{ij}|\boldsymbol{y_i}= \boldsymbol{0}$] = 0 for all individuals \citep{alho_logistic_1990}.  Using the gradient, apply the gradient ascent algorithm until convergence to obtain $\boldsymbol{\beta}_{MAP}$.  
 
-
+\newpage
 
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%% Appendix B %%%%%%%%%%%%%%%%%%%%%%% -->
@@ -82,3 +82,10 @@ z_i & \sim \text{Discrete}(\{1,2,...\},(\pi_1,\pi_2,...)) \hspace{10px} \text{fo
 (\pi_1,\pi_2,...) & \sim \text{SB}(\alpha) \\ 
 \alpha & \sim \text{Gamma}(a,b).
 \end{align}
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%% Appendix C %%%%%%%%%%%%%%%%%%%%%%% -->
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+
+\newpage
+

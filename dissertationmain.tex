@@ -7,16 +7,19 @@
   12pt,
 ]{article}
 \usepackage{amsmath,amssymb}
-\usepackage{lmodern}
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
 \else % if luatex or xetex
-  \usepackage{unicode-math}
+  \usepackage{unicode-math} % this also loads fontspec
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
 \fi
 % Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -71,7 +74,7 @@
 \fi
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same} % disable monospaced font for URLs
+\urlstyle{same}
 \hypersetup{
   colorlinks=true,
   linkcolor={Maroon},
@@ -269,28 +272,33 @@ logistic regressions which we term the Bayesian Logistic Regression
 Capture-Recapture (BLRCR) model.
 
 While the BLRCR model incorporates individual covariates and thus
-accounts for observable heterogeneity, it has a few shortcomings which
-are addressed in subsequent sections.
+accounts for observable heterogeneity, it has a few shortcomings:
 
 \begin{list}{}{}
 \item[1)] Since covariates are missing at least for the unobserved individuals, the use of a full likelihood approach requires the specification of a distribution for the covariates. As we will see in Section \ref{Sec:selectcovariates}, misspecifying the distribution can lead to incorrect inference. Like previous approaches, we apply a normal distribution; however, we propose a new method of using non-parametric approaches to the covariates such as an infinite mixture of normal distributions.
 
 \item[2)] Unobservable heterogeneity can bias the inference, and hence we need a way to account for it. From our perspective, we view the idea of unobservable heterogeneity as an issue of omitted covariates. We borrow the idea of individuals belonging to latent classes impacts the probability of capture\citep{manriquevallier_bayesian_2016}, but implement it in the regression procedure through an additional intercept term. 
 
-\item[3)] Determining which covariates to include and how each covariate should be included in the regression will ultimately impact the inference. There are multiple ways to account for this issue, but we explore it through the lens of variable selection.
+\item[3)] Determining which covariates to include and how each covariate should be included in the regression will ultimately impact the inference. There are multiple ways to account for this issue, but we explore it through the lens of variable selection. We investigate the difficulty of computing the Bayes Factor and ultimately suggest a regularization technique.
 
 \end{list}
 
 The dissertation proceeds as follows: Section \ref{Sec:litreview}
-partially reviews the relevant capture-recapture literature. Section
-\ref{sec:CRwithCovariates} details the BLRCR model along with the three
-extensions described above. This includes the derivation of the
-posterior and a Markov Chain Monte Carlo (MCMC) estimation procedure.
-Section \ref{sec:simulationanalysis} contains an analysis of the
-procedure using a series of simulations. Section \ref{Sec:example1}
-looks at Example 1. Section \ref{Sec:example2} looks at Example 2.
-Section \ref{Sec:Conclusion} concludes with a summary of the
-dissertation and future directions of work in this area.
+provides a brief history of the capture-recapture problem while
+reviewing literature relevant to Bayesian and covariate extensions.
+Section \ref{sec:CRwithCovariates} begins with preliminary details,
+provides a model using conditional independent Bayesian Logistic
+Regressions, and approximates the posterior distribution using a Markov
+Chain Monte Carlo (MCMC) estimation procedure. Section
+\ref{Sec:selectcovariates} explores different covariate distributions
+along with nonparametric specifications. Section
+\ref{Sec:condindependence} introduces hidden covariates that allow for a
+breaking of the conditional independence assumption. Section
+\ref{Sec:modelselection} investigates the problem of model selection.
+Section \ref{Sec:example1} looks at Example 1. Section
+\ref{Sec:example2} looks at Example 2. Section \ref{Sec:Conclusion}
+concludes with a summary of the dissertation and future directions of
+work in this area.
 
 \newpage
 \section{Literature Review}
@@ -551,17 +559,18 @@ even a semi-complete likelihood, a covariate distribution must be
 specified. The examples provided often assume a normal distribution, but
 \cite{royle_analysis_2009} does consider alternative distributions.
 These alternative distributions do reveal some sensitivity to the choice
-of covariate distribution, which will be explored further in subsection
+of covariate distribution, which will be explored further in Section
 \ref{Sec:selectcovariates}.
 
 \newpage
-\section{Capture-Recapture with Covariates: The Bayesian Logistic Capture-Recapture Model with Extensions}
+\section{The Bayesian Capture-Recapture Model with Covariates}
 \label{sec:CRwithCovariates}
 
 In this section, we develop a Bayesian procedure for the multiple-list
-capture-recapture (CR) problem with covariates. Perhaps the most
-ubiquitous technique in solving the CR problem with multiple-lists is
-through the frequentist technique of log-linear models
+capture-recapture (CR) problem with covariates.
+
+Perhaps the most ubiquitous technique in solving the CR problem with
+multiple-lists is through the frequentist technique of log-linear models
 \citep{fienberg_multiple_1972}. Using multiple lists (\(J\ge 2\)) can be
 beneficial in that we have more detailed patterns, which can lead to
 better inference. The downside is that as the number of lists increases,
@@ -603,8 +612,8 @@ covariate is irrelevant so it does not matter whether it is discrete or
 continuous. Unfortunately, since we're dealing with what amounts to a
 missing data problem, but the missing data is not missing at random
 \citep{rubin_inference_1976}, the distribution of the covariate matters
-(see subsection \ref{Sec:selectcovariates}). Nevertheless, while we must
-be careful how we model the distribution of the covariate, any type of
+(see Section \ref{Sec:selectcovariates}). Nevertheless, while we must be
+careful how we model the distribution of the covariate, any type of
 covariate, continuous or discrete, can be used.
 
 Finally, a key concern of any capture-recapture framework is that the
@@ -619,16 +628,16 @@ heterogeneity. In particular, we may be concerned with both
 detected through the use of covariates, but we may also be concerned
 with ``unobservable'' heterogeneity, i.e, the heterogeneity that
 persists but for which no covariate information exists. One such method,
-presented in subsection \ref{Sec:condindependence}, allows for the
-modeling of this unobservable heterogeneity through the use of latent
-classes. This assumption also happens to break the perhaps unpalatable
-assumption of conditional independence mentioned before. Similarly, the
-covariates that are present may be numerous or may affect the estimation
-procedure in non-linear ways, so we extend the model to include a
-variable selection procedure (see subsection
-\ref{Sec:variableselection}). Additional extensions may be warranted
-given the problem, but the estimation procedure that uses data
-augmentation allows for extensions to be added relatively easily.
+presented in Section \ref{Sec:condindependence}, allows for the modeling
+of this unobservable heterogeneity through the use of latent classes.
+This assumption also happens to break the perhaps unpalatable assumption
+of conditional independence mentioned before. Similarly, the covariates
+that are present may be numerous or may affect the estimation procedure
+in non-linear ways, so we extend the model to include a variable
+selection procedure (see Section \ref{Sec:modelselection}). Additional
+extensions may be warranted given the problem, but the estimation
+procedure that uses data augmentation allows for extensions to be added
+relatively easily.
 
 To summarize, we begin with a Bayesian framework for the
 capture-recapture problem with covariates (see subsection
@@ -636,11 +645,8 @@ capture-recapture problem with covariates (see subsection
 this procedure which we call the Bayesian Logistic Regression
 Capture-Recapture (BLRCR) model and estimate the posterior through a
 Markov Chain Monte Carlo (MCMC) algorithm (see subsection
-\ref{Sec:BLRCRmodel}). The three remaining subsections discuss
-extensions to specifying the distribution of the covariates (subsection
-\ref{Sec:selectcovariates}), discovering unobserved heterogeneity
-(subsection \ref{Sec:condindependence}), and variable selection
-(subsection \ref{Sec:variableselection}).
+\ref{Sec:BLRCRmodel}). We then explore the properties of this model
+using a series of simulations in Section \ref{sec:simulationanalysis}.
 
 \subsection{Background and Preliminaries}
 \label{Sec:CRbackground}
@@ -711,7 +717,7 @@ to include these covariates,
 \begin{align}
 \label{eqn:jointlikelihoodequation2}
 \nonumber p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|N,\theta,\boldsymbol{\phi},\mathcal{X}_{mis}) & = p(\mathcal{Y}_{obs}|N,\theta,\boldsymbol{\phi},\mathcal{X}_{obs},\mathcal{X}_{mis})p(\mathcal{X}_{obs}|\boldsymbol{\phi})\\
-& \propto \binom{N}{n} \prod_{i=1}^n f(\boldsymbol{y_i}|\boldsymbol{\theta},\mathcal{X}_{obs})\prod_{n+1}^N f(\boldsymbol{0}|\boldsymbol{\theta},\mathcal{X}_{mis})I(N\ge n)\cdot g(\mathcal{X}_{obs}|\boldsymbol{\phi}).
+& = \binom{N}{n} \prod_{i=1}^n f(\boldsymbol{y_i}|\boldsymbol{\theta},\mathcal{X}_{obs})\prod_{n+1}^N f(\boldsymbol{0}|\boldsymbol{\theta},\mathcal{X}_{mis})I(N\ge n)\cdot g(\mathcal{X}_{obs}|\boldsymbol{\phi}).
 \end{align}
 
 Once again, in order to complete the Bayesian model, priors must be
@@ -915,475 +921,62 @@ To sample from \autoref{eqn:conditionalXmis}, we use rejection sampling of a tru
 
 \end{list}
 
-\subsection{Selecting a Distribution for the Covariates}
-\label{Sec:selectcovariates}
-
-When the probability that an individual is captured at least once is
-dependent upon the covariates, the observed covariate distribution will
-differ from population covariate distribution. Simply using logistic
-regression on the observed data would lead to biased coefficients, which
-in turn would lead to bias in the population estimation. The algorithm
-presented in subsection \ref{Sec:BLRCRmodel} alleviates this problem by
-concatenating samples of the missing covariates with the observed data
-before estimating the coefficients. Unfortunately, this presents an
-additional burden on the user of specifying a distribution for the
-missing covariates, \(\boldsymbol{g}(\boldsymbol{\phi})\).
-
-\subsubsection{Specifying a Distribution for the Covariates}
-\label{sec:normaldistributioncovariate}
-
-If the distribution is known including parameters, then we can simply
-use the aforementioned algorithm. If the distribution is known except
-for the parameters, then we could specify that distribution along with
-priors on the parameters. For example, \cite{royle_analysis_2009} uses a
-single covariate and specifies a normal distribution with a normal
-distribution prior for the mean and a gamma prior for the inverse
-variance. One could take a multivariate version of this approach by
-specifying,
-
-\begin{align} 
-\label{eqn:normalcovariatedistribution}
-\boldsymbol{x_{i}} & \stackrel{iid}{\sim} \text{MVNormal}(\boldsymbol{\mu},\boldsymbol{\Sigma}),
-\end{align}
-
-with conjugate priors,
-
-\begin{align}
-\boldsymbol{\Sigma} \sim & \text{InvWishart}(\nu_{0},\boldsymbol{\Lambda_{0}^{-1}}) \\
-\boldsymbol{\mu}|\boldsymbol{\Sigma} \sim & \text{ MVNormal}(\boldsymbol{\mu_{0}},\boldsymbol{\Sigma}/\kappa_{0})
-\end{align}
-
-This would add two additional sampling stages to the algorithm (see
-\cite{gelman_bayesian_2014}):
-
-\begin{list}{}{}
-\item[1)] Sample $\boldsymbol{\Sigma}$.  Define the sufficient statistics, $\boldsymbol{\bar{x}}=\frac{1}{N}\sum_{i=1}^{N}\boldsymbol{x_{i}}$ and $\boldsymbol{S} = \sum_{i=1}^{N}(\boldsymbol{x_{i}}-\boldsymbol{\bar{x}})(\boldsymbol{x_{i}}-\boldsymbol{\bar{x}})^T$.  Then,
-
-\begin{equation}
-\boldsymbol{\Sigma} \sim \text{InvWishart}(\nu_{N},\boldsymbol{\Lambda_{N}^{-1}}),
-\end{equation}
-
-where $\nu_{N} = \nu_{0}+N$ and $\boldsymbol{\Lambda_{N}}=\boldsymbol{\Lambda_{0}}+\boldsymbol{S}+\frac{\kappa_{0}N}{\kappa_{0}+N}(\boldsymbol{\bar{x}}-\boldsymbol{\mu_{0}})(\boldsymbol{\bar{x}}-\boldsymbol{\mu_{0}})^T$.
-
-\item[2)] Sample $\boldsymbol{\mu_k|\Sigma_k}$ for $k=1,...,K^*$.  Using the same defined terms in the previous step,
-
-\begin{equation}
-\boldsymbol{\mu}|\boldsymbol{\Sigma} \sim \text{MVNormal}(\boldsymbol{\mu_{N}},\boldsymbol{\Sigma}/\kappa_{N} ),
-\end{equation}
-
-where $\boldsymbol{\mu_{N}}=\frac{\kappa_{0}}{\kappa_{0}+N}\boldsymbol{\mu_{0}} + \frac{N}{\kappa_{0}+N}\boldsymbol{\bar{x}} $ and $\kappa_{N}=\kappa_{0}+N$.
-\end{list}
-
-Different specified distributions would require different sampling
-procedures. In a supplementary document, \cite{royle_analysis_2009}
-considers other types of covariate distributions and found some
-variations in the inference. Unfortunately, knowing what distribution to
-specify can be difficult as rarely would we know this distribution.
-Deciding on a proposal distribution based upon the observed distribution
-can be also dangerous or misleading as the observed distribution is a
-truncation of the true distribution. Not only are the missing covariates
-not missing at random but we do not even know how many are missing. As
-we will shown in subsection \ref{Sec:simscovdists}, mispecifying the
-distribution can lead to inaccurate estimations.
-
-\subsubsection{Conditional Likelihood}
-
-One approach to the problem is estimating the coefficients using the
-conditional maximum likelihood, where the likelihood function to be
-maximized is conditioned on the probability an individual is observed at
-least once \citep{alho_logistic_1990,huggins_statistical_1989}. This
-avoids the necessity of specifying a distribution for the covariates but
-can lead to unstable results when the observed distribution of the
-covariates is dissimilar to the population distribution of the
-covariates \citep{tilling_capture-recapture_1999}. An article by
-\cite{yee_vgam_2015} shows an easy way to implement the technique using
-the \texttt{VGAM} package in \texttt{R}. The technique works in two
-stages. First, use generalized linear models with a positive Bernoulli
-family to estimate the the coefficients. This allows us to obtain fitted
-values for the probability that each individual in the dataset is
-missing. Second, use those fitted values in the Horvitz-Thompson
-estimator \citep{horvitz_generalization_1952} to estimate the population
-size, N. One could take a Bayesian approach to the logistic regression
-and assign prior distributions to the parameters and estimate the
-population in a similar way. We derive equations for finding the maximum
-a posteriori (MAP) estimate in Section \ref{Sec:conditionalmaximumlike}:
-Appendix A using gradient ascent.
-
-\subsubsection{Nonparametric Distributions}
-
-An alternative approach to the methods described above is to specify a
-nonparametric distribution for the covariates. Using a nonparametric
-method has the added consequence of increasing the complexity of the
-model which may lead to additional difficulties in the mixing of the
-posterior. Nevertheless, it comes with multiple benefits in allowing us
-to maintain use of a full likelihood approach, continued extensibility,
-and (most importantly) flexibility in the fitting of the covariates. In
-this subsection, we present two methods for modeling the covariates in a
-non-parametric fashion: The Dirichlet Process Mixture of Normal
-Distributions and the Bayesian Bootstrap.
-
-\paragraph{Dirichlet Process Mixture of Normal Distributions}\hspace{5px} \newline
-
-The first method is to fit a Dirichlet process mixture of normal
-distributions. This nonparametric approach fits a potentially infinite
-number of multivariate normal distributions to the data. The following
-is a description of the methodology and is adapted from
-\cite{gelman_bayesian_2014}. This model introduces a latent variable,
-\(z\), which is a latent parameter determining the mean and covariance
-matrix from which the observed covariate, \(\boldsymbol{x_i}\), is
-drawn. The generative process for each observation's covariate can then
-be summarized as,
-
-\begin{align}
-\boldsymbol{x_i}|z_i \stackrel{ind}{\sim} & \text{ MVNormal}(\boldsymbol{\mu_k},\boldsymbol{\Sigma_k}) \hspace{5px} \text{for } i=1,...,N\\
-z_i \stackrel{iid}{\sim} & \text{ Discrete}(\{1,2,...\},(\pi_1,\pi_2,...)) \hspace{5px} \text{for } i=1,...,N.
-\end{align}
-
-Therefore, the probability density function of the covariates can be
-formally written as,
-
-\begin{equation}
-g(\boldsymbol{x}|\boldsymbol{\mu},\boldsymbol{\Sigma}) = \prod_{i=1}^N \prod_{k=1}^\infty \pi_k \text{ MVNormal}(\boldsymbol{x_i}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k}).
-\end{equation}
-
-In order to have a fully Bayesian approach, we assign priors to the
-unknown parameters.
-
-\begin{align}
-\boldsymbol{\Sigma_k} \sim & \text{InvWishart}(\nu_{0},\boldsymbol{\Lambda_{0}^{-1}}) \\
-\boldsymbol{\mu_k}|\boldsymbol{\Sigma_k} \sim & \text{ MVNormal}(\boldsymbol{\mu_{0}},\boldsymbol{\Sigma_k}/\kappa_{0}) \\
-(\pi_1,\pi_2,...) \sim & SB(\alpha) \\
-\alpha \sim & \text{ Gamma}(a_{\alpha},b_{\beta}),
-\end{align}
-
-where SB(\(\alpha\)) is the stick breaking process,
-\citep{ishwaran_gibbs_2001}. While we model the number of latent classes
-as infinite, we can approximate this infinite mixture problem by setting
-a sufficiently large upperbound to the number of latent classes,
-\(K^*\), and solving this finite-dimensional problem. The stick breaking
-prior can therefore be defined as \(\pi_k = V_k \prod_{l<k}(1-V_l)\),
-where \(V_1, ..., V_{K^*-1} \sim \text{Beta}(1,\alpha)\) and
-\(V_{K^*}=1\). This upper bound, \(K^*\), should not be thought of as a
-parameter as it should have no impact on the estimation process as long
-as the value is set sufficiently large enough.
-
-Using this generative scheme adds five additional sampling stages to the
-algorithm presented in subsection \ref{Sec:BLRCRmodel}.
-
-\begin{list}{}{}
-
-\item[1)] Sample $z_i$ for $i=1,...,N$. The latent class label takes integer values from $1,...,K^*$.  To compute the probability of each latent class label for each $i$,
-
-\begin{equation}
-P(z_i=k) = \frac{\pi_k \text{ MVNormal}(\boldsymbol{x_i}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k})}{\sum_{l=1}^{K^*}\pi_l \text{ MVNormal}(\boldsymbol{x_i}|\boldsymbol{\mu_l},\boldsymbol{\Sigma_l})}.
-\end{equation}
-
-\item[2)] Sample $\boldsymbol{\Sigma_k}$ for $k=1,...,K^*$. Define $N_k=\sum_{i=1}1_{z_i=k}$ which is a count of the number of individuals in the population belonging to latent class, $k$.  Also, define the sufficient statistics, $\boldsymbol{\bar{x}_k}=\frac{1}{N_k}\sum_{i=1}^{N_k}\boldsymbol{x_{ik}}$ and $\boldsymbol{S_k} = \sum_{i=1}^{N_k}(\boldsymbol{x_{ik}}-\boldsymbol{\bar{x}_k})(\boldsymbol{x_{ik}}-\boldsymbol{\bar{x}_k})^T$.  Then,
-
-\begin{equation}
-\boldsymbol{\Sigma_k} \sim \text{InvWishart}(\nu_{N_k},\boldsymbol{\Lambda_{N_k}^{-1}}),
-\end{equation}
-
-where $\nu_{N_k} = \nu_{0}+N_k$ and $\boldsymbol{\Lambda_{N_k}}=\boldsymbol{\Lambda_{0}}+\boldsymbol{S_k}+\frac{\kappa_{0}N_k}{\kappa_{0}+N_k}(\boldsymbol{\bar{x}_k}-\boldsymbol{\mu_{0}})(\boldsymbol{\bar{x}_k}-\boldsymbol{\mu_{0}})^T$.
-
-\item[3)] Sample $\boldsymbol{\mu_k|\Sigma_k}$ for $k=1,...,K^*$.  Using the same defined terms in the previous step,
-
-\begin{equation}
-\boldsymbol{\mu_k}|\boldsymbol{\Sigma_k} \sim \text{MVNormal}(\boldsymbol{\mu_{N_k}},\boldsymbol{\Sigma_k}/\kappa_{N_k} ),
-\end{equation}
-
-where $\boldsymbol{\mu_{N_k}}=\frac{\kappa_{0}}{\kappa_{0}+N_k}\boldsymbol{\mu_{0}} + \frac{N_k}{\kappa_{0}+N_k}\boldsymbol{\bar{x}_k} $ and $\kappa_{N_k}=\kappa_{0}+N_k$.
-
-\item[4)] Sample $(\pi_1,\pi_2,...,\pi_{K^*})$ for $k=1,...,K^*$.  Begin by drawing a sample from each of the stochastic components,
-
-\begin{equation}
- V_k \sim \text{ Beta}\left(1+N_k, \alpha+\sum_{l=k+1}^K N_l\right) \hspace{5px} \text{for } k=1,...,K^*-1.
-\end{equation}
-
-Set $V_{K*}=1$.  Then, $\pi_k = V_k\prod_{l<k}(1-V_l)$ for all $k=1,...,K^*$.
-
-\item[5)] Sample $\alpha$.
-
-\begin{equation}
-  \alpha \sim \text{ Gamma}\left(a_\alpha + K^* -1, b_\alpha - \ln(\pi_{K^*}) \right).
-\end{equation}
-
-\end{list}
-
-It should be noted that the normal distribution specified in subsection
-\ref{sec:normaldistributioncovariate} is a special case of this
-specification where \(K^*=1\). We will show in section
-\ref{Sec:simscovdists} that the assumption of a single normal may lead
-to bias in the estimation process when the actual distribution is not
-normal. Using an infinite mixture of normal distributions tends to
-perform better, but still struggles when the distribution is discrete or
-is far from normally distributed.
-
-\paragraph{The Bayesian Bootstrap} \hspace{5px} \newline
-
-\vspace{-10px}
-
-An alternative approach would be to apply a discrete distribution with
-support at the observed, distinct values, \(\boldsymbol{d_k}\), of the
-covariates,
-
-\begin{equation}
-P(\boldsymbol{x_i}=\boldsymbol{d_k}) = \psi_k, \hspace{10px} \sum_{i=1}^K \psi_k = 1.
-\end{equation}
-
-We attach a Dirichlet prior to the probabilities, \(\psi_k\), such that
-
-\begin{equation}
-(\psi_1, ..., \psi_K) \sim Dirichlet(\alpha_1,...,\alpha_K)
-\end{equation}
-
-The posterior distribution for the \(\psi_k\) is then,
-
-\begin{equation}
-\label{eqn:bayesbootstrapposterior}
-(\psi_1, ..., \psi_K|\mathcal{X}) \sim Dirichlet(\alpha_1+\sum_{i=1}^N I_{d_1}(\boldsymbol{x_i}),...,\alpha_K+\sum_{i=1}^N I_{d_K}(\boldsymbol{x_i}))
-\end{equation}
-
-where \(I_{d_k}(\boldsymbol{x_i})=1\) is an indicator function for
-\(\boldsymbol{x_i} = \boldsymbol{d_i}\) and
-\(I_{d_k}(\boldsymbol{x_i})=0\) otherwise.
-
-Although we are not performing an actual bootstrapping procedure, we
-refer to this modelling setup as the Bayesian Bootstrap
-\citep{rubin_bayesian_1981} for a couple of reasons. First, the
-construction is quite similar to the theory behind the Bayesian
-Bootstrap in terms of placing a Dirichlet distribution on the observed
-values in the sample. Second, this methodology samples values for the
-missing observations in the same spirit as bootstrapping. Using the
-\(n\) observed covariates, we sample \(n_0\) values from the observed
-distribution with replacement and use these values in place of the
-missing covariates.
-
-To implement this model construction for the covariates, we only need to
-add one additional sampling stage to our estimation procedure. Noting
-that we use all covariates, not just the observed, we draw the
-probabilities, (\(\psi_1, ..., \psi_K\)) in accordance to equation
-\ref{eqn:bayesbootstrapposterior}. When
-\((\alpha_1, ..., \alpha_K) = \alpha = 0\), one can skip the adding of
-this sampling stage and simply draw, with replacement, from the current
-complete covariate data, \(\mathcal{X}\). As along as you remember to
-still condition on the probability of being missing as in equation
-equation \ref{eqn:conditionalXmis}, these sampling techniques would be
-trivially the same.
-
-This method addresses some of the potential issues in the covariate
-specification, but it also introduces new issues as well. These issues
-tend to align closely with those of the Bayesian Bootstrap. For example,
-the missing values are essentially being sampled from the observed
-empirical distribution. What happens if some of the potential values
-that are missing do not appear in the observed distribution? This is a
-concern for when the covariate distribution is discrete but a
-probabilistic certainty when the distribution is continuous.
-\cite{rubin_bayesian_1981} states that no method, even the bootstrap, is
-without constraints and any ``serious data analysis should always
-include serious consideration of model constraints.'' Furthermore, we
-note that the end goal is to estimate the size of the population, so the
-exact modelling of the covariate distribution is not as important as
-long as it does not bias the estimation. Using the rejection sampler
-based on equation \ref{eqn:conditionalXmis} combined with
-\((\alpha_1, ..., \alpha_K) = \alpha = 0\), the probability of each draw
-is appropriately weighted based on the probability of going unobserved.
-This has similar intuition as the mechanic behind the Horvitz-Thompson
-estimator in the conditional likelihood approach where each covariate
-essentially gets magnified based on its estimated probability of being
-missing.
-
-\subsection{Conditional Independence and Unobserved Heterogeneity}
-\label{Sec:condindependence}
-
-The model construction of section \ref{sec:CRwithCovariates} assumes
-conditional independence based on the covariates. In other words, given
-the information provided by the covariates, the probability of capture
-on one list is unaffected by another list. If the assumption does not
-hold, it may lead to biased parameter estimates. One reason the
-conditional independence may be violated is because the capture
-probabilities upon a list are directly related to the probability of
-being on another list, i.e., the assumption of list dependency. This may
-occur if, for example, one list uses another list as a reference or data
-is shared between various documentation projects
-\citep{manrique-vallier_capture-recapture_2020}. This would lead to
-heavy positive dependence between these two lists. While this is a
-serious issue, we assume the lists used in the analysis are collected
-independently.
-
-A second reason conditional independence may be violated is that
-underlying heterogeneity exists within the population that is not fully
-accounted for by covariates. Recall, the example cited in subsection
-\ref{sec:earlyapproachlitreview} of individual heterogeneity
-masquerading as list dependency in the study analyzing extrajudicial
-killings during the Guatemalan Civil War \citep{ball_making_2000}.
-Researchers found that people who were part of Catholic religious
-communities were more likely to trust Catholic researchers with their
-stories than with NGO researchers associated with the political left.
-Similarly, people located in areas associated with the rebel groups were
-more likely to do the opposite. If this trait is unobserved and not
-taken into account, it will result in biased \(\boldsymbol{\beta_j}\)
-coefficients. Further, because of the biased coefficients, the
-probabilities of capture and the estimate for the population size will
-be biased as well (see section \ref{Sec:simulations}).
-
-\subsubsection{Proposed Extension 2: Modelling the Unobserved Heterogeneity with Latent Classes}
-
-We view the problem of unobserved heterogeneity through the lens of a
-missing covariates problem. While there are multiple ways one could
-implement additional heterogeneity, we choose to add an indicator
-vector, \(\boldsymbol{\omega_i}\), that indicates membership to one of
-\(H_\omega\) latent groups with probability,
-\(\boldsymbol{\phi_\omega}\sim \text{Dirichlet}(\boldsymbol{\alpha_\omega})\).
-For simplicity, assume a hyperparameter specification with each value
-assigned the same value, \(\alpha_\omega\). Larger values of this
-hyperparameter put more weight on the prior and less on the data.
-
-This leads to three new types of parameters to sample:
-\(\boldsymbol{\omega_i}\), \(\boldsymbol{\phi_\omega}\), and
-\(\boldsymbol{\beta_\omega}\). The model is constructed such that each
-latent group has an additional intercept affecting the probability of
-capture on each list. \autoref{eqn:sigmoidfunc} then becomes
-
-\begin{equation}
-\label{eqn:sigmoidfunclatentvariable}
-\lambda_{ij}=\sigma(\boldsymbol{x_i}^T\boldsymbol{\beta_j} + \boldsymbol{\omega_i}^T\boldsymbol{\beta_\omega}) = \frac{1}{1+e^{-(\boldsymbol{x_i}^T\boldsymbol{\beta_j}+\boldsymbol{\omega_i}^T\boldsymbol{\beta_\omega}))}},
-\end{equation}
-
-\subsubsection{Proposed Extension 2: Updating the Estimation}
-
-Since we have three new parameters: \(\boldsymbol{\omega_i}\),
-\(\boldsymbol{\phi_\omega}\), and \(\boldsymbol{\beta_\omega}\); we
-might expect to need just three new sampling methods. Unfortunately,
-complications once again arise from the missing covariates. If the
-individual is observed, the latent group membership,
-\(\boldsymbol{\omega_i}\), can be sampled with corresponding discrete
-probability,
-
-\begin{equation}
-\label{eqn:latentvariableomega}
-p(\boldsymbol{\omega_i}|\boldsymbol{\phi_\omega},N,\mathcal{Y},\boldsymbol{\beta},\boldsymbol{X}) \propto \phi_\omega\prod_{j=1}^J\lambda_{ij}^{y_{ij}}(1-\lambda_{ij})^{1-y_{ij}}.
-\end{equation}
-
-For the individuals that are not observed, we draw the latent class
-membership during the missing covariate imputation stage. Recall,
-because of the complications mentioned in subsection
-\ref{sec:estimationBLRCRMCMC}, the Gibbs sampler requires \(N\) and
-\(\mathcal{X}_{mis}\) to be sampled simultaneously. In order to
-implement the sampling procedure of the missing covariates,
-\(\mathcal{X}_{mis}\), the latent class membership,
-\(\boldsymbol{\omega_i}\) of each unobserved individual must be drawn
-initially as well from its subpopulation with probability
-\(\boldsymbol{\phi_\omega}\).
-
-The \(\boldsymbol{\phi_\omega}\) are sampled according to,
-
-\begin{equation}
-\label{eqn:latentvariablePHIomega}
-\boldsymbol{\phi_\omega} \sim \text{Dirichlet}(\alpha_\omega + n_{\omega=1}, \alpha_\omega+n_{\omega=2}, ..., \alpha_\omega+n_{\omega={H_\omega}}),
-\end{equation}
-
-where \(n_{\omega}\) is the number of individuals belonging to each
-latent class membership and \(\alpha_\omega\) is a hyperparameter which
-can be thought of as a prior sample size. We set \(\alpha_\omega=1\).
-Lastly, the additional coefficient vector,
-\(\boldsymbol{\beta_\omega}\), can be sampled in the same manner and
-simultaneously with the other coefficients, \(\boldsymbol{\beta_j}\),
-when conditioned on \(\boldsymbol{\phi_\omega}\).
-
-\subsubsection{Future Work: Implementing Stick-Breaking Priors for Latent Classes}
-
-The current setup uses a finite number of latent classes with a prior
-specification of a Dirichlet(\(1/H_\omega\),\ldots,\(1/H_\omega\)).While
-it may be reasonable in some cases to know the number of latent classes,
-it may be advantageous to utilize the stick-breaking prior. Of course,
-with a sufficiently large \(H_\omega\) the current construction will
-approximate the solution under the stick-breaking prior. Nevertheless,
-the current construction uses the concentration parameter,
-\(\alpha_\omega\), as a hyperparameter. Adding some flexibility by
-placing a prior on \(\alpha_\omega\) could prove beneficial.
-
-\subsection{Proposed Extension 3: Covariate Selection}
-\label{Sec:variableselection}
-
-The covariates play an important role in how they affect the estimated
-capture probabilities that ultimately influence the estimate of the
-population size \(N\). If many covariates are present, we need a method
-for determining which covariates should be used along with possible
-interactions, which would relax the independence assumption between
-covariates. Even in the presence of a single covariate, how that
-covariate is used can have a major effect on the inference process.
-Perhaps some sort of non-linear transformation such as the log would
-give a better linear fit. A couple of strategies come to mind. First, we
-could consider some form of model averaging where multiple models are
-considered with various combinations of covariates. Alternatively, we
-could implement a prior that induces variables selection such as the
-horseshoe prior or spike and slab prior. A third possible solution is to
-perform some sort of post-hoc analysis between various fits and compute
-the Bayes factor.
-
-\newpage
-\section{Simulation Analysis}
+\subsection{Simulation Analysis}
 \label{sec:simulationanalysis}
 
-In this section, we run numerous simulations covering a number of
-different types of situations including varying levels of list
-dependency, sizes of population, non-normal covariate distributions, and
-unobservable heterogeneity. The primary objective is to examine the
-results of the Bayesian Logistic Regression Capture-Recapture (BLRCR)
-model. Along with the BLRCR algorithm, we compare our results using four
-other capture-recapture algorithms. The first algorithm we use is
-conditional maximum likelihood logistic regression (cMLCR) which is
-implemented using the \texttt{VGAM} package in \texttt{R} (see
-subsection \ref{Sec:selectcovariates}). Instead of using the asymptotic
-estimates for the standard error and assuming normality, we use a
-semiparametric bootstrap for the confidence intervals
-\citep{zwane_implementing_2003}. Second, we implement the ubiquitous
-hierarchical log-linear (Log Linear) modelling technique
+In this subsection, we examine the Bayesian Logistic Regression
+Capture-Recapture (BLRCR) model and estimation procedure using a variety
+of simulations and compare it with other popular methodologies. Of
+interest is the computational efficiency and quality of the model. Since
+the estimation procedure utilizes a MCMC methodology, the concern is in
+the mixing of the sampled posterior distribution. Typically, as the
+model becomes more complex with a greater number of parameters, the need
+arises for longer MCMC chains in order to converge to the target
+posterior stationary distribution. Meanwhile, assuming the model can
+converge, we also assess the quality of the procedure under various
+measures of accuracy (bias, mean-squared error, capture percentage) and
+precision (relative length of interval).
+
+While the primary purpose is to examine the results of the Bayesian
+Logistic Regression Capture-Recapture (\textbf{BLRCR}) model, we use
+four other popular capture-recapture algorithms as a comparison. First,
+we consider the conditional maximum likelihood logistic regression
+(\textbf{cMLCR}) which we implement using the \texttt{VGAM} package in
+\texttt{R} (see subsection \ref{Sec:selectcovariates}). The package
+provides asymptotic estimates for the standard error and suggests,
+through examples, to construct confidence intervals assuming normality.
+Instead, utilize the package to get our point estimate and proceed with
+a semiparametric bootstrap for the confidence intervals
+\citep{zwane_implementing_2003}. Second, we consider the ubiquitous
+hierarchical log-linear (\textbf{Log Linear - BIC}) modelling technique
 \citep{fienberg_multiple_1972} using the the \texttt{Rcapture} package
 in \texttt{R}. Keep in mind that this approach does not use covariates,
 but attempts to model list dependency directly through list
 interactions. Since the approach is hierarchical with \(2^J\) different
 model constructions, all are calculated and the one with the lowest BIC
 is selected. Third, we use the Bayesian Non-Parametric Latent-Class
-Capture-Recapture (LCMCR) algorithm in
+Capture-Recapture (\textbf{LCMCR}) algorithm in
 \cite{manriquevallier_bayesian_2016} which is another technique that
 does not allow covariates but uses a Bayesian nonparametric approach to
 account for unobserved heterogeneity (see Section \ref{LCMCRmodel}:
 Appendix B for a summary of this approach). The fourth technique is a
-simple independence model (Independent) where it is assumed there is no
-list or individual heterogeneity. Conveniently, when the number of
-latent classes is set equal to one, the LCMCR model collapses into an
-independence model, effectively giving a Bayesian independence sampler
-(Independent).
+simple independence model (\textbf{Independent}) where it is assumed
+there is no list or individual heterogeneity. Conveniently, when the
+number of latent classes is set equal to one, the LCMCR model collapses
+into an independence model, effectively giving a Bayesian independence
+sampler.
 
-We estimate \(N\) using the BLRCR model under three different
-specifications. First, we consider a single multivariate normal to
-describe the covariate distribution (\(K=1\)) and no hidden
-heterogeneity (\(H_\omega\)=1). Second, we allow for a mixture of
-multivariate normal distributions under the stick-breaking prior with a
-sufficiently large number of classes, \(K=20\), but still do not allow
-for additional unobserved heterogeneity. The third specification is
-similar to the second but now allows hidden heterogeneity with up to
-\(H_\omega=20\) different latent intercepts. Also, the BLRCR model
-requires a prior mean and covariance for the coefficients, which are set
-to
-
-\singlespacing
-
-\[\boldsymbol{b}=\boldsymbol{0} \text{ and } \boldsymbol{B}=\begin{bmatrix}
-1 & 0 & 0\\
-0 & 1 & 0\\
-0 & 0 & 1
-\end{bmatrix}.\] \doublespacing
-
-\vspace{10px}
-
-In addition to priors on the coefficients, BLRCR and LCMCR require
-additional hyperparameter specifications for the mixture distributions
-which can be found in \autoref{table:hyperparams}. The number of samples
-in each simulation for each method is set to 10,000 unless otherwise
-stated.
+The BLRCR model is designed to be flexible and extensible (see sections
+\ref{Sec:selectcovariates}, \ref{Sec:condindependence}, and
+\ref{Sec:modelselection}), hence there are several choices in its
+implementation. While we will implement these various extensions in
+upcoming sections, for now, we will assume the true distribution of the
+covariates is known. This does not, however, avoid the necessity of
+specifying hyperparameters for the Bayesian models. In order to be
+consistent throughout the entirety of this dissertation, we use the same
+relatively uninformative prior specifications throughout all sections.
+\autoref{table:hyperparams} lists these hyperparameter specifications
+for both the BLRCR and LCMCR models.
 
 \singlespacing
 \begin{table}[H]
@@ -1411,34 +1004,170 @@ $\boldsymbol{\Lambda_0}$ & $\begin{bmatrix}
 \end{table}
 \doublespacing
 
-The following subsections run simulations on data generated from
-different characteristics including levels of list dependency
-(subsection \ref{Sec:simslistdepend}), size of population (subsection
-\ref{Sec:simspopsize}), various covariate distributions (subsection
-\ref{Sec:simscovdists}), and unobservable heterogeneity (subsection
-\ref{Sec:simsunobservedheterogeneity}). The objective is to compare and
-contrast the BLRCR model with the other approaches described above. For
-each algorithm a point estimate of the population size, \(N\), is
-computed. We have some options for what to use as the point estimate,
-\(\hat{N}\), for the MCMC algorithms, but we elect to use median of the
-sampled posterior. In order to get a measure on the precision and
-accuracy model, we also compute the 95\(\%\) confidence/credible
-interval.
+Since the BLRCR model uses logistic regression with a normal
+distribution prior on the coefficients, this also requires a prior for
+the mean and covariance, which are set to
 
-In each subsection a table with results can be found. The column \(N\%\)
-computes the average \(\hat{N}\) across the simulations and takes it as
-a percentage of \(N\). Hence, a score of 1.000 would indicate an
-unbiased estimate. In addition, we consider the accuracy of the point
-estimate by computing the mean squared error (MSE) of the simulated
-\(\hat{N}\). We also look to the accuracy of the \(95\%\) interval
-estimate by checking whether \(N\) fell inside that interval (CI\(\%\)).
-Of course, the precision of the interval must also be considered so we
-computed the average of the simulated 95\(\%\) confidence/credible
-interval widths as a percentage of \(N\) (CI Width). Ideally, we would
-want a model with a small interval width (high precision) but maintains
-the ability to find the true population size often (high accuracy).
+\singlespacing
 
-\subsection{Simulations with Different Sized Populations}
+\[\boldsymbol{b}=\boldsymbol{0} \text{ and } \boldsymbol{B}=\begin{bmatrix}
+1 & 0 & 0\\
+0 & 1 & 0\\
+0 & 0 & 1
+\end{bmatrix}.\] \doublespacing
+
+\vspace{10px}
+
+For each set of simulations, a table with results can be found. For each
+algorithm a point estimate of the population size, \(N\), is computed.
+We have some options for what to use as the point estimate, \(\hat{N}\),
+for the MCMC algorithms, but we elect to use median of the sampled
+posterior. The column \({Mean}\hspace{5px}{N}\) records the average
+\(\hat{N}\) across the simulations and the column
+\({Mean}\hspace{5px}{N}\%\) takes it as a percentage of \(N\). Hence, if
+the true population size is \(N=2000\), a
+\({Mean}\hspace{5px}{N} = 2000\) and a
+\({Mean}\hspace{5px}{N}\%= 1.000\) would indicate an unbiased estimate.
+We also consider the accuracy in two other ways: the column \(MSE\)
+records the estimated mean squared error of the point estimate and the
+column \(CI \%\) records the percentage of times the \(95\%\) interval
+captured the true population number, \(N\). In order to get a measure of
+interval's precision, we compute the average of the simulated 95\(\%\)
+confidence/credible interval widths as a percentage of \(N\), which is
+recorded in column \({CI}\hspace{5px}{Width}\). Ideally, we would want a
+model with high precision, i.e.~a small interval width; but still
+maintains the ability to be highly accurate.
+
+\subsubsection{Simulations with Varying Levels of List Dependency }
+\label{Sec:simslistdepend}
+
+The objective of this subsection is to evaluate the BLRCR and other
+models under varying coefficients that induce different levels of list
+dependency. All of this list dependency is really just heterogeneity in
+the capture probabilities that can be fully explained by the covariates.
+The models that do not use covariates (Log Linear, LCMCR, and
+Independent) will not or will struggle to detect the heterogeneity
+leading to biased results. On the other hand, the BLRCR and cMLCR will
+perform well as they incorporate the covariates into their modelling.
+
+We simulate data in accordance with \autoref{eqn:logitdatacreation}
+using two covariates (\(H\)=2) and four lists (\(J=4\)). The covariates
+are drawn from two independent standard normal distributions. Three sets
+of \(\beta\) coefficients are chosen that create ``negative'',
+``moderate'', and ``positive'' dependency between the lists and are
+described in \autoref{table:1}. To clarify, all of the lists regardless
+of the coefficients are conditionally independent given the covariates.
+We simulate an additional dataset with all of the slope coefficients set
+to 0, thereby creating lists with independent capture probabilities.
+
+\singlespacing
+\begin{table}[H]
+\centering
+\begin{tabular}{||c c c c||} 
+ \hline
+ \multicolumn{4}{||c||}{"Negative"}\\
+ \hline
+ List ($j$) & $\beta_{0j}$ & $\beta_{1j}$ & $\beta_{2j}$   \\ [0.5ex] 
+ \hline\hline
+ 1 & -2 &  -1  & 1 \\ 
+ 2 & -2 & 1  &  -1 \\
+ 3 & -2 & 1  &  1 \\
+ 4 & -2 &  -1  &  -1 \\
+ \hline
+\end{tabular}
+\begin{tabular}{||c c c c||} 
+\hline
+ \multicolumn{4}{||c||}{"Moderate"}\\
+ \hline
+ List ($j$) & $\beta_{0j}$ & $\beta_{1j}$ & $\beta_{2j}$   \\ [0.5ex] 
+ \hline\hline
+ 1 & -2 &  -1  & 1 \\ 
+ 2 & -2 & 1  &  -1 \\
+ 3 & -2 & -1  &  1 \\
+ 4 & -2 &  1  &  -1 \\
+ \hline
+\end{tabular}
+\begin{tabular}{||c c c c||} 
+ \hline
+ \multicolumn{4}{||c||}{"Positive"}\\
+ \hline
+ List ($j$) & $\beta_{0j}$ & $\beta_{1j}$ & $\beta_{2j}$   \\ [0.5ex] 
+ \hline\hline
+ 1 & -2 &  -1  & 1 \\ 
+ 2 & -2 & -1  &  1 \\
+ 3 & -2 & -1  &  1 \\
+ 4 & -2 &  -1  &  1 \\
+ \hline
+\end{tabular}
+\caption{Coefficients for Simulated Data}
+\label{table:1}
+\end{table}
+\doublespacing
+
+\singlespacing
+\begin{table}[H]
+\centering
+\begin{tabular}{||r l r r r r||} 
+ \hline
+$\boldsymbol{\beta}$ & Method & N$\%$ &MSE & CI Width & CI $\%$   \\ [0.5ex] 
+ \hline\hline
+ "Moderate"    & BLRCR($K=1$, $H_\omega=1$)  & 0.983   & 82.5   & 0.156   & 94.0 \\ 
+               &  BLRCR($K=20$, $H_\omega=1$)   & 0.988     & 82.6     & 0.162     & 95.0 \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & 0.997     & 84.9     & 0.204     & 99.0 \\                
+               & cMLCR       & 1.002       & 87.1      & 0.163      & 92.0 \\
+               & Log Linear (BIC)  & 1.399      & 1669.3     & 0.458     & 0.0 \\ 
+               & LCMCR       & 0.851       & 303.4      & 0.148      & 11.0 \\ 
+               & Independent & 1.035 & 103.1& 0.157& 90.0 \\ 
+               
+
+                                  
+ \hline
+"Negative"    & BLRCR($K=1$, $H_\omega=1$)  & 0.987   & 79.0   & 0.149   & 97.0 \\ 
+               & BLRCR($K=20$, $H_\omega=1$)    & 0.990     & 76.3     & 0.151     & 100.0 \\ 
+                              & BLRCR($K=20$, $H_\omega=20$)    & 1.006     & 80.5     & 0.189     & 99.0 \\                
+               & cMLCR       & 1.000       & 77.1      & 0.150      & 99.0 \\
+               & Log Linear (BIC)  & 0.999      & 81.0     & 0.159     & 98.0 \\ 
+               & LCMCR       & 1.008       & 99.3      & 0.284      & 98.0 \\ 
+               & Independent & 1.208 & 426.7& 0.206& 0.0 \\
+
+ \hline
+ "Positive"    & BLRCR($K=1$, $H_\omega=1$)  & 0.942   & 188.0   & 0.350   & 91.0 \\ 
+               & BLRCR($K=20$, $H_\omega=1$)    & 0.952     & 168.1     & 0.354     & 93.0 \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & 0.978     & 158.0     & 0.385     & 97.0 \\                
+               & cMLCR       & 1.025       & 207.3      & 0.389      & 94.0 \\
+               & Log Linear (BIC)  & 0.899      & 301.4     & 0.322     & 77.0 \\ 
+               & LCMCR       & 0.699       & 608.1      & 0.236      & 4.0 \\ 
+               & Independent & 0.566 & 868.4& 0.048& 0.0 \\ 
+
+ \hline
+ "Independent" & BLRCR($K=1$, $H_\omega=1$)  & 0.981   & 120.2   & 0.247   & 96.0 \\ 
+               & BLRCR($K=20$, $H_\omega=1$)    & 0.980     & 119.2     & 0.247     & 96.0 \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & 1.009     & 128.6     & 0.370     & 100.0 \\                
+               & cMLCR       & 1.011       & 126.6      & 0.261      & 97.0 \\
+               & Log Linear (BIC)  & 1.002      & 121.5     & 0.256     & 98.0 \\ 
+               & LCMCR       & 0.993       & 115.7      & 0.260      & 99.0 \\ 
+               & Independent & 0.989 & 115.9& 0.247& 97.0 \\ 
+ \hline
+\end{tabular}
+\caption{Results of 100 capture-recapture simulations per coefficient set using $N=2000$ with "Moderate", "Negative", "Positive", and "Independent" list dependency with two standard normal covariates. }
+\label{table:diffcoefs}
+\end{table}
+\doublespacing
+
+\autoref{table:diffcoefs} shows the results from 100 simulated datasets
+for each set of coefficients, \(\beta\). While all of the models
+performed well when the slope coefficients were set to 0,
+i.e.~``Independent'', the methods using covariates (BLRCR and cMLRCR)
+showed substantially less bias than the other methods when coefficients
+impacted the capture probability, i.e.~``Moderate'', ``Negative'', and
+``Positive''. This illustrates the importance of including covariates in
+the estimation process. Nevertheless, the two methods that account for
+unknown heterogeneity, log linear and LCMCR, still performed remarkably
+well when the list dependency was set to be ``negative.'' Unfortunately,
+``positively'' induced list dependency led to a substantial decline in
+performance.
+
+\subsubsection{Simulations with Different Sized Populations}
 \label{Sec:simspopsize}
 
 In this subsection, we examine the effects of differing population sizes
@@ -1579,137 +1308,315 @@ Overall, the BLRCR model is shown to be consistent. It also tends to
 outperform or equally perform the other methods in terms of MSE, CI
 width, and CI\(\%\).
 
-\subsection{Simulations with Varying Levels of List Dependency }
-\label{Sec:simslistdepend}
+\section{Selecting a Distribution for the Covariates}
+\label{Sec:selectcovariates}
 
-The objective of this subsection is to evaluate the BLRCR and other
-models under varying coefficients that induce different levels of list
-dependency. All of this list dependency is really just heterogeneity in
-the capture probabilities that can be fully explained by the covariates.
-The models that do not use covariates (Log Linear, LCMCR, and
-Independent) will not or will struggle to detect the heterogeneity
-leading to biased results. On the other hand, the BLRCR and cMLCR will
-perform well as they incorporate the covariates into their modelling.
+When the probability that an individual is captured at least once is
+dependent upon the covariates, the observed covariate distribution will
+differ from population covariate distribution. Simply using logistic
+regression on the observed data would lead to biased coefficients, which
+in turn would lead to bias in the population estimation. The algorithm
+presented in subsection \ref{Sec:BLRCRmodel} alleviates this problem by
+concatenating samples of the missing covariates with the observed data
+before estimating the coefficients. Unfortunately, this presents an
+additional burden on the user of specifying a distribution for the
+missing covariates, \(\boldsymbol{g}(\boldsymbol{\phi})\).
 
-We simulate data in accordance with \autoref{eqn:logitdatacreation}
-using two covariates (\(H\)=2) and four lists (\(J=4\)). The covariates
-are drawn from two independent standard normal distributions. Three sets
-of \(\beta\) coefficients are chosen that create ``negative'',
-``moderate'', and ``positive'' dependency between the lists and are
-described in \autoref{table:1}. To clarify, all of the lists regardless
-of the coefficients are conditionally independent given the covariates.
-We simulate an additional dataset with all of the slope coefficients set
-to 0, thereby creating lists with independent capture probabilities.
+\subsection{Specifying a Distribution for the Covariates}
+\label{sec:normaldistributioncovariate}
 
-\singlespacing
-\begin{table}[H]
-\centering
-\begin{tabular}{||c c c c||} 
- \hline
- \multicolumn{4}{||c||}{"Negative"}\\
- \hline
- List ($j$) & $\beta_{0j}$ & $\beta_{1j}$ & $\beta_{2j}$   \\ [0.5ex] 
- \hline\hline
- 1 & -2 &  -1  & 1 \\ 
- 2 & -2 & 1  &  -1 \\
- 3 & -2 & 1  &  1 \\
- 4 & -2 &  -1  &  -1 \\
- \hline
-\end{tabular}
-\begin{tabular}{||c c c c||} 
-\hline
- \multicolumn{4}{||c||}{"Moderate"}\\
- \hline
- List ($j$) & $\beta_{0j}$ & $\beta_{1j}$ & $\beta_{2j}$   \\ [0.5ex] 
- \hline\hline
- 1 & -2 &  -1  & 1 \\ 
- 2 & -2 & 1  &  -1 \\
- 3 & -2 & -1  &  1 \\
- 4 & -2 &  1  &  -1 \\
- \hline
-\end{tabular}
-\begin{tabular}{||c c c c||} 
- \hline
- \multicolumn{4}{||c||}{"Positive"}\\
- \hline
- List ($j$) & $\beta_{0j}$ & $\beta_{1j}$ & $\beta_{2j}$   \\ [0.5ex] 
- \hline\hline
- 1 & -2 &  -1  & 1 \\ 
- 2 & -2 & -1  &  1 \\
- 3 & -2 & -1  &  1 \\
- 4 & -2 &  -1  &  1 \\
- \hline
-\end{tabular}
-\caption{Coefficients for Simulated Data}
-\label{table:1}
-\end{table}
-\doublespacing
+If the distribution is known including parameters, then we can simply
+use the aforementioned algorithm. If the distribution is known except
+for the parameters, then we could specify that distribution along with
+priors on the parameters. For example, \cite{royle_analysis_2009} uses a
+single covariate and specifies a normal distribution with a normal
+distribution prior for the mean and a gamma prior for the inverse
+variance. One could take a multivariate version of this approach by
+specifying,
 
-\singlespacing
-\begin{table}[H]
-\centering
-\begin{tabular}{||r l r r r r||} 
- \hline
-$\boldsymbol{\beta}$ & Method & N$\%$ &MSE & CI Width & CI $\%$   \\ [0.5ex] 
- \hline\hline
- "Moderate"    & BLRCR($K=1$, $H_\omega=1$)  & 0.983   & 82.5   & 0.156   & 94.0 \\ 
-               &  BLRCR($K=20$, $H_\omega=1$)   & 0.988     & 82.6     & 0.162     & 95.0 \\ 
-               & BLRCR($K=20$, $H_\omega=20$)    & 0.997     & 84.9     & 0.204     & 99.0 \\                
-               & cMLCR       & 1.002       & 87.1      & 0.163      & 92.0 \\
-               & Log Linear (BIC)  & 1.399      & 1669.3     & 0.458     & 0.0 \\ 
-               & LCMCR       & 0.851       & 303.4      & 0.148      & 11.0 \\ 
-               & Independent & 1.035 & 103.1& 0.157& 90.0 \\ 
-               
+\begin{align} 
+\label{eqn:normalcovariatedistribution}
+\boldsymbol{x_{i}} & \stackrel{iid}{\sim} \text{MVNormal}(\boldsymbol{\mu},\boldsymbol{\Sigma}),
+\end{align}
 
-                                  
- \hline
-"Negative"    & BLRCR($K=1$, $H_\omega=1$)  & 0.987   & 79.0   & 0.149   & 97.0 \\ 
-               & BLRCR($K=20$, $H_\omega=1$)    & 0.990     & 76.3     & 0.151     & 100.0 \\ 
-                              & BLRCR($K=20$, $H_\omega=20$)    & 1.006     & 80.5     & 0.189     & 99.0 \\                
-               & cMLCR       & 1.000       & 77.1      & 0.150      & 99.0 \\
-               & Log Linear (BIC)  & 0.999      & 81.0     & 0.159     & 98.0 \\ 
-               & LCMCR       & 1.008       & 99.3      & 0.284      & 98.0 \\ 
-               & Independent & 1.208 & 426.7& 0.206& 0.0 \\
+with conjugate priors,
 
- \hline
- "Positive"    & BLRCR($K=1$, $H_\omega=1$)  & 0.942   & 188.0   & 0.350   & 91.0 \\ 
-               & BLRCR($K=20$, $H_\omega=1$)    & 0.952     & 168.1     & 0.354     & 93.0 \\ 
-               & BLRCR($K=20$, $H_\omega=20$)    & 0.978     & 158.0     & 0.385     & 97.0 \\                
-               & cMLCR       & 1.025       & 207.3      & 0.389      & 94.0 \\
-               & Log Linear (BIC)  & 0.899      & 301.4     & 0.322     & 77.0 \\ 
-               & LCMCR       & 0.699       & 608.1      & 0.236      & 4.0 \\ 
-               & Independent & 0.566 & 868.4& 0.048& 0.0 \\ 
+\begin{align}
+\boldsymbol{\Sigma} \sim & \text{InvWishart}(\nu_{0},\boldsymbol{\Lambda_{0}^{-1}}) \\
+\boldsymbol{\mu}|\boldsymbol{\Sigma} \sim & \text{ MVNormal}(\boldsymbol{\mu_{0}},\boldsymbol{\Sigma}/\kappa_{0})
+\end{align}
 
- \hline
- "Independent" & BLRCR($K=1$, $H_\omega=1$)  & 0.981   & 120.2   & 0.247   & 96.0 \\ 
-               & BLRCR($K=20$, $H_\omega=1$)    & 0.980     & 119.2     & 0.247     & 96.0 \\ 
-               & BLRCR($K=20$, $H_\omega=20$)    & 1.009     & 128.6     & 0.370     & 100.0 \\                
-               & cMLCR       & 1.011       & 126.6      & 0.261      & 97.0 \\
-               & Log Linear (BIC)  & 1.002      & 121.5     & 0.256     & 98.0 \\ 
-               & LCMCR       & 0.993       & 115.7      & 0.260      & 99.0 \\ 
-               & Independent & 0.989 & 115.9& 0.247& 97.0 \\ 
- \hline
-\end{tabular}
-\caption{Results of 100 capture-recapture simulations per coefficient set using $N=2000$ with "Moderate", "Negative", "Positive", and "Independent" list dependency with two standard normal covariates. }
-\label{table:diffcoefs}
-\end{table}
-\doublespacing
+This would add two additional sampling stages to the algorithm (see
+\cite{gelman_bayesian_2014}):
 
-\autoref{table:diffcoefs} shows the results from 100 simulated datasets
-for each set of coefficients, \(\beta\). While all of the models
-performed well when the slope coefficients were set to 0,
-i.e.~``Independent'', the methods using covariates (BLRCR and cMLRCR)
-showed substantially less bias than the other methods when coefficients
-impacted the capture probability, i.e.~``Moderate'', ``Negative'', and
-``Positive''. This illustrates the importance of including covariates in
-the estimation process. Nevertheless, the two methods that account for
-unknown heterogeneity, log linear and LCMCR, still performed remarkably
-well when the list dependency was set to be ``negative.'' Unfortunately,
-``positively'' induced list dependency led to a substantial decline in
-performance.
+\begin{list}{}{}
+\item[1)] Sample $\boldsymbol{\Sigma}$.  Define the sufficient statistics, $\boldsymbol{\bar{x}}=\frac{1}{N}\sum_{i=1}^{N}\boldsymbol{x_{i}}$ and $\boldsymbol{S} = \sum_{i=1}^{N}(\boldsymbol{x_{i}}-\boldsymbol{\bar{x}})(\boldsymbol{x_{i}}-\boldsymbol{\bar{x}})^T$.  Then,
+
+\begin{equation}
+\boldsymbol{\Sigma} \sim \text{InvWishart}(\nu_{N},\boldsymbol{\Lambda_{N}^{-1}}),
+\end{equation}
+
+where $\nu_{N} = \nu_{0}+N$ and $\boldsymbol{\Lambda_{N}}=\boldsymbol{\Lambda_{0}}+\boldsymbol{S}+\frac{\kappa_{0}N}{\kappa_{0}+N}(\boldsymbol{\bar{x}}-\boldsymbol{\mu_{0}})(\boldsymbol{\bar{x}}-\boldsymbol{\mu_{0}})^T$.
+
+\item[2)] Sample $\boldsymbol{\mu_k|\Sigma_k}$ for $k=1,...,K^*$.  Using the same defined terms in the previous step,
+
+\begin{equation}
+\boldsymbol{\mu}|\boldsymbol{\Sigma} \sim \text{MVNormal}(\boldsymbol{\mu_{N}},\boldsymbol{\Sigma}/\kappa_{N} ),
+\end{equation}
+
+where $\boldsymbol{\mu_{N}}=\frac{\kappa_{0}}{\kappa_{0}+N}\boldsymbol{\mu_{0}} + \frac{N}{\kappa_{0}+N}\boldsymbol{\bar{x}} $ and $\kappa_{N}=\kappa_{0}+N$.
+\end{list}
+
+Different specified distributions would require different sampling
+procedures. In a supplementary document, \cite{royle_analysis_2009}
+considers other types of covariate distributions and found some
+variations in the inference. Unfortunately, knowing what distribution to
+specify can be difficult as rarely would we know this distribution.
+Deciding on a proposal distribution based upon the observed distribution
+can be also dangerous or misleading as the observed distribution is a
+truncation of the true distribution. Not only are the missing covariates
+not missing at random but we do not even know how many are missing. As
+we will shown in subsection \ref{Sec:simscovdists}, mispecifying the
+distribution can lead to inaccurate estimations.
+
+\subsection{Conditional Likelihood}
+
+One approach to the problem is estimating the coefficients using the
+conditional maximum likelihood, where the likelihood function to be
+maximized is conditioned on the probability an individual is observed at
+least once \citep{alho_logistic_1990,huggins_statistical_1989}. This
+avoids the necessity of specifying a distribution for the covariates but
+can lead to unstable results when the observed distribution of the
+covariates is dissimilar to the population distribution of the
+covariates \citep{tilling_capture-recapture_1999}. An article by
+\cite{yee_vgam_2015} shows an easy way to implement the technique using
+the \texttt{VGAM} package in \texttt{R}. The technique works in two
+stages. First, use generalized linear models with a positive Bernoulli
+family to estimate the the coefficients. This allows us to obtain fitted
+values for the probability that each individual in the dataset is
+missing. Second, use those fitted values in the Horvitz-Thompson
+estimator \citep{horvitz_generalization_1952} to estimate the population
+size, N. One could take a Bayesian approach to the logistic regression
+and assign prior distributions to the parameters and estimate the
+population in a similar way. We derive equations for finding the maximum
+a posteriori (MAP) estimate in Section \ref{Sec:conditionalmaximumlike}:
+Appendix A using gradient ascent.
+
+\subsection{Nonparametric Distributions}
+
+An alternative approach to the methods described above is to specify a
+nonparametric distribution for the covariates. Using a nonparametric
+method has the added consequence of increasing the complexity of the
+model which may lead to additional difficulties in the mixing of the
+posterior. Nevertheless, it comes with multiple benefits in allowing us
+to maintain use of a full likelihood approach, continued extensibility,
+and (most importantly) flexibility in the fitting of the covariates. In
+this subsection, we present two methods for modeling the covariates in a
+non-parametric fashion: The Dirichlet Process Mixture of Normal
+Distributions and the Bayesian Bootstrap.
+
+\subsubsection{Dirichlet Process Mixture of Normal Distributions}
+
+The first method is to fit a Dirichlet process mixture of normal
+distributions. This nonparametric approach fits a potentially infinite
+number of multivariate normal distributions to the data. The following
+is a description of the methodology and is adapted from
+\cite{gelman_bayesian_2014}. This model introduces a latent variable,
+\(z\), which is a latent parameter determining the mean and covariance
+matrix from which the observed covariate, \(\boldsymbol{x_i}\), is
+drawn. The generative process for each observation's covariate can then
+be summarized as,
+
+\begin{align}
+\boldsymbol{x_i}|z_i \stackrel{ind}{\sim} & \text{ MVNormal}(\boldsymbol{\mu_k},\boldsymbol{\Sigma_k}) \hspace{5px} \text{for } i=1,...,N\\
+z_i \stackrel{iid}{\sim} & \text{ Discrete}(\{1,2,...\},(\pi_1,\pi_2,...)) \hspace{5px} \text{for } i=1,...,N.
+\end{align}
+
+Therefore, the probability density function of the covariates can be
+formally written as,
+
+\begin{equation}
+g(\boldsymbol{x}|\boldsymbol{\mu},\boldsymbol{\Sigma}) = \prod_{i=1}^N \prod_{k=1}^\infty \pi_k \text{ MVNormal}(\boldsymbol{x_i}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k}).
+\end{equation}
+
+In order to have a fully Bayesian approach, we assign priors to the
+unknown parameters.
+
+\begin{align}
+\boldsymbol{\Sigma_k} \sim & \text{InvWishart}(\nu_{0},\boldsymbol{\Lambda_{0}^{-1}}) \\
+\boldsymbol{\mu_k}|\boldsymbol{\Sigma_k} \sim & \text{ MVNormal}(\boldsymbol{\mu_{0}},\boldsymbol{\Sigma_k}/\kappa_{0}) \\
+(\pi_1,\pi_2,...) \sim & SB(\alpha) \\
+\alpha \sim & \text{ Gamma}(a_{\alpha},b_{\beta}),
+\end{align}
+
+where SB(\(\alpha\)) is the stick breaking process,
+\citep{ishwaran_gibbs_2001}. While we model the number of latent classes
+as infinite, we can approximate this infinite mixture problem by setting
+a sufficiently large upperbound to the number of latent classes,
+\(K^*\), and solving this finite-dimensional problem. The stick breaking
+prior can therefore be defined as \(\pi_k = V_k \prod_{l<k}(1-V_l)\),
+where \(V_1, ..., V_{K^*-1} \sim \text{Beta}(1,\alpha)\) and
+\(V_{K^*}=1\). This upper bound, \(K^*\), should not be thought of as a
+parameter as it should have no impact on the estimation process as long
+as the value is set sufficiently large enough.
+
+Using this generative scheme adds five additional sampling stages to the
+algorithm presented in subsection \ref{Sec:BLRCRmodel}.
+
+\begin{list}{}{}
+
+\item[1)] Sample $z_i$ for $i=1,...,N$. The latent class label takes integer values from $1,...,K^*$.  To compute the probability of each latent class label for each $i$,
+
+\begin{equation}
+P(z_i=k) = \frac{\pi_k \text{ MVNormal}(\boldsymbol{x_i}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k})}{\sum_{l=1}^{K^*}\pi_l \text{ MVNormal}(\boldsymbol{x_i}|\boldsymbol{\mu_l},\boldsymbol{\Sigma_l})}.
+\end{equation}
+
+\item[2)] Sample $\boldsymbol{\Sigma_k}$ for $k=1,...,K^*$. Define $N_k=\sum_{i=1}1_{z_i=k}$ which is a count of the number of individuals in the population belonging to latent class, $k$.  Also, define the sufficient statistics, $\boldsymbol{\bar{x}_k}=\frac{1}{N_k}\sum_{i=1}^{N_k}\boldsymbol{x_{ik}}$ and $\boldsymbol{S_k} = \sum_{i=1}^{N_k}(\boldsymbol{x_{ik}}-\boldsymbol{\bar{x}_k})(\boldsymbol{x_{ik}}-\boldsymbol{\bar{x}_k})^T$.  Then,
+
+\begin{equation}
+\boldsymbol{\Sigma_k} \sim \text{InvWishart}(\nu_{N_k},\boldsymbol{\Lambda_{N_k}^{-1}}),
+\end{equation}
+
+where $\nu_{N_k} = \nu_{0}+N_k$ and $\boldsymbol{\Lambda_{N_k}}=\boldsymbol{\Lambda_{0}}+\boldsymbol{S_k}+\frac{\kappa_{0}N_k}{\kappa_{0}+N_k}(\boldsymbol{\bar{x}_k}-\boldsymbol{\mu_{0}})(\boldsymbol{\bar{x}_k}-\boldsymbol{\mu_{0}})^T$.
+
+\item[3)] Sample $\boldsymbol{\mu_k|\Sigma_k}$ for $k=1,...,K^*$.  Using the same defined terms in the previous step,
+
+\begin{equation}
+\boldsymbol{\mu_k}|\boldsymbol{\Sigma_k} \sim \text{MVNormal}(\boldsymbol{\mu_{N_k}},\boldsymbol{\Sigma_k}/\kappa_{N_k} ),
+\end{equation}
+
+where $\boldsymbol{\mu_{N_k}}=\frac{\kappa_{0}}{\kappa_{0}+N_k}\boldsymbol{\mu_{0}} + \frac{N_k}{\kappa_{0}+N_k}\boldsymbol{\bar{x}_k} $ and $\kappa_{N_k}=\kappa_{0}+N_k$.
+
+\item[4)] Sample $(\pi_1,\pi_2,...,\pi_{K^*})$ for $k=1,...,K^*$.  Begin by drawing a sample from each of the stochastic components,
+
+\begin{equation}
+ V_k \sim \text{ Beta}\left(1+N_k, \alpha+\sum_{l=k+1}^K N_l\right) \hspace{5px} \text{for } k=1,...,K^*-1.
+\end{equation}
+
+Set $V_{K*}=1$.  Then, $\pi_k = V_k\prod_{l<k}(1-V_l)$ for all $k=1,...,K^*$.
+
+\item[5)] Sample $\alpha$.
+
+\begin{equation}
+  \alpha \sim \text{ Gamma}\left(a_\alpha + K^* -1, b_\alpha - \sum_{k}^{K^*-1}\ln(1-V_k) \right).
+\end{equation}
+
+\end{list}
+
+It should be noted that the normal distribution specified in subsection
+\ref{sec:normaldistributioncovariate} is a special case of this
+specification where \(K^*=1\). We will show in section
+\ref{Sec:simscovdists} that the assumption of a single normal may lead
+to bias in the estimation process when the actual distribution is not
+normal. Using an infinite mixture of normal distributions tends to
+perform better, but still struggles when the distribution is discrete or
+is far from normally distributed.
+
+\subsubsection{The Bayesian Bootstrap}
+
+\vspace{-10px}
+
+An alternative approach would be to apply a discrete distribution with
+support at the observed, distinct values, \(\boldsymbol{d_k}\), of the
+covariates,
+
+\begin{equation}
+P(\boldsymbol{x_i}=\boldsymbol{d_k}) = \psi_k, \hspace{10px} \sum_{i=1}^K \psi_k = 1.
+\end{equation}
+
+We attach a Dirichlet prior to the probabilities, \(\psi_k\), such that
+
+\begin{equation}
+(\psi_1, ..., \psi_K) \sim Dirichlet(\alpha_1,...,\alpha_K)
+\end{equation}
+
+The posterior distribution for the \(\psi_k\) is then,
+
+\begin{equation}
+\label{eqn:bayesbootstrapposterior}
+(\psi_1, ..., \psi_K|\mathcal{X}) \sim Dirichlet(\alpha_1+\sum_{i=1}^N I_{d_1}(\boldsymbol{x_i}),...,\alpha_K+\sum_{i=1}^N I_{d_K}(\boldsymbol{x_i}))
+\end{equation}
+
+where \(I_{d_k}(\boldsymbol{x_i})=1\) is an indicator function for
+\(\boldsymbol{x_i} = \boldsymbol{d_i}\) and
+\(I_{d_k}(\boldsymbol{x_i})=0\) otherwise.
+
+Although we are not performing an actual bootstrapping procedure, we
+refer to this modelling setup as the Bayesian Bootstrap
+\citep{rubin_bayesian_1981} for a couple of reasons. First, the
+construction is quite similar to the theory behind the Bayesian
+Bootstrap in terms of placing a Dirichlet distribution on the observed
+values in the sample. Second, this methodology samples values for the
+missing observations in the same spirit as bootstrapping. Using the
+\(n\) observed covariates, we sample, with replacement, \(n_0\) values
+from a discrete distribution based on the observed distribution and use
+these values in place of the missing covariates.
+
+To implement this model construction for the covariates, we only need to
+add one additional sampling stage to our estimation procedure. Noting
+that we use all covariates, not just the observed, we draw the
+probabilities, (\(\psi_1, ..., \psi_K\)) in accordance to equation
+\ref{eqn:bayesbootstrapposterior}. Once the probabilities,
+(\(\psi_1, ..., \psi_K\)), are drawn, the covariate distribution is
+fully specified, so the rejection sampling method as displayed in
+equation \ref{eqn:conditionalXmis} can be performed.
+
+A common approximation to the Bayesian Bootstrap is to sample directly
+from the empirical distribution. When
+\((\alpha_1, ..., \alpha_K) = \alpha = 0\), one could skip the Dirichlet
+distribution sampling stage and simply draw, with replacement, from the
+current complete covariate data, \(\mathcal{X}\). While this is a good
+approximation, it will have less smoothing than it's Bayesian
+counterpart.
+
+This Bayesian Bootstrap method addresses some of the potential issues in
+the covariate specification, but it also introduces new issues as well.
+This method provides an ``all-purpose'' solution in that it can be used
+when the covariate distribution is discrete, continuous, or both.
+Nevertheless, while it alleviates some of the issue with data type, no
+method is truly ``all-purpose'' as any method will provide some sort of
+constraint. The issues this particular model tends to have aligns
+closely with those of the Bayesian Bootstrap. For example, the missing
+values that are sampled only has support at values in the observed
+empirical distribution. What happens if some of the potential values
+that are missing do not appear in the observed distribution? This is a
+concern for when the covariate distribution is discrete but a
+probabilistic certainty when the distribution is continuous. This should
+be a concern but as \cite{rubin_bayesian_1981} states ``serious data
+analysis should always include serious consideration of model
+constraints'' and that no method, even the bootstrap, is without
+constraints. Furthermore, we note that the end goal is to estimate the
+size of the population, so the exact modelling of the covariate
+distribution is not as important as long as it does not bias the
+estimation. Using the rejection sampler based on equation
+\ref{eqn:conditionalXmis} combined with
+\((\alpha_1, ..., \alpha_K) = \alpha = 0\), the probability of each draw
+is appropriately weighted based on the probability of going unobserved.
+This has similar intuition as the mechanic behind the Horvitz-Thompson
+estimator in the conditional likelihood approach where each covariate
+essentially gets magnified based on its estimated probability of being
+missing.
 
 \subsection{Simulations using Different Covariate Distributions}
 \label{Sec:simscovdists}
+
+EXTRA STUFF BELOW WRITTEN HERE, MAY NEED TO BE MOVED By default, we do
+not use any regularization (see subsection \ref{Sec:modelselection})
+unless specifically stated. For the covariate distribution, there are
+three possibilities including the mixture of multivariate normal
+distributions (\textbf{mixture}), the Bayesian Bootstrap
+(\textbf{bootstrap}), and the approximation of the Bayesian Boostrap
+that simple samples from the empirical distribution
+(\textbf{empirical}). In general, the maximum number of mixture
+components allowed by the mixture of multivariate normal distributions
+(\(K^*\)) will be specified but is intented to be set intentially large
+enough so that it does not influence the estimation. The exception would
+be the case where we desire a single multivariate normal distribution
+(\(K^*=1\)). Similarly, when latent intercepts are used (see subsection
+\ref{Sec:condindependence}), the number of latent intercepts
+(\(H_{\omega}\)) is specified.
+
+EXTRA STUFF ABOVE WRITTEN HERE, MAY NEED TO BE MOVED
 
 In this subsection, we examine the impact of different covariate
 distributions and how they impact the BLRCR model's estimation. Recall,
@@ -1866,6 +1773,146 @@ From this subsection, we saw that depending on the level of the
 covariate distribution misspecification, the BLRCR model may perform
 poorly. However, using a non-parametric distribution like the mixture of
 normal distributions considerably reduced the bias.
+
+\section{Conditional Independence and Unobserved Heterogeneity}
+\label{Sec:condindependence}
+
+The model construction of subsection \ref{Sec:BLRCRmodel} assumes
+conditional independence based on the covariates. In other words, given
+the information provided by the covariates, the probability of capture
+on one list is unaffected by another list. If the assumption does not
+hold, it may lead to biased parameter estimates. One reason the
+conditional independence may be violated is because the capture
+probabilities upon a list are directly related to the probability of
+being on another list, i.e., the assumption of list dependency. This may
+occur if, for example, one list uses another list as a reference or data
+is shared between various documentation projects
+\citep{manrique-vallier_capture-recapture_2020}. This would lead to
+heavy positive dependence between these two lists. While this is a
+serious issue, we assume the lists used in the analysis are collected
+independently.
+
+A second reason conditional independence may be violated is that
+underlying heterogeneity exists within the population that is not fully
+accounted for by covariates. Recall, the example cited in subsection
+\ref{sec:earlyapproachlitreview} of individual heterogeneity
+masquerading as list dependency in the study analyzing extrajudicial
+killings during the Guatemalan Civil War \citep{ball_making_2000}.
+Researchers found that people who were part of Catholic religious
+communities were more likely to trust Catholic researchers with their
+stories than with NGO researchers associated with the political left.
+Similarly, people located in areas associated with the rebel groups were
+more likely to do the opposite. If this trait is unobserved and not
+taken into account, it will result in biased \(\boldsymbol{\beta_j}\)
+coefficients. Further, because of the biased coefficients, the
+probabilities of capture and the estimate for the population size will
+be biased as well.
+
+\subsection{Modelling the Unobserved Heterogeneity with Latent Classes}
+
+We view the problem of unobserved heterogeneity through the lens of a
+missing covariates problem. There are multiple ways one can induce
+additional heterogeneity into the modelling. For example,
+\cite{king_bayesian_2008} uses individual random effects following a
+normal distribution, while \cite{manriquevallier_bayesian_2016} induces
+heterogeneity by assigning different capture probabilities according to
+latent group membership. In this subsection, we model hidden
+heterogeneity also through the use of latent group membership, but
+instead of each group being assigned a different probability, each group
+is instead given a different value for an intercept in the linear
+equation.
+
+Define an indicator vector, \(\boldsymbol{\omega_i}\), indicating
+membership to one of potentially infinite latent groups. As we saw in
+subsection \ref{sec:normaldistributioncovariate} with the infinite
+mixture of normal distributions, we again make use of the stick-breaking
+procedure in order to avoid self-selecting the number of the classes to
+uses. Hence,
+
+\vspace{-10px}
+
+\begin{equation}
+\boldsymbol{\phi_\omega}\sim \text{SB}(\boldsymbol{\alpha_\omega})
+\end{equation} \begin{equation}
+\alpha_\omega \sim \text{Gamma}(a_\omega,b_\omega).
+\end{equation}
+
+An additional intercept term is added to the linear equation with the
+value dependent on the individual's latent class membership. As such,
+equation \ref{eqn:sigmoidfunc} then becomes,
+
+\begin{equation}
+\label{eqn:sigmoidfunclatentvariable}
+\lambda_{ij}=\sigma(\boldsymbol{x_i}^T\boldsymbol{\beta_j} + \boldsymbol{\omega_i}^T\boldsymbol{\beta_\omega}) = \frac{1}{1+e^{-(\boldsymbol{x_i}^T\boldsymbol{\beta_j}+\boldsymbol{\omega_i}^T\boldsymbol{\beta_\omega}))}}.
+\end{equation}
+
+This construction leads to four new types of parameters to sample:
+\(\boldsymbol{\omega_i}\), \(\alpha_\omega\),
+\(\boldsymbol{\phi_\omega}\), and \(\boldsymbol{\beta_\omega}\).
+
+\subsection{Updating the Estimation}
+
+Since we have four new parameters: \(\boldsymbol{\omega_i}\),
+\(\alpha_\omega\), \(\boldsymbol{\phi_\omega}\), and
+\(\boldsymbol{\beta_\omega}\); we might expect to need just four new
+sampling methods. Unfortunately, complications once again arise from the
+missing covariates of the unobserved individuals. If the individual is
+observed, the latent group membership, \(\boldsymbol{\omega_i}\), can be
+sampled with corresponding discrete probability,
+
+\begin{equation}
+\label{eqn:latentvariableomega}
+p(\boldsymbol{\omega_i}|\boldsymbol{\phi_\omega},N,\mathcal{Y},\boldsymbol{\beta},\boldsymbol{X}) \propto \phi_\omega\prod_{j=1}^J\lambda_{ij}^{y_{ij}}(1-\lambda_{ij})^{1-y_{ij}}.
+\end{equation}
+
+For the individuals that are not observed, we draw the latent class
+membership during the missing covariate imputation stage. Recall,
+because of the complications mentioned in subsection
+\ref{sec:estimationBLRCRMCMC}, the Gibbs sampler requires \(N\) and
+\(\mathcal{X}_{mis}\) to be sampled simultaneously. In order to
+implement this stage, the latent class membership,
+\(\boldsymbol{\omega_i}\) of each unobserved individual must be drawn
+along with, presumably independently, the missing covariates,
+\(\mathcal{X}_{mis}\). Whereas the distribution from which the
+covariates is drawn is dependent on the covariate distribution selected
+(see subsection \ref{Sec:selectcovariates}), the \(\omega_i\)'s are
+drawn from the discrete distribution with probability vector
+\(\boldsymbol{\phi_\omega}\).
+
+Once again, we use a finite representation of the stick-breaking process
+for estimation purposes with a sufficiently large upperbound,
+\(H_\omega^*\). Under this construction, the stick-breaking process is
+defined as
+\((\phi_{1},\phi_{2},...,\phi_{H_\omega^*}) = V_{h} \prod_{{h'}<h}(1-V_{{h'}})\),
+where
+\(V_{1}, V_{2}, ..., V_{H_\omega^*-1} \sim \text{Beta}(1,\alpha_\omega)\)
+and \(V_{H_\omega^*}=1\). To obtain samples from the conditional
+posterior distribution, \(p(\phi_\omega|...)\), we first sample \(V_h\)
+by,
+
+\vspace{-10px}
+
+\begin{equation}
+\label{eqn:latentvariablePHIomega}
+V_h \sim \text{Beta}\Big(1+N_h,\alpha_\omega + \sum_{h'=h+1}^{H^*_\omega} N_{h'}\Big),
+\end{equation}
+
+for all \(h=1,...,H_\omega^*-1\) where \(N_{h}\) is the number of
+individuals belonging to each latent class. Then compute
+\(\phi_{h} = V_h \prod_{{h'}<h}(1-V_{h'})\) for \(h=1,...,H^*_\omega.\)
+The conditional posterior distribution, \(p(\alpha_\omega|...)\) can be
+sampled by
+
+\vspace{-10px}
+
+\begin{equation}
+\label{eqn:alphaomegacondsampling}
+\alpha_\omega \sim \text{Gamma}\Big(a_\omega + H_\omega^* - 1, b_\omega - \sum_{h=1}^{H^*_\omega-1}\ln (1-V_h)\Big),
+\end{equation}
+
+Lastly, the coefficient vector of latent intercepts,
+\(\boldsymbol{\beta_\omega}\), can be sampled in the same manner as the
+other coefficients, \(\boldsymbol{\beta_j}\).
 
 \subsection{Simulations with Unobserved Heterogeneity}
 \label{Sec:simsunobservedheterogeneity}
@@ -2052,6 +2099,245 @@ well. On the other hand, When the unobserved heterogeneity is strong,
 the bias in \(N\) will be relatively larger, but the ability to detect
 and properly account for this heterogeneity increases.
 
+\section{Model Selection}
+\label{Sec:modelselection}
+
+The methodology described in the previous sections assumes the
+practitioner knows exactly how the covariates impact the probability of
+each individual going undetected on a given list. The key to the
+successful estimation of the population size relies on the proper and
+accurate sampling of the coefficients in the logistic regression, or at
+a minimum, these cofficients must lead to a correct estimate of the
+overall probability of an individual being missing. Hence, one must
+carefully select which covariates to use, how to use these covariates,
+and whether there are any interactions that may play an important role
+in this process. While it may be beneficial to rely on domain knowledge
+of the population to make these determinations, this may not be
+sufficient so it is desirable to take a statistical approach to this
+problem.
+
+\subsection{Model Comparison via the Bayes Factor}
+
+Perhaps the most ubiquitous approach to model selection in a Bayesian
+setting is through the computation of the Bayes Factor. This approach of
+model comparison has a lot of similarities with the problem of
+hypothesis testing. Suppose there is a null and alternative model,
+\(\mathcal{M}_0\) and \(\mathcal{M}_1\), respectively. With the standard
+frequentist approach, the practitioner computes the the probability of
+observing the data given the null model, the p-value, and chooses to
+accept or reject the null model based on some arbitrary threshold,
+typically based on controlling for Type I error. On the other hand,
+using a Bayesian approach
+\citep{jeffreys_tests_1935,jeffreys_theory_1967}, we compare two
+hypotheses or models by directly computing the probability of each model
+given the data through the posterior probabilities. This means, unlike
+frequentist hypothesis testing, there is no need to distinguish between
+which model is the null and which is the alternative.
+
+For the BLRCR model, the posterior probability of \(\mathcal{M}_1\)
+given the observed data is written as
+
+\vspace{-20px}
+
+\begin{align}
+p(\mathcal{M}_1|\mathcal{Y}_{obs},\mathcal{X}_{obs}) = \frac{p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_1)p(\mathcal{M}_1)}{p(\mathcal{Y}_{obs},\mathcal{X}_{obs})}.
+\end{align}
+
+\vspace{-20px}
+
+Next, we calculate the posterior odds ratio between \(\mathcal{M}_1\)
+and \(\mathcal{M}_0\) as
+
+\vspace{-20px}
+
+\begin{align}
+\frac{p(\mathcal{M}_1|\mathcal{Y}_{obs},\mathcal{X}_{obs})}{p(\mathcal{M}_0|\mathcal{Y}_{obs},\mathcal{X}_{obs})} = 
+\frac{p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_0)p(\mathcal{M}_0)}{p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_1)p(\mathcal{M}_1)}.
+\end{align} \vspace{-20px}
+
+If we do not a priori favor one model over another, such that
+\(p(\mathcal{M}_0)=p(\mathcal{M}_1)\), then the posterior odds ratio is
+equal to what is known as the Bayes Factor,
+
+\vspace{-20px}
+
+\begin{align}
+\label{eqn:bayesfactorformula}
+BF_{10} & = \frac{p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_1)}{p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_0)}.
+\end{align} \vspace{-20px}
+
+where values greater than 1 would suggest \(\mathcal{M}_1\), and values
+less than 1 would suggest \(\mathcal{M}_0\) as the better fit.
+
+Calculation of the Bayes Factor is often difficult or intractable as it
+is the ratio of the marginal likelihoods of the two models. Given a
+specific model, \(\mathcal{M}_i\), The marginal likelihood is the
+probability of the data integrated across all values of the parameters,
+
+\vspace{-20px}
+
+\begin{align}
+\label{eqn:marginallikelihoodBF}
+p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_i) & = \int p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta},\mathcal{M}_i)p(\boldsymbol{\theta}|\mathcal{M}_i) d\boldsymbol{\theta}.
+\end{align} \vspace{-20px}
+
+This is the the denominator in the calculation of the posterior
+distribution assuming a fixed model (ignore the \(\mathcal{M}_i\)).
+Because this is just the normalizing constant on the posterior density
+and because of the complexity of its calculation, the calculation of the
+marginal likelihood is often avoided by taking advantage of
+posterior/prior conjugacy or normalization in the discrete case.
+
+Without the ability to solve Equation \ref{eqn:marginallikelihoodBF}
+analytically, we must rely on an approximate solution. Perhaps the
+simplest solution is to recognize Equation
+\ref{eqn:marginallikelihoodBF} can be written as the expected value of
+the likelihood under the prior distribution. As such, a simple
+application of the Law of Large numbers, leads to the estimator,
+
+\vspace{-20px}
+
+\begin{align}
+\label{eqn:priorapproxBF}
+\hat{p}_1(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_i) & =\frac{1}{G}\sum_{g=1}^G p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta}^{(g)},\mathcal{M}_i),
+\end{align} \vspace{-20px}
+
+where \(G\) is the number of samples and \(\boldsymbol{\theta}^{(g)}\)
+are the sampled parameter values from the \textbf{prior} distribution.
+While this estimator is simple and easy to implement, it converges
+slowly when the prior and posterior are significantly different, which
+is often the case when using non-informative priors. Many of the prior
+samples will produce negligibly small likelihood values, leading to a
+large variance in the estimator. One solution to improve this
+integration is to use importance sampling
+\cite{kass_bayes_1995,robert_computational_2009}, but leads to the
+additional hardship of selecting a proper importance sampling function.
+Furthermore, this method requires sampling from the prior which creates
+additional difficulties when using an improper prior such as the prior
+for \(N\) as with the BLRCR.
+
+Instead of using the prior distribution, \cite{newton_approximate_1994}
+showed that the harmonic mean can be used to approximate the marginal
+likelihood using posterior samples,
+
+\vspace{-20px}
+
+\begin{align}
+\label{eqn:harmonicmeanBF}
+\hat{p}_2(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_i) & = \left[\frac{1}{G}\sum_{g=1}^G \frac{1}{p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta}^{(g)},\mathcal{M}_i)}\right]^{-1},
+\end{align} \vspace{-20px}
+
+where \(\boldsymbol{\theta}^{(g)}\) are the sampled parameter values
+from the \textbf{posterior} distribution. Unfortunately, this estimator
+tends to not work well with results being unstable and the estimator
+having infinite variance
+\citep{neal_contribution_1994,robert_computational_2009}. To improve
+this estimator, \cite{newton_approximate_1994} present additional
+estimators using mixtures from the prior and posterior. Alternatively,
+\cite{gelfand_bayesian_1994} derives an estimator in the context of
+importance sampling where the posterior distribution is selected as the
+importance sampling density.
+
+\vspace{-20px}
+
+\begin{align}
+\label{eqn:harmonicmeanimportanceBFderivation}
+\nonumber E_{p(\boldsymbol{\theta}|\mathcal{Y}_{obs},\mathcal{X}_{obs})}\left[\frac{\psi(\boldsymbol{\theta})}{p(\boldsymbol{\theta})p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta})}\right] & =\int \frac{\psi(\boldsymbol{\theta})}{p(\boldsymbol{\theta})p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta})}\cdot p(\boldsymbol{\theta}|\mathcal{Y}_{obs},\mathcal{X}_{obs})d\boldsymbol{\theta}\\
+\nonumber & =\int \frac{\psi(\boldsymbol{\theta})}{p(\boldsymbol{\theta})p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta})}\cdot\frac{p(\boldsymbol{\theta})p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta})}{p(\mathcal{Y}_{obs},\mathcal{X}_{obs})}d\boldsymbol{\theta}\\
+\nonumber & =\frac{1}{p(\mathcal{Y}_{obs},\mathcal{X}_{obs})} \int \psi(\boldsymbol{\theta}) d\boldsymbol{\theta}\\
+& =\frac{1}{p(\mathcal{Y}_{obs},\mathcal{X}_{obs})}
+\end{align} \vspace{-20px}
+
+where \(\psi(\boldsymbol{\theta})\) can be any proper density. Hence a
+consistent estimator for the marginal likelihood is
+
+\vspace{-20px}
+
+\begin{align}
+\label{eqn:harmonicmeanimportanceBF}
+\hat{p}_3(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_i) & = \left[\frac{1}{G}\sum_{g=1}^G \frac{\psi(\boldsymbol{\theta}^{(g)})}{p(\boldsymbol{\theta}^{(g)}|\mathcal{M}_i)p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta}^{(g)},\mathcal{M}_i)}\right]^{-1}.
+\end{align} \vspace{-20px}
+
+Notice that if we set
+\(\psi(\boldsymbol{\theta}^{(g)}) = p(\boldsymbol{\theta}^{(g)})\), we
+have the original harmonic mean estimator,
+\(\hat{p}_2(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_i)\). While
+any density can be selected, we need a density with lighter tails than
+\(p(\boldsymbol{\theta}^{(g)}|\mathcal{M}_i)p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta}^{(g)},\mathcal{M}_i)\)
+in order to improve the original estimator and achieve finite variance
+\citep{robert_computational_2009}. Potential candidate densities that
+may work include asymptotic densities around the maximum likelihood
+values or kernel approximations. For example, in the case of Probit
+regression, \cite{marin_importance_2018} found success using the normal
+density with mean and covariance equal to the maximum likelihood
+estimate.
+
+This subsection provides a handful of methods for computing the Bayes
+Factor for the BLRCR model, but there are several potential issues
+making the above procedures impossible or at best questionable to
+implement. For starters, the use of improper priors on \(N\) means the
+Bayes Factors should certainly not be interpreted literally as the
+actual value is off by an arbitrary constant. Second, the
+multi-dimensionality of the problem leads to issues of converge with
+even the largest of chains. Nevertheless, we will see in {[}INSERT
+SIMULATION SUBSECTION{]} that the Bayes Factor computations above lead
+us to the correct implementation more often than not.
+
+Our focus is on the methods that utilize samples from the posterior
+distribution since the algorithm provided in subsection
+\ref{sec:estimationBLRCRMCMC} utilizes a MCMC method. Further work could
+be done on methods that use samples from the prior like the estimator,
+\(\hat{p}_1(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_i)\). In
+addition, other approaches such as asymptotic approximations like
+Laplace's Method or exploiting functional equalities
+\cite{chib_marginal_1995} may prove promising as well. While we leave
+this to future research, we believe a more promising approach may be
+through the use of regression regularization.
+
+\subsection{Regularization and Prior Specifications}
+
+We propose a different approach to model selection via the Bayes factor
+by instead narrowing in on the portion of the methodology that samples
+the logistic regression coefficients. While the various subsections have
+added stages to the BLRCR sampler to accommodate various complications,
+the sampling stages can be summarized into two basic groupings as
+presented in subsection \ref{sec:estimationBLRCRMCMC}. The first
+grouping of sampling stages are used to augment the missing data by
+first sampling the size of the data, \(N\), and then sampling the
+missing covariates, \(\mathcal{X}_{mis}\). The second grouping of
+sampling stages then samples the probability an individual goes missing
+through a deterministic function of the sampled logistic regression
+coefficients, \(\boldsymbol{\beta}\). Under this framework, taking a
+sample of regression coefficients using the augmented data is no
+different than taking a sample of regression coefficients from a dataset
+that is static. Hence, we can narrow our focus to finding the correct
+fitting for the linear component of our logistic regression.
+
+By narrowing our focus to the regression coefficients, we can include
+all potential variables (including transformations and interactions)
+with the purported threat of overfitting. There are multiple ways to
+overcome the problem with overfitting. A typical way seen especially in
+the data science community is through cross validation using training
+and testing sets. This is not a feasible approach for the
+capture-recapture problem, as the number of observed captures, plays a
+crucial rule in the estimation process. Theoretically, there may be ways
+around this by estimating random subpopulation sizes, but as is typical
+with these approaches, less data being used for estimation leads to more
+uncertainty especially in the face of sparsity. As a result, we suggest
+implementing regularized regression, which in a Bayesian context, is
+through different types of priors.
+
+{[}MENTION HORSESHOE and SLAB/SPIKE PRIOR HERE ALONG WITH PAPERS FOR
+IMPLEMENTING, note that using normal priors is a form of regularization,
+i.e.~ridge regression{]}
+
+While regularization has its shortcomings, using these different priors
+avoids many of the complications that can arise with the computation of
+the Bayes Factor. Also, when the number of model comparisons is large,
+computing the Bayes Factor requires posterior samples from each of the
+candidate models, whereas with regularization, only one MCMC chain is
+required.
+
 \newpage
 \section{Example 1 (probably superhero)}
 \label{Sec:example1}
@@ -2119,64 +2405,6 @@ suggest three possible routes including model averaging, variable
 selection through priors, or even post-hoc analysis like computing the
 Bayes factor.
 
-\subsection{Further Ideas and Futurework}
-
-The extensions mentioned above are of primary focus for the
-dissertation, but there are several other minor extensions that may be
-considered. A summary of all proposed extensions and future ideas can be
-found in \autoref{table:timelinetable}. Extensions with priority equal
-to 1 will be addressed in the dissertation. Extensions with priority
-greater than 1 will be explored if time permits with lower values having
-higher priority. Extensions that do not get covered will be left for
-future work.
-
-\begin{table}[H]
-\centering
-\begin{tabular}{||p{3cm}||p{10cm}|p{1.2cm}||} 
- \hline
- Extension & Description & Priority    \\ [0.5ex] 
- \hline\hline
-  Stick Breaking Priors & Instead of fixing the number of unobserved latent intercepts, we could use stick breaking priors. &  1   \\ 
- \hline
- Distribution for Covariates & Currently we implement a mixture of normals to represent the missing covariates.  This is shown through simulation to work fairly well; however, often times we have non-continuous covariates or covariates that differ greatly from normality.  We will explore the empirical distribution or a more generalized Dirichlet process for the covariates. & 1   \\
- \hline
-  Covariate Selection & Currently, the model assumes the covariates to be used are known.  Even with a single covariate, the relationship may be non-linear.  One way to address this issue is through the use of polynomials or interactions of the covariates.  Since this may cause the parameter space to get quite large, this could require a need for variable selection. & 1  \\
- \hline
- Create an R Package & We plan to develop an R package that allows practitioners the easy and fast ability to use the algorithm & 1   \\ 
- \hline
- Missing Covariates of Observed Data & Using the methodology described in this paper, the imputation of missing covariates should be naturally imputable. &  2   \\ 
- \hline
- The Probability of Missing & Currently we use a Monte Carlo within MCMC to find the probability of missing (see \cite{bonner_mcmcmc_2014}).  It may be advantageous to try different types of methods or even approximations like a Laplace Approximation (see \cite{herliansyah_laplace_2022})&  2  \\
-  \hline
-Conditional Likelihood Newton's Method & Develop an algorithm to get the MAP estimate using Newton's Method.  Could find confidence interval using bootstrap. & 3  \\
- \hline
-Conditional Likelihood MCMC & Instead of specifying a distribution for the covariates, sample the beta coefficients using the conditional likelihood. A method like this would eliminate the need to specify a distribution and would still allow for detection of latent classes and the imputation of missing covariates for observed individuals.  We may need to exercise caution as this methodology may not properly consider the variation in the covariates. & 4   \\
- \hline
- Model Latent Groups & Use logistic regression or even Gaussian Processes to classify individuals (through the label step in LCMCR) instead of using it to directly determine probability of capture. In the literature review, I note there are two ways to handle covariates: stratification and using them to model and estimate capture probabilities. A promising potential third method would be to picture the population as having latent classes (see \cite{manriquevallier_bayesian_2016}), and using the covariates to classify individuals into those classes.&  5  \\
- \hline
-\end{tabular}
-\caption{Potential Dissertation Extensions and Priority}
-\label{table:timelinetable}
-\end{table}
-
-\subsection{Current Status of Project and Timeline}
-
-From this proposal document, we can see that the basic framework and the
-Bayesian Logistic Regression (BLRCR) model have already been derived and
-studied. While considerable work has already been completed on modelling
-the unobserved heterogeneity (extension 1) and specifying the covariate
-distribution (extension 2), there is still some work left to be
-completed. As of now, little has been done in the area of covariate
-selection (extension 3), which will encompass most of the future effort.
-The current plan is to finish up with the first two extensions and then
-begin exploring methods for handling covariate selection.
-
-The preliminary results of section \ref{Sec:simulations} only utilize
-simulations. While simulations are an excellent tool to evaluate the
-success of an algorithm, the final project will use some real datasets.
-
-The objective is to finish the dissertation project by May 2024.
-
 \newpage
 
 \section{Appendix A: Conditional Maximum Likelihood Estimation}
@@ -2225,6 +2453,8 @@ E{[}\(y_{ij}|\boldsymbol{y_i}= \boldsymbol{0}\){]} = 0 for all
 individuals \citep{alho_logistic_1990}. Using the gradient, apply the
 gradient ascent algorithm until convergence to obtain
 \(\boldsymbol{\beta}_{MAP}\).
+
+\newpage
 
 \section{Appendix B: LCMCR Model}
 \label{LCMCRmodel}
@@ -2281,6 +2511,8 @@ z_i & \sim \text{Discrete}(\{1,2,...\},(\pi_1,\pi_2,...)) \hspace{10px} \text{fo
 (\pi_1,\pi_2,...) & \sim \text{SB}(\alpha) \\ 
 \alpha & \sim \text{Gamma}(a,b).
 \end{align}
+
+\newpage
 
 \newpage
 

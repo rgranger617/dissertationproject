@@ -45,7 +45,7 @@ We update the joint likelihood in \autoref{eqn:jointlikelihoodequation1} to incl
 \begin{align}
 \label{eqn:jointlikelihoodequation2}
 \nonumber p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|N,\theta,\boldsymbol{\phi},\mathcal{X}_{mis}) & = p(\mathcal{Y}_{obs}|N,\theta,\boldsymbol{\phi},\mathcal{X}_{obs},\mathcal{X}_{mis})p(\mathcal{X}_{obs}|\boldsymbol{\phi})\\
-& \propto \binom{N}{n} \prod_{i=1}^n f(\boldsymbol{y_i}|\boldsymbol{\theta},\mathcal{X}_{obs})\prod_{n+1}^N f(\boldsymbol{0}|\boldsymbol{\theta},\mathcal{X}_{mis})I(N\ge n)\cdot g(\mathcal{X}_{obs}|\boldsymbol{\phi}).
+& = \binom{N}{n} \prod_{i=1}^n f(\boldsymbol{y_i}|\boldsymbol{\theta},\mathcal{X}_{obs})\prod_{n+1}^N f(\boldsymbol{0}|\boldsymbol{\theta},\mathcal{X}_{mis})I(N\ge n)\cdot g(\mathcal{X}_{obs}|\boldsymbol{\phi}).
 \end{align}
 
 Once again, in order to complete the Bayesian model, priors must be assigned to the unknown parameters $\boldsymbol{\theta}$ and N; however, we also must consider the distribution of the observed and missing covariates along with the parameter(s) governing their distribution, $\boldsymbol{\phi}$. The joint posterior can be written as,

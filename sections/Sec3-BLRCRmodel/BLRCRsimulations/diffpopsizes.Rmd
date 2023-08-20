@@ -1,0 +1,412 @@
+---
+title: ''
+output: pdf_document
+---
+
+\subsubsection{Simulations with Different Sized Populations}
+\label{Sec:simspopsize}
+
+In this subsection, we examine the effects of differing population sizes on the estimations with two objectives to evaluate in mind: performance and consistency. For the most part, we will see that all models will become less biased as the population size increases (except assuming independence). We will also see that using the BLRCR will tend to have a lower MSE than the cMLCR approach, especially with smaller population sizes.
+
+Data was simulated with varying population sizes, $N=$[200,500,1000,2000,5000,10000], with the results summarized in \autoref{table:diffsizes}.  For consistency, all datasets were contructed using the coefficients yielding "moderate" dependency and with two standard normal covariates. Before examining the results, it should be pointed out that there were considerable issues with using the log linear approach with the smaller sample sizes.  While a point estimate was always able to be obtained, often times, the \texttt{Rcapture} package would simply report a lower bound on the upper limit of the confidence interval.  Instead of making a decision on whether to use that bound as the upper limit, we simply report the interval width as not available (NA).
+
+With this consideration in mind, we highlight a few interesting observations. Most importantly, the BLRCR and cMLCR methods tended to outperform the other methods in terms of mean squared error (MSE), 95 $\%$ credible interval width (CI width), and the 95$\%$ credible interval capture percentage (CI $\%$). There were a handful of occasions where that was not the case but appears to be attributed to the choice of simulation parameters. Noteably, the independence model outperformed all other models when $N=1000$, but as the population grew, it became substantially worse and is actually the worst option when $N=10000$.  Additional simulations (not shown) performed with different sets of coefficients revealed the independence model to be a substantially worse choice than BLRCR regardless of population size. 
+
+A comparison of the three BLRCR methods and cMLCR reveal relatively similar performances across population sizes.  Keep in mind, the simulation used in \autoref{table:diffcoefs} simply used a single multivariate normal with no heterogeneity. The additional noise of assuming an infinite mixture of normal distributions and/or heterogeneity in capture probabilities seems to have had little to no impact on the estimation.\autoref{fig:plotNvalues} shows a correlation plot between the 100 estimates for $N$ using the three BLRCR methods and cMLCR with the true population size set to $N=2000$.  Notice, the estimates are highly correlated, and BLRCR tends to return smaller estimated values than cMLCR. An important result of \cite{alho_logistic_1990}, is that the cMLCR estimator is consistent but may be biased with small sample sizes. From the simulations, it certainly appears this is true for N=200, but the level of bias quickly disappears with N=500 and above.  Similarly, the BLRCR seems to share this quality of consistency but the bias is greater albeit the opposite direction. Nevertheless, as we would expect with Bayesian methods, we are trading some bias for a reduction in variance.  The mean squared error (MSE) tends to be smaller than the other methods.
+
+
+```{r}
+##################################
+######## Different Sizes #########
+##################################
+
+##########
+#N = 200 #
+##########
+#Set N and BETA
+myN=200
+myBeta="moderate"
+myindex <- simdat$N==myN & simdat$BETA==myBeta & simdat$covariates=="twonormalcovs"
+
+
+#Compute Percentage of N
+HSPBLRCRNhat = mean(as.numeric(simdat[myindex,]$HSPBLRCR50))/myN
+SPBLRCRNhat = mean(as.numeric(simdat[myindex,]$SPBLRCR50))/myN
+normBLRCRNhat = mean(as.numeric(simdat[myindex,]$normBLRCR50))/myN
+cMLCRNhat = mean(as.numeric(simdat[myindex,]$cMLCR))/myN
+cBLRCRNhat = mean(as.numeric(simdat[myindex,]$cBLRCR))/myN
+LCMCRNhat = mean(as.numeric(simdat[myindex,]$LCMCR50))/myN
+loglinNhat = mean(as.numeric(simdat[myindex,]$loglin50))/myN
+IndependentNhat = mean(as.numeric(simdat[myindex,]$Independent50))/myN
+
+#Check RMSE
+HSPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$HSPBLRCR50),myN)
+SPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$SPBLRCR50),myN)
+normBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$normBLRCR50),myN)
+cMLCRRMSE = RMSE(as.numeric(simdat[myindex,]$cMLCR),myN)
+cBLRCRRMSE = RMSE(as.numeric(simdat[myindex,]$cBLRCR),myN)
+LCMCRRMSE = RMSE(as.numeric(simdat[myindex,]$LCMCR50),myN)
+loglinRMSE = RMSE(as.numeric(simdat[myindex,]$loglin50),myN)
+IndependentRMSE = RMSE(as.numeric(simdat[myindex,]$Independent50),myN)
+
+#Average width of interval
+cMLCRwidth = mean(as.numeric(simdat[myindex,]$cMLCR97.5)-as.numeric(simdat[myindex,]$cMLCR2.5))/myN
+HSPBLRCwidth = mean(as.numeric(simdat[myindex,]$HSPBLRCR97.5)-as.numeric(simdat[myindex,]$HSPBLRCR2.5))/myN
+SPBLRCwidth = mean(as.numeric(simdat[myindex,]$SPBLRCR97.5)-as.numeric(simdat[myindex,]$SPBLRCR2.5))/myN
+normBLRCwidth = mean(as.numeric(simdat[myindex,]$normBLRCR97.5)-as.numeric(simdat[myindex,]$normBLRCR2.5))/myN
+LCMCRwidth = mean(as.numeric(simdat[myindex,]$LCMCR97.5)-as.numeric(simdat[myindex,]$LCMCR2.5))/myN
+loglinwidth = mean(as.numeric(simdat[myindex,]$loglin97.5)-as.numeric(simdat[myindex,]$loglin2.5))/myN
+Independentwidth = mean(as.numeric(simdat[myindex,]$Independent97.5)-as.numeric(simdat[myindex,]$Independent2.5))/myN
+
+#Check Percentage in Interval
+cMLRCCI = mean(as.numeric(simdat[myindex,]$cMLCR2.5)<myN&as.numeric(simdat[myindex,]$cMLCR97.5)>myN)*100
+HSPBLRCCI = mean(as.numeric(simdat[myindex,]$HSPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$HSPBLRCR97.5)>myN)*100
+SPBLRCCI = mean(as.numeric(simdat[myindex,]$SPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$SPBLRCR97.5)>myN)*100
+normBLRCCI = mean(as.numeric(simdat[myindex,]$normBLRCR2.5)<myN&as.numeric(simdat[myindex,]$normBLRCR97.5)>myN)*100
+LCMCRCI = mean(as.numeric(simdat[myindex,]$LCMCR2.5)<myN&as.numeric(simdat[myindex,]$LCMCR97.5)>myN)*100
+loglinCI = mean(as.numeric(simdat[myindex,]$loglin2.5)<myN&as.numeric(simdat[myindex,]$loglin97.5)>myN)*100
+IndependentCI = mean(as.numeric(simdat[myindex,]$Independent2.5)<myN&as.numeric(simdat[myindex,]$Independent97.5)>myN)*100
+```
+
+\singlespacing
+\begin{table}[H]
+\centering
+\begin{tabular}{||r l r r r r||} 
+ \hline
+$N$ & Method & N$\%$ &MSE & CI Width & CI $\%$   \\ [0.5ex] 
+ \hline\hline
+ 200    & BLRCR($K=1$, $H_\omega=1$)  & `r op(normBLRCRNhat,3)`   & `r op(normBLRCRMSE,1)`   & `r op(normBLRCwidth,3)`   & `r op(normBLRCCI,1)` \\ 
+               & BLRCR($K=20$, $H_\omega=1$)    & `r op(SPBLRCRNhat,3)`     & `r op(SPBLRCRMSE,1)`     & `r op(SPBLRCwidth,3)`     & `r op(SPBLRCCI,1)` \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & `r op(HSPBLRCRNhat,3)`     & `r op(HSPBLRCRMSE,1)`     & `r op(HSPBLRCwidth,3)`     & `r op(HSPBLRCCI,1)` \\  
+               & cMLCR       & `r op(cMLCRNhat,3)`       & `r op(cMLCRRMSE,1)`      & `r op(cMLCRwidth,3)`      & `r op(cMLRCCI,1)` \\
+               & Log Linear (BIC)  & `r op(loglinNhat,3)`      & `r op(loglinRMSE,1)`     & `r op(loglinwidth,3)`     & `r op(loglinCI,1)` \\ 
+               & LCMCR       & `r op(LCMCRNhat,3)`       & `r op(LCMCRRMSE,1)`      & `r op(LCMCRwidth,3)`      & `r op(LCMCRCI,1)` \\ 
+               & Independent & `r op(IndependentNhat,3)` & `r op(IndependentRMSE,1)`& `r op(Independentwidth,3)`& `r op(IndependentCI,1)` \\ 
+```{r}
+##########
+#N = 500 #
+##########
+#Set N and BETA
+myN=500
+myBeta="moderate"
+myindex <- simdat$N==myN & simdat$BETA==myBeta & simdat$covariates=="twonormalcovs"
+
+#Compute Percentage of N
+HSPBLRCRNhat = mean(as.numeric(simdat[myindex,]$HSPBLRCR50))/myN
+SPBLRCRNhat = mean(as.numeric(simdat[myindex,]$SPBLRCR50))/myN
+normBLRCRNhat = mean(as.numeric(simdat[myindex,]$normBLRCR50))/myN
+cMLCRNhat = mean(as.numeric(simdat[myindex,]$cMLCR))/myN
+cBLRCRNhat = mean(as.numeric(simdat[myindex,]$cBLRCR))/myN
+LCMCRNhat = mean(as.numeric(simdat[myindex,]$LCMCR50))/myN
+loglinNhat = mean(as.numeric(simdat[myindex,]$loglin50))/myN
+IndependentNhat = mean(as.numeric(simdat[myindex,]$Independent50))/myN
+
+#Check RMSE
+HSPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$HSPBLRCR50),myN)
+SPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$SPBLRCR50),myN)
+normBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$normBLRCR50),myN)
+cMLCRRMSE = RMSE(as.numeric(simdat[myindex,]$cMLCR),myN)
+cBLRCRRMSE = RMSE(as.numeric(simdat[myindex,]$cBLRCR),myN)
+LCMCRRMSE = RMSE(as.numeric(simdat[myindex,]$LCMCR50),myN)
+loglinRMSE = RMSE(as.numeric(simdat[myindex,]$loglin50),myN)
+IndependentRMSE = RMSE(as.numeric(simdat[myindex,]$Independent50),myN)
+
+#Average width of interval
+cMLCRwidth = mean(as.numeric(simdat[myindex,]$cMLCR97.5)-as.numeric(simdat[myindex,]$cMLCR2.5))/myN
+HSPBLRCwidth = mean(as.numeric(simdat[myindex,]$HSPBLRCR97.5)-as.numeric(simdat[myindex,]$HSPBLRCR2.5))/myN
+SPBLRCwidth = mean(as.numeric(simdat[myindex,]$SPBLRCR97.5)-as.numeric(simdat[myindex,]$SPBLRCR2.5))/myN
+normBLRCwidth = mean(as.numeric(simdat[myindex,]$normBLRCR97.5)-as.numeric(simdat[myindex,]$normBLRCR2.5))/myN
+LCMCRwidth = mean(as.numeric(simdat[myindex,]$LCMCR97.5)-as.numeric(simdat[myindex,]$LCMCR2.5))/myN
+loglinwidth = mean(as.numeric(simdat[myindex,]$loglin97.5)-as.numeric(simdat[myindex,]$loglin2.5))/myN
+Independentwidth = mean(as.numeric(simdat[myindex,]$Independent97.5)-as.numeric(simdat[myindex,]$Independent2.5))/myN
+
+#Check Percentage in Interval
+cMLRCCI = mean(as.numeric(simdat[myindex,]$cMLCR2.5)<myN&as.numeric(simdat[myindex,]$cMLCR97.5)>myN)*100
+HSPBLRCCI = mean(as.numeric(simdat[myindex,]$HSPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$HSPBLRCR97.5)>myN)*100
+SPBLRCCI = mean(as.numeric(simdat[myindex,]$SPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$SPBLRCR97.5)>myN)*100
+normBLRCCI = mean(as.numeric(simdat[myindex,]$normBLRCR2.5)<myN&as.numeric(simdat[myindex,]$normBLRCR97.5)>myN)*100
+LCMCRCI = mean(as.numeric(simdat[myindex,]$LCMCR2.5)<myN&as.numeric(simdat[myindex,]$LCMCR97.5)>myN)*100
+loglinCI = mean(as.numeric(simdat[myindex,]$loglin2.5)<myN&as.numeric(simdat[myindex,]$loglin97.5)>myN)*100
+IndependentCI = mean(as.numeric(simdat[myindex,]$Independent2.5)<myN&as.numeric(simdat[myindex,]$Independent97.5)>myN)*100
+```
+\hline
+500    & BLRCR($K=1$, $H_\omega=1$)  & `r op(normBLRCRNhat,3)`   & `r op(normBLRCRMSE,1)`   & `r op(normBLRCwidth,3)`   & `r op(normBLRCCI,1)` \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & `r op(SPBLRCRNhat,3)`     & `r op(SPBLRCRMSE,1)`     & `r op(SPBLRCwidth,3)`     & `r op(SPBLRCCI,1)` \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & `r op(HSPBLRCRNhat,3)`     & `r op(HSPBLRCRMSE,1)`     & `r op(HSPBLRCwidth,3)`     & `r op(HSPBLRCCI,1)` \\  
+               & cMLCR       & `r op(cMLCRNhat,3)`       & `r op(cMLCRRMSE,1)`      & `r op(cMLCRwidth,3)`      & `r op(cMLRCCI,1)` \\
+               & Log Linear (BIC)  & `r op(loglinNhat,3)`      & `r op(loglinRMSE,1)`     & `r op(loglinwidth,3)`     & `r op(loglinCI,1)` \\ 
+               & LCMCR       & `r op(LCMCRNhat,3)`       & `r op(LCMCRRMSE,1)`      & `r op(LCMCRwidth,3)`      & `r op(LCMCRCI,1)` \\ 
+               & Independent & `r op(IndependentNhat,3)` & `r op(IndependentRMSE,1)`& `r op(Independentwidth,3)`& `r op(IndependentCI,1)` \\ 
+
+
+```{r}
+##########
+#N = 1000#
+##########
+#Set N and BETA
+myN=1000
+myBeta="moderate"
+myindex <- simdat$N==myN & simdat$BETA==myBeta & simdat$covariates=="twonormalcovs"
+
+#Compute Percentage of N
+HSPBLRCRNhat = mean(as.numeric(simdat[myindex,]$HSPBLRCR50))/myN
+SPBLRCRNhat = mean(as.numeric(simdat[myindex,]$SPBLRCR50))/myN
+normBLRCRNhat = mean(as.numeric(simdat[myindex,]$normBLRCR50))/myN
+cMLCRNhat = mean(as.numeric(simdat[myindex,]$cMLCR))/myN
+cBLRCRNhat = mean(as.numeric(simdat[myindex,]$cBLRCR))/myN
+LCMCRNhat = mean(as.numeric(simdat[myindex,]$LCMCR50))/myN
+loglinNhat = mean(as.numeric(simdat[myindex,]$loglin50))/myN
+IndependentNhat = mean(as.numeric(simdat[myindex,]$Independent50))/myN
+
+#Check RMSE
+HSPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$HSPBLRCR50),myN)
+SPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$SPBLRCR50),myN)
+normBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$normBLRCR50),myN)
+cMLCRRMSE = RMSE(as.numeric(simdat[myindex,]$cMLCR),myN)
+cBLRCRRMSE = RMSE(as.numeric(simdat[myindex,]$cBLRCR),myN)
+LCMCRRMSE = RMSE(as.numeric(simdat[myindex,]$LCMCR50),myN)
+loglinRMSE = RMSE(as.numeric(simdat[myindex,]$loglin50),myN)
+IndependentRMSE = RMSE(as.numeric(simdat[myindex,]$Independent50),myN)
+
+#Average width of interval
+cMLCRwidth = mean(as.numeric(simdat[myindex,]$cMLCR97.5)-as.numeric(simdat[myindex,]$cMLCR2.5))/myN
+HSPBLRCwidth = mean(as.numeric(simdat[myindex,]$HSPBLRCR97.5)-as.numeric(simdat[myindex,]$HSPBLRCR2.5))/myN
+SPBLRCwidth = mean(as.numeric(simdat[myindex,]$SPBLRCR97.5)-as.numeric(simdat[myindex,]$SPBLRCR2.5))/myN
+normBLRCwidth = mean(as.numeric(simdat[myindex,]$normBLRCR97.5)-as.numeric(simdat[myindex,]$normBLRCR2.5))/myN
+LCMCRwidth = mean(as.numeric(simdat[myindex,]$LCMCR97.5)-as.numeric(simdat[myindex,]$LCMCR2.5))/myN
+loglinwidth = mean(as.numeric(simdat[myindex,]$loglin97.5)-as.numeric(simdat[myindex,]$loglin2.5))/myN
+Independentwidth = mean(as.numeric(simdat[myindex,]$Independent97.5)-as.numeric(simdat[myindex,]$Independent2.5))/myN
+
+#Check Percentage in Interval
+cMLRCCI = mean(as.numeric(simdat[myindex,]$cMLCR2.5)<myN&as.numeric(simdat[myindex,]$cMLCR97.5)>myN)*100
+HSPBLRCCI = mean(as.numeric(simdat[myindex,]$HSPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$HSPBLRCR97.5)>myN)*100
+SPBLRCCI = mean(as.numeric(simdat[myindex,]$SPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$SPBLRCR97.5)>myN)*100
+normBLRCCI = mean(as.numeric(simdat[myindex,]$normBLRCR2.5)<myN&as.numeric(simdat[myindex,]$normBLRCR97.5)>myN)*100
+LCMCRCI = mean(as.numeric(simdat[myindex,]$LCMCR2.5)<myN&as.numeric(simdat[myindex,]$LCMCR97.5)>myN)*100
+loglinCI = mean(as.numeric(simdat[myindex,]$loglin2.5)<myN&as.numeric(simdat[myindex,]$loglin97.5)>myN)*100
+IndependentCI = mean(as.numeric(simdat[myindex,]$Independent2.5)<myN&as.numeric(simdat[myindex,]$Independent97.5)>myN)*100
+```
+\hline
+1000    & BLRCR($K=1$, $H_\omega=1$)  & `r op(normBLRCRNhat,3)`   & `r op(normBLRCRMSE,1)`   & `r op(normBLRCwidth,3)`   & `r op(normBLRCCI,1)` \\ 
+               & BLRCR($K=$, $H_\omega=20$)    & `r op(SPBLRCRNhat,3)`     & `r op(SPBLRCRMSE,1)`     & `r op(SPBLRCwidth,3)`     & `r op(SPBLRCCI,1)` \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & `r op(HSPBLRCRNhat,3)`     & `r op(HSPBLRCRMSE,1)`     & `r op(HSPBLRCwidth,3)`     & `r op(HSPBLRCCI,1)` \\  
+               & cMLCR       & `r op(cMLCRNhat,3)`       & `r op(cMLCRRMSE,1)`      & `r op(cMLCRwidth,3)`      & `r op(cMLRCCI,1)` \\
+               & Log Linear (BIC)  & `r op(loglinNhat,3)`      & `r op(loglinRMSE,1)`     & `r op(loglinwidth,3)`     & `r op(loglinCI,1)` \\ 
+               & LCMCR       & `r op(LCMCRNhat,3)`       & `r op(LCMCRRMSE,1)`      & `r op(LCMCRwidth,3)`      & `r op(LCMCRCI,1)` \\ 
+               & Independent & `r op(IndependentNhat,3)` & `r op(IndependentRMSE,1)`& `r op(Independentwidth,3)`& `r op(IndependentCI,1)` \\ 
+
+```{r}
+##########
+#N = 2000#
+##########
+#Set N and BETA
+myN=2000
+myBeta="moderate"
+myindex <- simdat$N==myN & simdat$BETA==myBeta & simdat$covariates=="twonormalcovs"
+
+#Compute Percentage of N
+HSPBLRCRNhat = mean(as.numeric(simdat[myindex,]$HSPBLRCR50))/myN
+SPBLRCRNhat = mean(as.numeric(simdat[myindex,]$SPBLRCR50))/myN
+normBLRCRNhat = mean(as.numeric(simdat[myindex,]$normBLRCR50))/myN
+cMLCRNhat = mean(as.numeric(simdat[myindex,]$cMLCR))/myN
+cBLRCRNhat = mean(as.numeric(simdat[myindex,]$cBLRCR))/myN
+LCMCRNhat = mean(as.numeric(simdat[myindex,]$LCMCR50))/myN
+loglinNhat = mean(as.numeric(simdat[myindex,]$loglin50))/myN
+IndependentNhat = mean(as.numeric(simdat[myindex,]$Independent50))/myN
+
+#Check RMSE
+HSPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$HSPBLRCR50),myN)
+SPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$SPBLRCR50),myN)
+normBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$normBLRCR50),myN)
+cMLCRRMSE = RMSE(as.numeric(simdat[myindex,]$cMLCR),myN)
+cBLRCRRMSE = RMSE(as.numeric(simdat[myindex,]$cBLRCR),myN)
+LCMCRRMSE = RMSE(as.numeric(simdat[myindex,]$LCMCR50),myN)
+loglinRMSE = RMSE(as.numeric(simdat[myindex,]$loglin50),myN)
+IndependentRMSE = RMSE(as.numeric(simdat[myindex,]$Independent50),myN)
+
+#Average width of interval
+cMLCRwidth = mean(as.numeric(simdat[myindex,]$cMLCR97.5)-as.numeric(simdat[myindex,]$cMLCR2.5))/myN
+HSPBLRCwidth = mean(as.numeric(simdat[myindex,]$HSPBLRCR97.5)-as.numeric(simdat[myindex,]$HSPBLRCR2.5))/myN
+SPBLRCwidth = mean(as.numeric(simdat[myindex,]$SPBLRCR97.5)-as.numeric(simdat[myindex,]$SPBLRCR2.5))/myN
+normBLRCwidth = mean(as.numeric(simdat[myindex,]$normBLRCR97.5)-as.numeric(simdat[myindex,]$normBLRCR2.5))/myN
+LCMCRwidth = mean(as.numeric(simdat[myindex,]$LCMCR97.5)-as.numeric(simdat[myindex,]$LCMCR2.5))/myN
+loglinwidth = mean(as.numeric(simdat[myindex,]$loglin97.5)-as.numeric(simdat[myindex,]$loglin2.5))/myN
+Independentwidth = mean(as.numeric(simdat[myindex,]$Independent97.5)-as.numeric(simdat[myindex,]$Independent2.5))/myN
+
+#Check Percentage in Interval
+cMLRCCI = mean(as.numeric(simdat[myindex,]$cMLCR2.5)<myN&as.numeric(simdat[myindex,]$cMLCR97.5)>myN)*100
+HSPBLRCCI = mean(as.numeric(simdat[myindex,]$HSPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$HSPBLRCR97.5)>myN)*100
+SPBLRCCI = mean(as.numeric(simdat[myindex,]$SPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$SPBLRCR97.5)>myN)*100
+normBLRCCI = mean(as.numeric(simdat[myindex,]$normBLRCR2.5)<myN&as.numeric(simdat[myindex,]$normBLRCR97.5)>myN)*100
+LCMCRCI = mean(as.numeric(simdat[myindex,]$LCMCR2.5)<myN&as.numeric(simdat[myindex,]$LCMCR97.5)>myN)*100
+loglinCI = mean(as.numeric(simdat[myindex,]$loglin2.5)<myN&as.numeric(simdat[myindex,]$loglin97.5)>myN)*100
+IndependentCI = mean(as.numeric(simdat[myindex,]$Independent2.5)<myN&as.numeric(simdat[myindex,]$Independent97.5)>myN)*100
+```
+\hline
+2000    & BLRCR($K=1$, $H_\omega=1$)  & `r op(normBLRCRNhat,3)`   & `r op(normBLRCRMSE,1)`   & `r op(normBLRCwidth,3)`   & `r op(normBLRCCI,1)` \\ 
+               & BLRCR($K=20$, $H_\omega=1$)   & `r op(SPBLRCRNhat,3)`     & `r op(SPBLRCRMSE,1)`     & `r op(SPBLRCwidth,3)`     & `r op(SPBLRCCI,1)` \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & `r op(HSPBLRCRNhat,3)`     & `r op(HSPBLRCRMSE,1)`     & `r op(HSPBLRCwidth,3)`     & `r op(HSPBLRCCI,1)` \\  
+               & cMLCR       & `r op(cMLCRNhat,3)`       & `r op(cMLCRRMSE,1)`      & `r op(cMLCRwidth,3)`      & `r op(cMLRCCI,1)` \\
+               & Log Linear (BIC)  & `r op(loglinNhat,3)`      & `r op(loglinRMSE,1)`     & `r op(loglinwidth,3)`     & `r op(loglinCI,1)` \\ 
+               & LCMCR       & `r op(LCMCRNhat,3)`       & `r op(LCMCRRMSE,1)`      & `r op(LCMCRwidth,3)`      & `r op(LCMCRCI,1)` \\ 
+               & Independent & `r op(IndependentNhat,3)` & `r op(IndependentRMSE,1)`& `r op(Independentwidth,3)`& `r op(IndependentCI,1)` \\ 
+
+```{r}
+##########
+#N = 5000#
+##########
+#Set N and BETA
+myN=5000
+myBeta="moderate"
+myindex <- simdat$N==myN & simdat$BETA==myBeta & simdat$covariates=="twonormalcovs"
+
+#Compute Percentage of N
+HSPBLRCRNhat = mean(as.numeric(simdat[myindex,]$HSPBLRCR50))/myN
+SPBLRCRNhat = mean(as.numeric(simdat[myindex,]$SPBLRCR50))/myN
+normBLRCRNhat = mean(as.numeric(simdat[myindex,]$normBLRCR50))/myN
+cMLCRNhat = mean(as.numeric(simdat[myindex,]$cMLCR))/myN
+cBLRCRNhat = mean(as.numeric(simdat[myindex,]$cBLRCR))/myN
+LCMCRNhat = mean(as.numeric(simdat[myindex,]$LCMCR50))/myN
+loglinNhat = mean(as.numeric(simdat[myindex,]$loglin50))/myN
+IndependentNhat = mean(as.numeric(simdat[myindex,]$Independent50))/myN
+
+#Check RMSE
+HSPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$HSPBLRCR50),myN)
+SPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$SPBLRCR50),myN)
+normBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$normBLRCR50),myN)
+cMLCRRMSE = RMSE(as.numeric(simdat[myindex,]$cMLCR),myN)
+cBLRCRRMSE = RMSE(as.numeric(simdat[myindex,]$cBLRCR),myN)
+LCMCRRMSE = RMSE(as.numeric(simdat[myindex,]$LCMCR50),myN)
+loglinRMSE = RMSE(as.numeric(simdat[myindex,]$loglin50),myN)
+IndependentRMSE = RMSE(as.numeric(simdat[myindex,]$Independent50),myN)
+
+#Average width of interval
+cMLCRwidth = mean(as.numeric(simdat[myindex,]$cMLCR97.5)-as.numeric(simdat[myindex,]$cMLCR2.5))/myN
+HSPBLRCwidth = mean(as.numeric(simdat[myindex,]$HSPBLRCR97.5)-as.numeric(simdat[myindex,]$HSPBLRCR2.5))/myN
+SPBLRCwidth = mean(as.numeric(simdat[myindex,]$SPBLRCR97.5)-as.numeric(simdat[myindex,]$SPBLRCR2.5))/myN
+normBLRCwidth = mean(as.numeric(simdat[myindex,]$normBLRCR97.5)-as.numeric(simdat[myindex,]$normBLRCR2.5))/myN
+LCMCRwidth = mean(as.numeric(simdat[myindex,]$LCMCR97.5)-as.numeric(simdat[myindex,]$LCMCR2.5))/myN
+loglinwidth = mean(as.numeric(simdat[myindex,]$loglin97.5)-as.numeric(simdat[myindex,]$loglin2.5))/myN
+Independentwidth = mean(as.numeric(simdat[myindex,]$Independent97.5)-as.numeric(simdat[myindex,]$Independent2.5))/myN
+
+#Check Percentage in Interval
+cMLRCCI = mean(as.numeric(simdat[myindex,]$cMLCR2.5)<myN&as.numeric(simdat[myindex,]$cMLCR97.5)>myN)*100
+HSPBLRCCI = mean(as.numeric(simdat[myindex,]$HSPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$HSPBLRCR97.5)>myN)*100
+SPBLRCCI = mean(as.numeric(simdat[myindex,]$SPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$SPBLRCR97.5)>myN)*100
+normBLRCCI = mean(as.numeric(simdat[myindex,]$normBLRCR2.5)<myN&as.numeric(simdat[myindex,]$normBLRCR97.5)>myN)*100
+LCMCRCI = mean(as.numeric(simdat[myindex,]$LCMCR2.5)<myN&as.numeric(simdat[myindex,]$LCMCR97.5)>myN)*100
+loglinCI = mean(as.numeric(simdat[myindex,]$loglin2.5)<myN&as.numeric(simdat[myindex,]$loglin97.5)>myN)*100
+IndependentCI = mean(as.numeric(simdat[myindex,]$Independent2.5)<myN&as.numeric(simdat[myindex,]$Independent97.5)>myN)*100
+```
+\hline
+5000    & BLRCR($K=1$, $H_\omega=1$)  & `r op(normBLRCRNhat,3)`   & `r op(normBLRCRMSE,1)`   & `r op(normBLRCwidth,3)`   & `r op(normBLRCCI,1)` \\ 
+               & BLRCR($K=20$, $H_\omega=1$)    & `r op(SPBLRCRNhat,3)`     & `r op(SPBLRCRMSE,1)`     & `r op(SPBLRCwidth,3)`     & `r op(SPBLRCCI,1)` \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & `r op(HSPBLRCRNhat,3)`     & `r op(HSPBLRCRMSE,1)`     & `r op(HSPBLRCwidth,3)`     & `r op(HSPBLRCCI,1)` \\  
+               & cMLCR       & `r op(cMLCRNhat,3)`       & `r op(cMLCRRMSE,1)`      & `r op(cMLCRwidth,3)`      & `r op(cMLRCCI,1)` \\
+               & Log Linear (BIC)  & `r op(loglinNhat,3)`      & `r op(loglinRMSE,1)`     & `r op(loglinwidth,3)`     & `r op(loglinCI,1)` \\ 
+               & LCMCR       & `r op(LCMCRNhat,3)`       & `r op(LCMCRRMSE,1)`      & `r op(LCMCRwidth,3)`      & `r op(LCMCRCI,1)` \\ 
+               & Independent & `r op(IndependentNhat,3)` & `r op(IndependentRMSE,1)`& `r op(Independentwidth,3)`& `r op(IndependentCI,1)` \\ 
+
+```{r}
+###########
+#N = 10000#
+###########
+#Set N and BETA
+myN=10000
+myBeta="moderate"
+myindex <- simdat$N==myN & simdat$BETA==myBeta & simdat$covariates=="twonormalcovs"
+
+#Compute Percentage of N
+HSPBLRCRNhat = mean(as.numeric(simdat[myindex,]$HSPBLRCR50))/myN
+SPBLRCRNhat = mean(as.numeric(simdat[myindex,]$SPBLRCR50))/myN
+normBLRCRNhat = mean(as.numeric(simdat[myindex,]$normBLRCR50))/myN
+cMLCRNhat = mean(as.numeric(simdat[myindex,]$cMLCR))/myN
+cBLRCRNhat = mean(as.numeric(simdat[myindex,]$cBLRCR))/myN
+LCMCRNhat = mean(as.numeric(simdat[myindex,]$LCMCR50))/myN
+loglinNhat = mean(as.numeric(simdat[myindex,]$loglin50))/myN
+IndependentNhat = mean(as.numeric(simdat[myindex,]$Independent50))/myN
+
+#Check RMSE
+HSPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$HSPBLRCR50),myN)
+SPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$SPBLRCR50),myN)
+normBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$normBLRCR50),myN)
+cMLCRRMSE = RMSE(as.numeric(simdat[myindex,]$cMLCR),myN)
+cBLRCRRMSE = RMSE(as.numeric(simdat[myindex,]$cBLRCR),myN)
+LCMCRRMSE = RMSE(as.numeric(simdat[myindex,]$LCMCR50),myN)
+loglinRMSE = RMSE(as.numeric(simdat[myindex,]$loglin50),myN)
+IndependentRMSE = RMSE(as.numeric(simdat[myindex,]$Independent50),myN)
+
+#Average width of interval
+cMLCRwidth = mean(as.numeric(simdat[myindex,]$cMLCR97.5)-as.numeric(simdat[myindex,]$cMLCR2.5))/myN
+HSPBLRCwidth = mean(as.numeric(simdat[myindex,]$HSPBLRCR97.5)-as.numeric(simdat[myindex,]$HSPBLRCR2.5))/myN
+SPBLRCwidth = mean(as.numeric(simdat[myindex,]$SPBLRCR97.5)-as.numeric(simdat[myindex,]$SPBLRCR2.5))/myN
+normBLRCwidth = mean(as.numeric(simdat[myindex,]$normBLRCR97.5)-as.numeric(simdat[myindex,]$normBLRCR2.5))/myN
+LCMCRwidth = mean(as.numeric(simdat[myindex,]$LCMCR97.5)-as.numeric(simdat[myindex,]$LCMCR2.5))/myN
+loglinwidth = mean(as.numeric(simdat[myindex,]$loglin97.5)-as.numeric(simdat[myindex,]$loglin2.5))/myN
+Independentwidth = mean(as.numeric(simdat[myindex,]$Independent97.5)-as.numeric(simdat[myindex,]$Independent2.5))/myN
+
+#Check Percentage in Interval
+cMLRCCI = mean(as.numeric(simdat[myindex,]$cMLCR2.5)<myN&as.numeric(simdat[myindex,]$cMLCR97.5)>myN)*100
+HSPBLRCCI = mean(as.numeric(simdat[myindex,]$HSPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$HSPBLRCR97.5)>myN)*100
+SPBLRCCI = mean(as.numeric(simdat[myindex,]$SPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$SPBLRCR97.5)>myN)*100
+normBLRCCI = mean(as.numeric(simdat[myindex,]$normBLRCR2.5)<myN&as.numeric(simdat[myindex,]$normBLRCR97.5)>myN)*100
+LCMCRCI = mean(as.numeric(simdat[myindex,]$LCMCR2.5)<myN&as.numeric(simdat[myindex,]$LCMCR97.5)>myN)*100
+loglinCI = mean(as.numeric(simdat[myindex,]$loglin2.5)<myN&as.numeric(simdat[myindex,]$loglin97.5)>myN)*100
+IndependentCI = mean(as.numeric(simdat[myindex,]$Independent2.5)<myN&as.numeric(simdat[myindex,]$Independent97.5)>myN)*100
+```
+\hline
+10000    & BLRCR($K=1$, $H_\omega=1$)  & `r op(normBLRCRNhat,3)`   & `r op(normBLRCRMSE,1)`   & `r op(normBLRCwidth,3)`   & `r op(normBLRCCI,1)` \\ 
+               & BLRCR($K=20$, $H_\omega=1$)    & `r op(SPBLRCRNhat,3)`     & `r op(SPBLRCRMSE,1)`     & `r op(SPBLRCwidth,3)`     & `r op(SPBLRCCI,1)` \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & `r op(HSPBLRCRNhat,3)`     & `r op(HSPBLRCRMSE,1)`     & `r op(HSPBLRCwidth,3)`     & `r op(HSPBLRCCI,1)` \\  
+               & cMLCR       & `r op(cMLCRNhat,3)`       & `r op(cMLCRRMSE,1)`      & `r op(cMLCRwidth,3)`      & `r op(cMLRCCI,1)` \\
+               & Log Linear (BIC)  & `r op(loglinNhat,3)`      & `r op(loglinRMSE,1)`     & `r op(loglinwidth,3)`     & `r op(loglinCI,1)` \\ 
+               & LCMCR       & `r op(LCMCRNhat,3)`       & `r op(LCMCRRMSE,1)`      & `r op(LCMCRwidth,3)`      & `r op(LCMCRCI,1)` \\ 
+               & Independent & `r op(IndependentNhat,3)` & `r op(IndependentRMSE,1)`& `r op(Independentwidth,3)`& `r op(IndependentCI,1)` \\ 
+\hline
+\end{tabular}
+\caption{Results of 100 capture-recapture simulations per varying population sizes using "Moderate" list dependency and two standard normal covariates. }
+\label{table:diffsizes}
+\end{table}
+\doublespacing
+
+
+```{r plotNvalues, fig.align='center',fig.width=8,fig.height=6,fig.margin=TRUE,fig.cap="\\label{fig:normalx} Correlation Plot of the 100 estimates for N using BLRCR and cMLCR when simulating from two independent standard normal distributions with moderate dependency between lists and a true population size of N=2000."}
+#Set N and BETA
+myN=2000
+myBeta="moderate"
+myindex <- simdat$N==myN & simdat$BETA==myBeta & simdat$covariates=="twonormalcovs"
+
+#Get estimates
+BLRCRN = as.numeric(simdat[myindex,]$normBLRCR50)
+HSPBLRCRN = as.numeric(simdat[myindex,]$HSPBLRCR50)
+SPBLRCRN = as.numeric(simdat[myindex,]$SPBLRCR50)
+cMLCRN = as.numeric(simdat[myindex,]$cMLCR)
+
+
+Nestimates=data.frame("B1"=BLRCRN,
+                      "B2"=SPBLRCRN,
+                      "B3"=HSPBLRCRN,
+                      "cMLCR"=cMLCRN)
+
+lowerfun <- function(data,mapping){
+  ggplot(data = data, mapping = mapping)+
+    geom_point()+
+    geom_abline(intercept=0,slope=1)
+    #scale_x_continuous(limits = c(1750,2250))+
+    #scale_y_continuous(limits = c(1750,2250))
+}
+ggpairs(Nestimates,
+        columnLabels = c("BLRCR(K=1,Hw=1)",
+                         "BLRCR(K=20,Hw=1)",
+                         "BLRCR(K=20,Hw=20)",
+                         "cMLCR"),
+        rowLabels =    c("BLRCR(K=1,Hw=1)",
+                         "BLRCR(K=20,Hw=1)",
+                         "BLRCR(K=20,Hw=20)",
+                         "cMLCR"),
+        lower=list(continuous=wrap(lowerfun))) + theme_bw()
+```
+
+
+
+Overall, the BLRCR model is shown to be consistent.  It also tends to outperform or equally perform the other methods in terms of MSE, CI width, and CI$\%$.

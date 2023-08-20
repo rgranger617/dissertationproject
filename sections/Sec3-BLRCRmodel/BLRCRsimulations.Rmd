@@ -1,0 +1,87 @@
+---
+title: ''
+output: pdf_document
+---
+
+\subsection{Simulation Analysis}
+\label{sec:simulationanalysis}
+
+ 
+```{r simulatedata}
+library(mvtnorm) #needed for multivariate normal
+library(MCMCpack) #needed for inverse wishart
+library(BayesLogit) #pollygamma sampling
+library(cubature) #numerical integration
+library(MASS)
+library(LCMCR)
+library(ellipse) #helpful for plotting ellipses
+library(ggplot2)
+library(GGally)
+library(dplyr)
+
+RMSE <- function(x,N){
+  sqrt(mean((x-N)^2))
+}
+
+#Load simdata
+simdat<-readRDS("BLRCRsimulations/simdata/simdata11122022.rds")
+simdat=simdat[complete.cases(simdat),]
+simdat$N = as.numeric(simdat$N)
+simdat$n = as.numeric(simdat$n)
+
+
+#remove NA
+#simdat=simdat[-which(is.na(simdat$N)),]
+```
+
+In this subsection, we examine the Bayesian Logistic Regression Capture-Recapture (BLRCR) model and estimation procedure using a variety of simulations and compare it with other popular methodologies. Of interest is the computational efficiency and quality of the model. Since the estimation procedure utilizes a MCMC methodology, the concern is in the mixing of the sampled posterior distribution. Typically, as the model becomes more complex with a greater number of parameters, the need arises for longer MCMC chains in order to converge to the target posterior stationary distribution. Meanwhile, assuming the model can converge, we also assess the quality of the procedure under various measures of accuracy (bias, mean-squared error, capture percentage) and precision (relative length of interval). 
+
+While the primary purpose is to examine the results of the Bayesian Logistic Regression Capture-Recapture (\textbf{BLRCR}) model, we use four other popular capture-recapture algorithms as a comparison. First, we consider the conditional maximum likelihood logistic regression (\textbf{cMLCR}) which we implement using the \texttt{VGAM} package in \texttt{R} (see subsection \ref{Sec:selectcovariates}). The package provides asymptotic estimates for the standard error and suggests, through examples, to construct confidence intervals assuming normality. Instead, utilize the package to get our point estimate and proceed with a semiparametric bootstrap for the confidence intervals \citep{zwane_implementing_2003}. Second, we consider the ubiquitous hierarchical log-linear (\textbf{Log Linear - BIC}) modelling technique \citep{fienberg_multiple_1972} using the the \texttt{Rcapture} package in \texttt{R}. Keep in mind that this approach does not use covariates, but attempts to model list dependency directly through list interactions. Since the approach is hierarchical with $2^J$ different model constructions, all are calculated and the one with the lowest BIC is selected. Third, we use the Bayesian Non-Parametric Latent-Class Capture-Recapture (\textbf{LCMCR}) algorithm in \cite{manriquevallier_bayesian_2016} which is another technique that does not allow covariates but uses a Bayesian nonparametric approach to account for unobserved heterogeneity (see Section \ref{LCMCRmodel}: Appendix B for a summary of this approach). The fourth technique is a simple independence model (\textbf{Independent}) where it is assumed there is no list or individual heterogeneity. Conveniently, when the number of latent classes is set equal to one, the LCMCR model collapses into an independence model, effectively giving a Bayesian independence sampler.
+
+The BLRCR model is designed to be flexible and extensible (see sections \ref{Sec:selectcovariates}, \ref{Sec:condindependence}, and \ref{Sec:modelselection}), hence there are several choices in its implementation. While we will implement these various extensions in upcoming sections, for now, we will assume the true distribution of the covariates is known. This does not, however, avoid the necessity of specifying hyperparameters for the Bayesian models. In order to be consistent throughout the entirety of this dissertation, we use the same relatively uninformative prior specifications throughout all sections. \autoref{table:hyperparams} lists these hyperparameter specifications for both the BLRCR and LCMCR models.
+
+\singlespacing
+\begin{table}[H]
+\centering
+\begin{tabular}{||r r r||} 
+\hline
+& \multicolumn{2}{ c ||}{Method}\\
+\hline
+Hyperparameter & SP-BLRCR & LCMCR   \\ [0.5ex] 
+\hline
+$a$                      & 0.25  & 0.25  \\ 
+$b$                      & 0.25  & 0.25  \\ 
+$\nu_0$                  & 3     &  \\ 
+$\kappa_0$               & 1     &  \\ 
+$\boldsymbol{\mu_0}$     & (0,0) &  \\ 
+$\boldsymbol{\Lambda_0}$ & $\begin{bmatrix}
+1 & 0 \\
+0 & 1 
+\end{bmatrix}$ &  \\
+&&\\ [-0.25ex]
+ \hline
+\end{tabular}
+\caption{Hyperparameter specifications for the SP-BLRCR and LCMCR methodologies.}
+\label{table:hyperparams}
+\end{table}
+\doublespacing
+
+Since the BLRCR model uses logistic regression with a normal distribution prior on the coefficients, this also requires a prior for the mean and covariance, which are set to
+
+\singlespacing
+$$\boldsymbol{b}=\boldsymbol{0} \text{ and } \boldsymbol{B}=\begin{bmatrix}
+1 & 0 & 0\\
+0 & 1 & 0\\
+0 & 0 & 1
+\end{bmatrix}.$$
+\doublespacing
+
+\vspace{10px}
+
+For each set of simulations, a table with results can be found. For each algorithm a point estimate of the population size, $N$, is computed. We have some options for what to use as the point estimate, $\hat{N}$, for the MCMC algorithms, but we elect to use median of the sampled posterior. The column ${Mean}\hspace{5px}{N}$ records the average $\hat{N}$ across the simulations and the column ${Mean}\hspace{5px}{N}\%$ takes it as a percentage of $N$. Hence, if the true population size is $N=2000$, a ${Mean}\hspace{5px}{N} = 2000$ and a ${Mean}\hspace{5px}{N}\%= 1.000$ would indicate an unbiased estimate. We also consider the accuracy in two other ways: the column $MSE$ records the estimated mean squared error of the point estimate and the column $CI \%$ records the percentage of times the $95\%$ interval captured the true population number, $N$. In order to get a measure of interval's precision, we compute the average of the simulated 95$\%$ confidence/credible interval widths as a percentage of $N$, which is recorded in column ${CI}\hspace{5px}{Width}$.  Ideally, we would want a model with high precision, i.e. a small interval width; but still maintains the ability to be highly accurate.
+
+```{r selectcovariates, child = 'BLRCRsimulations/difflevelsdependency.Rmd'}
+```
+
+```{r selectcovariates, child = 'BLRCRsimulations/diffpopsizes.Rmd'}
+```

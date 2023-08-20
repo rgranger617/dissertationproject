@@ -1,0 +1,118 @@
+---
+title: ''
+output: pdf_document
+---
+
+\section{Model Selection}
+\label{Sec:modelselection}
+
+The methodology described in the previous sections assumes the practitioner knows exactly how the covariates impact the probability of each individual going undetected on a given list. The key to the successful estimation of the population size relies on the proper and accurate sampling of the coefficients in the logistic regression, or at a minimum, these cofficients must lead to a correct estimate of the overall probability of an individual being missing. Hence, one must carefully select which covariates to use, how to use these covariates, and whether there are any interactions that may play an important role in this process. While it may be beneficial to rely on domain knowledge of the population to make these determinations, this may not be sufficient so it is desirable to take a statistical approach to this problem.
+
+
+\subsection{Model Comparison via the Bayes Factor}
+
+Perhaps the most ubiquitous approach to model selection in a Bayesian setting is through the computation of the Bayes Factor. This approach of model comparison has a lot of similarities with the problem of hypothesis testing. Suppose there is a null and alternative model, $\mathcal{M}_0$ and $\mathcal{M}_1$, respectively. With the standard frequentist approach, the practitioner computes the the probability of observing the data given the null model, the p-value, and chooses to accept or reject the null model based on some arbitrary threshold, typically based on controlling for Type I error. On the other hand, using a Bayesian approach \citep{jeffreys_tests_1935,jeffreys_theory_1967}, we compare two hypotheses or models by directly computing the probability of each model given the data through the posterior probabilities. This means, unlike frequentist hypothesis testing, there is no need to distinguish between which model is the null and which is the alternative. 
+
+For the BLRCR model, the posterior probability of $\mathcal{M}_1$ given the observed data is written as
+
+\vspace{-20px}
+\begin{align}
+p(\mathcal{M}_1|\mathcal{Y}_{obs},\mathcal{X}_{obs}) = \frac{p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_1)p(\mathcal{M}_1)}{p(\mathcal{Y}_{obs},\mathcal{X}_{obs})}.
+\end{align}
+
+\vspace{-20px}
+
+Next, we calculate the posterior odds ratio between $\mathcal{M}_1$ and $\mathcal{M}_0$ as
+
+\vspace{-20px}
+\begin{align}
+\frac{p(\mathcal{M}_1|\mathcal{Y}_{obs},\mathcal{X}_{obs})}{p(\mathcal{M}_0|\mathcal{Y}_{obs},\mathcal{X}_{obs})} = 
+\frac{p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_0)p(\mathcal{M}_0)}{p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_1)p(\mathcal{M}_1)}.
+\end{align}
+\vspace{-20px}
+
+If we do not a priori favor one model over another, such that $p(\mathcal{M}_0)=p(\mathcal{M}_1)$, then the posterior odds ratio is equal to what is known as the Bayes Factor,
+
+\vspace{-20px}
+\begin{align}
+\label{eqn:bayesfactorformula}
+BF_{10} & = \frac{p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_1)}{p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_0)}.
+\end{align}
+\vspace{-20px}
+
+where values greater than 1 would suggest $\mathcal{M}_1$, and values less than 1 would suggest $\mathcal{M}_0$ as the better fit.
+
+Calculation of the Bayes Factor is often difficult or intractable as it is the ratio of the marginal likelihoods of the two models.  Given a specific model, $\mathcal{M}_i$, The marginal likelihood is the probability of the data integrated across all values of the parameters, 
+
+\vspace{-20px}
+\begin{align}
+\label{eqn:marginallikelihoodBF}
+p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_i) & = \int p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta},\mathcal{M}_i)p(\boldsymbol{\theta}|\mathcal{M}_i) d\boldsymbol{\theta}.
+\end{align}
+\vspace{-20px}
+
+This is the the denominator in the calculation of the posterior distribution assuming a fixed model (ignore the $\mathcal{M}_i$). Because this is just the normalizing constant on the posterior density and because of the complexity of its calculation, the calculation of the marginal likelihood is often avoided by taking advantage of posterior/prior conjugacy or normalization in the discrete case. 
+
+Without the ability to solve Equation \ref{eqn:marginallikelihoodBF} analytically, we must rely on an approximate solution. Perhaps the simplest solution is to recognize Equation \ref{eqn:marginallikelihoodBF} can be written as the expected value of the likelihood under the prior distribution. As such, a simple application of the Law of Large numbers, leads to the estimator,
+
+\vspace{-20px}
+\begin{align}
+\label{eqn:priorapproxBF}
+\hat{p}_1(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_i) & =\frac{1}{G}\sum_{g=1}^G p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta}^{(g)},\mathcal{M}_i),
+\end{align}
+\vspace{-20px}
+
+where $G$ is the number of samples and $\boldsymbol{\theta}^{(g)}$ are the sampled parameter values from the \textbf{prior} distribution. While this estimator is simple and easy to implement, it converges slowly when the prior and posterior are significantly different, which is often the case when using non-informative priors. Many of the prior samples will produce negligibly small likelihood values, leading to a large variance in the estimator. One solution to improve this integration is to use importance sampling \cite{kass_bayes_1995,robert_computational_2009}, but leads to the additional hardship of selecting a proper importance sampling function. Furthermore, this method requires sampling from the prior which creates additional difficulties when using an improper prior such as the prior for $N$ as with the BLRCR.
+
+Instead of using the prior distribution, \cite{newton_approximate_1994} showed that the harmonic mean can be used to approximate the marginal likelihood using posterior samples,
+
+\vspace{-20px}
+\begin{align}
+\label{eqn:harmonicmeanBF}
+\hat{p}_2(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_i) & = \left[\frac{1}{G}\sum_{g=1}^G \frac{1}{p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta}^{(g)},\mathcal{M}_i)}\right]^{-1},
+\end{align}
+\vspace{-20px}
+
+where $\boldsymbol{\theta}^{(g)}$ are the sampled parameter values from the \textbf{posterior} distribution. Unfortunately, this estimator tends to not work well with results being unstable and the estimator having infinite variance \citep{neal_contribution_1994,robert_computational_2009}. To improve this estimator, \cite{newton_approximate_1994} present additional estimators using mixtures from the prior and posterior. Alternatively, \cite{gelfand_bayesian_1994} derives an estimator in the context of importance sampling where the posterior distribution is selected as the importance sampling density.
+
+\vspace{-20px}
+\begin{align}
+\label{eqn:harmonicmeanimportanceBFderivation}
+\nonumber E_{p(\boldsymbol{\theta}|\mathcal{Y}_{obs},\mathcal{X}_{obs})}\left[\frac{\psi(\boldsymbol{\theta})}{p(\boldsymbol{\theta})p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta})}\right] & =\int \frac{\psi(\boldsymbol{\theta})}{p(\boldsymbol{\theta})p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta})}\cdot p(\boldsymbol{\theta}|\mathcal{Y}_{obs},\mathcal{X}_{obs})d\boldsymbol{\theta}\\
+\nonumber & =\int \frac{\psi(\boldsymbol{\theta})}{p(\boldsymbol{\theta})p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta})}\cdot\frac{p(\boldsymbol{\theta})p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta})}{p(\mathcal{Y}_{obs},\mathcal{X}_{obs})}d\boldsymbol{\theta}\\
+\nonumber & =\frac{1}{p(\mathcal{Y}_{obs},\mathcal{X}_{obs})} \int \psi(\boldsymbol{\theta}) d\boldsymbol{\theta}\\
+& =\frac{1}{p(\mathcal{Y}_{obs},\mathcal{X}_{obs})}
+\end{align}
+\vspace{-20px}
+
+where $\psi(\boldsymbol{\theta})$ can be any proper density. Hence a consistent estimator for the marginal likelihood is
+
+\vspace{-20px}
+\begin{align}
+\label{eqn:harmonicmeanimportanceBF}
+\hat{p}_3(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_i) & = \left[\frac{1}{G}\sum_{g=1}^G \frac{\psi(\boldsymbol{\theta}^{(g)})}{p(\boldsymbol{\theta}^{(g)}|\mathcal{M}_i)p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta}^{(g)},\mathcal{M}_i)}\right]^{-1}.
+\end{align}
+\vspace{-20px}
+
+Notice that if we set $\psi(\boldsymbol{\theta}^{(g)}) = p(\boldsymbol{\theta}^{(g)})$, we have the original harmonic mean estimator, $\hat{p}_2(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_i)$. While any density can be selected, we need a density with lighter tails than $p(\boldsymbol{\theta}^{(g)}|\mathcal{M}_i)p(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\boldsymbol{\theta}^{(g)},\mathcal{M}_i)$ in order to improve the original estimator and achieve finite variance \citep{robert_computational_2009}. Potential candidate densities that may work include asymptotic densities around the maximum likelihood values or kernel approximations. For example, in the case of Probit regression, \cite{marin_importance_2018} found success using the normal density with mean and covariance equal to the maximum likelihood estimate. 
+
+This subsection provides a handful of methods for computing the Bayes Factor for the BLRCR model, but there are several potential issues making the above procedures impossible or at best questionable to implement. For starters, the use of improper priors on $N$ means the Bayes Factors should certainly not be interpreted literally as the actual value is off by an arbitrary constant. Second, the multi-dimensionality of the problem leads to issues of converge with even the largest of chains. Nevertheless, we will see in [INSERT SIMULATION SUBSECTION] that the Bayes Factor computations above lead us to the correct implementation more often than not.
+
+Our focus is on the methods that utilize samples from the posterior distribution since the algorithm provided in subsection \ref{sec:estimationBLRCRMCMC} utilizes a MCMC method. Further work could be done on methods that use samples from the prior like the estimator, $\hat{p}_1(\mathcal{Y}_{obs},\mathcal{X}_{obs}|\mathcal{M}_i)$. In addition, other approaches such as asymptotic approximations like Laplace's Method or exploiting functional equalities \cite{chib_marginal_1995} may prove promising as well. While we leave this to future research, we believe a more promising approach may be through the use of regression regularization.
+
+
+\subsection{Regularization and Prior Specifications}
+
+We propose a different approach to model selection via the Bayes factor by instead narrowing in on the portion of the methodology that samples the logistic regression coefficients. While the various subsections have added stages to the BLRCR sampler to accommodate various complications, the sampling stages can be summarized into two basic groupings as presented in subsection \ref{sec:estimationBLRCRMCMC}. The first grouping of sampling stages are used to augment the missing data by first sampling the size of the data, $N$, and then sampling the missing covariates, $\mathcal{X}_{mis}$. The second grouping of sampling stages then samples the probability an individual goes missing through a deterministic function of the sampled logistic regression coefficients, $\boldsymbol{\beta}$. Under this framework, taking a sample of regression coefficients using the augmented data is no different than taking a sample of regression coefficients from a dataset that is static. Hence, we can narrow our focus to finding the correct fitting for the linear component of our logistic regression.
+
+By narrowing our focus to the regression coefficients, we can include all potential variables (including transformations and interactions) with the purported threat of overfitting. There are multiple ways to overcome the problem with overfitting. A typical way seen especially in the data science community is through cross validation using training and testing sets. This is not a feasible approach for the capture-recapture problem, as the number of observed captures, plays a crucial rule in the estimation process. Theoretically, there may be ways around this by estimating random subpopulation sizes, but as is typical with these approaches, less data being used for estimation leads to more uncertainty especially in the face of sparsity. As a result, we suggest implementing regularized regression, which in a Bayesian context, is through different types of priors.
+
+[MENTION HORSESHOE and SLAB/SPIKE PRIOR HERE ALONG WITH PAPERS FOR IMPLEMENTING, note that using normal priors is a form of regularization, i.e. ridge regression]
+
+While regularization has its shortcomings, using these different priors avoids many of the complications that can arise with the computation of the Bayes Factor. Also, when the number of model comparisons is large, computing the Bayes Factor requires posterior samples from each of the candidate models, whereas with regularization, only one MCMC chain is required. 
+
+
+
+
+
+

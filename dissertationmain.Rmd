@@ -46,38 +46,44 @@ op = function(x, d=2) sprintf(paste0("%1.",d,"f"), x) #allows display of decimal
 <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
 \pagenumbering{arabic}
 
-```{r intro, child = 'sections/introduction.Rmd'}
+```{r intro, child = 'sections/Sec1-Introduction/introduction.Rmd'}
 ```
 
-```{r litreview, child = 'sections/litreview.Rmd'}
+```{r litreview, child = 'sections/Sec2-LitReview/litreview.Rmd'}
 ```
 
-```{r mainwork, child = 'sections/mainwork.Rmd'}
+```{r BLRCRmodel, child = 'sections/Sec3-BLRCRmodel/BLRCRmain.Rmd'}
 ```
 
-```{r simulationanalysis, child = 'sections/simulationanalysis.Rmd'}
+```{r selectcovariates, child = 'sections/Sec4-CovariateDistribution/selectcovariates.Rmd'}
 ```
 
-```{r example1, child = 'sections/example1.Rmd'}
+```{r hiddencovariates, child = 'sections/Sec5-UnobservedHeterogeneity/hiddencovariates.Rmd'}
 ```
 
-```{r example2, child = 'sections/example2.Rmd'}
+```{r modelselection, child = 'sections/Sec6-ModelSelection/modelselection.Rmd'}
 ```
 
-```{r conclusion, child = 'sections/conclusion.Rmd'}
+```{r example1, child = 'sections/Sec7-Example1/example1.Rmd'}
+```
+
+```{r example2, child = 'sections/Sec8-Example2/example2.Rmd'}
+```
+
+```{r conclusion, child = 'sections/Sec9-Conclusion/conclusion.Rmd'}
+```
+
+\newpage
+
+```{r appendix, child = 'sections/Appendix/appendix.Rmd'}
 ```
 
 \newpage
 
-```{r appendix, child = 'sections/appendix.Rmd'}
+```{r biblio, child = 'sections/References/references.Rmd'}
 ```
 
 \newpage
-
-```{r biblio, child = 'sections/references.Rmd'}
-```
-
-\newpage
-```{r curriculumvitae, child = 'sections/curriculumvitae.Rmd'}
+```{r curriculumvitae, child = 'sections/CV/curriculumvitae.Rmd'}
 ```
 

@@ -1,0 +1,468 @@
+---
+title: ''
+output: pdf_document
+---
+
+\subsection{Simulations using Different Covariate Distributions}
+\label{Sec:simscovdists}
+
+EXTRA STUFF BELOW WRITTEN HERE, MAY NEED TO BE MOVED
+By default, we do not use any regularization (see subsection \ref{Sec:modelselection}) unless specifically stated. For the covariate distribution, there are three possibilities including the mixture of multivariate normal distributions (\textbf{mixture}), the Bayesian Bootstrap (\textbf{bootstrap}), and the approximation of the Bayesian Boostrap that simple samples from the empirical distribution (\textbf{empirical}). In general, the maximum number of mixture components allowed by the mixture of multivariate normal distributions ($K^*$) will be specified but is intented to be set intentially large enough so that it does not influence the estimation. The exception would be the case where we desire a single multivariate normal distribution ($K^*=1$). Similarly, when latent intercepts are used (see subsection \ref{Sec:condindependence}), the number of latent intercepts ($H_{\omega}$) is specified.
+
+EXTRA STUFF ABOVE WRITTEN HERE, MAY NEED TO BE MOVED
+
+In this subsection, we examine the impact of different covariate distributions and how they impact the BLRCR model's estimation. Recall, the BLRCR requires the specification of a covariate distribution, whereas the cMLCR does not. Hence, as we will see below, a misspecification of the covariate distribution can lead to bias in the inference. This bias will be reduced when using a more flexible covariate distribution like the infinite mixture of normal distributions (K=20).
+
+\autoref{table:diffdists} presents the results of 100 simulations for three different sets of covariate distributions.  The first set of simulations uses the two standard normal distributions seen in the previous subsections.  While the cMLCR algorithm is unbiased, all three specifications of the BLRCR algorithm yield a lower MSE. Since the distribution of the covariates is actually normal, it is not surprising that the BLRCR performs well with these simulations.  On the other hand, we would expect the second set of covariates, two independent chi-square(1) distributions, to be particularly challenging.  The chi-square distribution only has probability mass for nonnegative values, which creates an abrupt cutoff at 0. The third set of covariates includes two different Gamma distributions, Gamma(1,1) and Gamma(3,1).  This set of covariates cuts off abruptly on one axis at 0, but not the other.  We can therefore think of the three sets of covariates as "normal", "not normal", and "near/approximately normal", respectively.
+
+
+
+```{r}
+###########################################
+##### Different Dists #####################
+###########################################
+#Set N and BETA
+myN=2000
+myBeta="moderate"
+mycovariates="twonormalcovs"
+myindex <- simdat$N==myN & simdat$BETA==myBeta & simdat$covariates==mycovariates
+
+#Compute Percentage of N
+HSPBLRCRNhat = mean(as.numeric(simdat[myindex,]$HSPBLRCR50))/myN
+SPBLRCRNhat = mean(as.numeric(simdat[myindex,]$SPBLRCR50))/myN
+normBLRCRNhat = mean(as.numeric(simdat[myindex,]$normBLRCR50))/myN
+cMLCRNhat = mean(as.numeric(simdat[myindex,]$cMLCR))/myN
+cBLRCRNhat = mean(as.numeric(simdat[myindex,]$cBLRCR))/myN
+LCMCRNhat = mean(as.numeric(simdat[myindex,]$LCMCR50))/myN
+loglinNhat = mean(as.numeric(simdat[myindex,]$loglin50))/myN
+IndependentNhat = mean(as.numeric(simdat[myindex,]$Independent50))/myN
+
+#Check RMSE
+HSPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$HSPBLRCR50),myN)
+SPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$SPBLRCR50),myN)
+normBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$normBLRCR50),myN)
+cMLCRRMSE = RMSE(as.numeric(simdat[myindex,]$cMLCR),myN)
+cBLRCRRMSE = RMSE(as.numeric(simdat[myindex,]$cBLRCR),myN)
+LCMCRRMSE = RMSE(as.numeric(simdat[myindex,]$LCMCR50),myN)
+loglinRMSE = RMSE(as.numeric(simdat[myindex,]$loglin50),myN)
+IndependentRMSE = RMSE(as.numeric(simdat[myindex,]$Independent50),myN)
+
+#Average width of interval
+cMLCRwidth = mean(as.numeric(simdat[myindex,]$cMLCR97.5)-as.numeric(simdat[myindex,]$cMLCR2.5))/myN
+HSPBLRCwidth = mean(as.numeric(simdat[myindex,]$HSPBLRCR97.5)-as.numeric(simdat[myindex,]$HSPBLRCR2.5))/myN
+SPBLRCwidth = mean(as.numeric(simdat[myindex,]$SPBLRCR97.5)-as.numeric(simdat[myindex,]$SPBLRCR2.5))/myN
+normBLRCwidth = mean(as.numeric(simdat[myindex,]$normBLRCR97.5)-as.numeric(simdat[myindex,]$normBLRCR2.5))/myN
+LCMCRwidth = mean(as.numeric(simdat[myindex,]$LCMCR97.5)-as.numeric(simdat[myindex,]$LCMCR2.5))/myN
+loglinwidth = mean(as.numeric(simdat[myindex,]$loglin97.5)-as.numeric(simdat[myindex,]$loglin2.5))/myN
+Independentwidth = mean(as.numeric(simdat[myindex,]$Independent97.5)-as.numeric(simdat[myindex,]$Independent2.5))/myN
+
+#Check Percentage in Interval
+cMLRCCI = mean(as.numeric(simdat[myindex,]$cMLCR2.5)<myN&as.numeric(simdat[myindex,]$cMLCR97.5)>myN)*100
+HSPBLRCCI = mean(as.numeric(simdat[myindex,]$HSPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$HSPBLRCR97.5)>myN)*100
+SPBLRCCI = mean(as.numeric(simdat[myindex,]$SPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$SPBLRCR97.5)>myN)*100
+normBLRCCI = mean(as.numeric(simdat[myindex,]$normBLRCR2.5)<myN&as.numeric(simdat[myindex,]$normBLRCR97.5)>myN)*100
+LCMCRCI = mean(as.numeric(simdat[myindex,]$LCMCR2.5)<myN&as.numeric(simdat[myindex,]$LCMCR97.5)>myN)*100
+loglinCI = mean(as.numeric(simdat[myindex,]$loglin2.5)<myN&as.numeric(simdat[myindex,]$loglin97.5)>myN)*100
+IndependentCI = mean(as.numeric(simdat[myindex,]$Independent2.5)<myN&as.numeric(simdat[myindex,]$Independent97.5)>myN)*100
+```
+
+
+\singlespacing
+\begin{table}[H]
+\centering
+\begin{tabular}{||r l r r r r||} 
+ \hline
+Distribution & Method & N$\%$ &MSE & CI Width & CI $\%$   \\ [0.5ex] 
+ \hline\hline
+ Normal(0,1)   & BLRCR($K=1$, $H_\omega=1$)  & `r op(normBLRCRNhat,3)`   & `r op(normBLRCRMSE,1)`   & `r op(normBLRCwidth,3)`   & `r op(normBLRCCI,1)` \\ 
+ Normal(0,1)   & BLRCR($K=20$, $H_\omega=1$)    & `r op(SPBLRCRNhat,3)`     & `r op(SPBLRCRMSE,1)`     & `r op(SPBLRCwidth,3)`     & `r op(SPBLRCCI,1)` \\ 
+               & BLRCR($K=20$, $H_\omega=20$)    & `r op(HSPBLRCRNhat,3)`     & `r op(HSPBLRCRMSE,1)`     & `r op(HSPBLRCwidth,3)`     & `r op(HSPBLRCCI,1)` \\
+               & cMLCR       & `r op(cMLCRNhat,3)`       & `r op(cMLCRRMSE,1)`      & `r op(cMLCRwidth,3)`      & `r op(cMLRCCI,1)` \\
+               & Log Linear (BIC)  & `r op(loglinNhat,3)`      & `r op(loglinRMSE,1)`     & `r op(loglinwidth,3)`     & `r op(loglinCI,1)` \\ 
+               & LCMCR       & `r op(LCMCRNhat,3)`       & `r op(LCMCRRMSE,1)`      & `r op(LCMCRwidth,3)`      & `r op(LCMCRCI,1)` \\ 
+               & Independent & `r op(IndependentNhat,3)` & `r op(IndependentRMSE,1)`& `r op(Independentwidth,3)`& `r op(IndependentCI,1)` \\ 
+
+```{r}
+###########################################
+##### Different Dists #####################
+###########################################
+#Set N and BETA
+myN=2000
+myBeta="moderate"
+mycovariates="twochisqcovs"
+myindex <- simdat$N==myN & simdat$BETA==myBeta & simdat$covariates==mycovariates
+
+#test <- simdat[myindex,]
+
+#Compute Percentage of N
+HSPBLRCRNhat = mean(as.numeric(simdat[myindex,]$HSPBLRCR50))/myN
+SPBLRCRNhat = mean(as.numeric(simdat[myindex,]$SPBLRCR50))/myN
+normBLRCRNhat = mean(as.numeric(simdat[myindex,]$normBLRCR50))/myN
+cMLCRNhat = mean(as.numeric(simdat[myindex,]$cMLCR))/myN
+cBLRCRNhat = mean(as.numeric(simdat[myindex,]$cBLRCR))/myN
+LCMCRNhat = mean(as.numeric(simdat[myindex,]$LCMCR50))/myN
+loglinNhat = mean(as.numeric(simdat[myindex,]$loglin50))/myN
+IndependentNhat = mean(as.numeric(simdat[myindex,]$Independent50))/myN
+
+#Check RMSE
+HSPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$HSPBLRCR50),myN)
+SPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$SPBLRCR50),myN)
+normBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$normBLRCR50),myN)
+cMLCRRMSE = RMSE(as.numeric(simdat[myindex,]$cMLCR),myN)
+cBLRCRRMSE = RMSE(as.numeric(simdat[myindex,]$cBLRCR),myN)
+LCMCRRMSE = RMSE(as.numeric(simdat[myindex,]$LCMCR50),myN)
+loglinRMSE = RMSE(as.numeric(simdat[myindex,]$loglin50),myN)
+IndependentRMSE = RMSE(as.numeric(simdat[myindex,]$Independent50),myN)
+
+#Average width of interval
+cMLCRwidth = mean(as.numeric(simdat[myindex,]$cMLCR97.5)-as.numeric(simdat[myindex,]$cMLCR2.5))/myN
+HSPBLRCwidth = mean(as.numeric(simdat[myindex,]$HSPBLRCR97.5)-as.numeric(simdat[myindex,]$HSPBLRCR2.5))/myN
+SPBLRCwidth = mean(as.numeric(simdat[myindex,]$SPBLRCR97.5)-as.numeric(simdat[myindex,]$SPBLRCR2.5))/myN
+normBLRCwidth = mean(as.numeric(simdat[myindex,]$normBLRCR97.5)-as.numeric(simdat[myindex,]$normBLRCR2.5))/myN
+LCMCRwidth = mean(as.numeric(simdat[myindex,]$LCMCR97.5)-as.numeric(simdat[myindex,]$LCMCR2.5))/myN
+loglinwidth = mean(as.numeric(simdat[myindex,]$loglin97.5)-as.numeric(simdat[myindex,]$loglin2.5))/myN
+Independentwidth = mean(as.numeric(simdat[myindex,]$Independent97.5)-as.numeric(simdat[myindex,]$Independent2.5))/myN
+
+#Check Percentage in Interval
+cMLRCCI = mean(as.numeric(simdat[myindex,]$cMLCR2.5)<myN&as.numeric(simdat[myindex,]$cMLCR97.5)>myN)*100
+HSPBLRCCI = mean(as.numeric(simdat[myindex,]$HSPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$HSPBLRCR97.5)>myN)*100
+SPBLRCCI = mean(as.numeric(simdat[myindex,]$SPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$SPBLRCR97.5)>myN)*100
+normBLRCCI = mean(as.numeric(simdat[myindex,]$normBLRCR2.5)<myN&as.numeric(simdat[myindex,]$normBLRCR97.5)>myN)*100
+LCMCRCI = mean(as.numeric(simdat[myindex,]$LCMCR2.5)<myN&as.numeric(simdat[myindex,]$LCMCR97.5)>myN)*100
+loglinCI = mean(as.numeric(simdat[myindex,]$loglin2.5)<myN&as.numeric(simdat[myindex,]$loglin97.5)>myN)*100
+IndependentCI = mean(as.numeric(simdat[myindex,]$Independent2.5)<myN&as.numeric(simdat[myindex,]$Independent97.5)>myN)*100
+```
+ \hline
+ Chi-Square(1)   & BLRCR($K=1$, $H_\omega=1$)  & `r op(normBLRCRNhat,3)`   & `r op(normBLRCRMSE,1)`   & `r op(normBLRCwidth,3)`   & `r op(normBLRCCI,1)` \\ 
+ Chi-Square(1)   & BLRCR($K=20$, $H_\omega=1$)    & `r op(SPBLRCRNhat,3)`     & `r op(SPBLRCRMSE,1)`     & `r op(SPBLRCwidth,3)`     & `r op(SPBLRCCI,1)` \\ 
+                 & BLRCR($K=20$, $H_\omega=20$)    & `r op(HSPBLRCRNhat,3)`     & `r op(HSPBLRCRMSE,1)`     & `r op(HSPBLRCwidth,3)`     & `r op(HSPBLRCCI,1)` \\
+               & cMLCR       & `r op(cMLCRNhat,3)`       & `r op(cMLCRRMSE,1)`      & `r op(cMLCRwidth,3)`      & `r op(cMLRCCI,1)` \\
+               & Log Linear (BIC)  & `r op(loglinNhat,3)`      & `r op(loglinRMSE,1)`     & `r op(loglinwidth,3)`     & `r op(loglinCI,1)` \\ 
+               & LCMCR       & `r op(LCMCRNhat,3)`       & `r op(LCMCRRMSE,1)`      & `r op(LCMCRwidth,3)`      & `r op(LCMCRCI,1)` \\ 
+               & Independent & `r op(IndependentNhat,3)` & `r op(IndependentRMSE,1)`& `r op(Independentwidth,3)`& `r op(IndependentCI,1)` \\ 
+
+```{r}
+###########################################
+##### Different Dists #####################
+###########################################
+#Set N and BETA
+myN=2000
+myBeta="moderate"
+mycovariates="twogammacovs"
+myindex <- simdat$N==myN & simdat$BETA==myBeta & simdat$covariates==mycovariates
+
+#Compute Percentage of N
+HSPBLRCRNhat = mean(as.numeric(simdat[myindex,]$HSPBLRCR50))/myN
+SPBLRCRNhat = mean(as.numeric(simdat[myindex,]$SPBLRCR50))/myN
+normBLRCRNhat = mean(as.numeric(simdat[myindex,]$normBLRCR50))/myN
+cMLCRNhat = mean(as.numeric(simdat[myindex,]$cMLCR))/myN
+cBLRCRNhat = mean(as.numeric(simdat[myindex,]$cBLRCR))/myN
+LCMCRNhat = mean(as.numeric(simdat[myindex,]$LCMCR50))/myN
+loglinNhat = mean(as.numeric(simdat[myindex,]$loglin50))/myN
+IndependentNhat = mean(as.numeric(simdat[myindex,]$Independent50))/myN
+
+#Check RMSE
+HSPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$HSPBLRCR50),myN)
+SPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$SPBLRCR50),myN)
+normBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$normBLRCR50),myN)
+cMLCRRMSE = RMSE(as.numeric(simdat[myindex,]$cMLCR),myN)
+cBLRCRRMSE = RMSE(as.numeric(simdat[myindex,]$cBLRCR),myN)
+LCMCRRMSE = RMSE(as.numeric(simdat[myindex,]$LCMCR50),myN)
+loglinRMSE = RMSE(as.numeric(simdat[myindex,]$loglin50),myN)
+IndependentRMSE = RMSE(as.numeric(simdat[myindex,]$Independent50),myN)
+
+#Average width of interval
+cMLCRwidth = mean(as.numeric(simdat[myindex,]$cMLCR97.5)-as.numeric(simdat[myindex,]$cMLCR2.5))/myN
+HSPBLRCwidth = mean(as.numeric(simdat[myindex,]$HSPBLRCR97.5)-as.numeric(simdat[myindex,]$HSPBLRCR2.5))/myN
+SPBLRCwidth = mean(as.numeric(simdat[myindex,]$SPBLRCR97.5)-as.numeric(simdat[myindex,]$SPBLRCR2.5))/myN
+normBLRCwidth = mean(as.numeric(simdat[myindex,]$normBLRCR97.5)-as.numeric(simdat[myindex,]$normBLRCR2.5))/myN
+LCMCRwidth = mean(as.numeric(simdat[myindex,]$LCMCR97.5)-as.numeric(simdat[myindex,]$LCMCR2.5))/myN
+loglinwidth = mean(as.numeric(simdat[myindex,]$loglin97.5)-as.numeric(simdat[myindex,]$loglin2.5))/myN
+Independentwidth = mean(as.numeric(simdat[myindex,]$Independent97.5)-as.numeric(simdat[myindex,]$Independent2.5))/myN
+
+#Check Percentage in Interval
+cMLRCCI = mean(as.numeric(simdat[myindex,]$cMLCR2.5)<myN&as.numeric(simdat[myindex,]$cMLCR97.5)>myN)*100
+HSPBLRCCI = mean(as.numeric(simdat[myindex,]$HSPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$HSPBLRCR97.5)>myN)*100
+SPBLRCCI = mean(as.numeric(simdat[myindex,]$SPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$SPBLRCR97.5)>myN)*100
+normBLRCCI = mean(as.numeric(simdat[myindex,]$normBLRCR2.5)<myN&as.numeric(simdat[myindex,]$normBLRCR97.5)>myN)*100
+LCMCRCI = mean(as.numeric(simdat[myindex,]$LCMCR2.5)<myN&as.numeric(simdat[myindex,]$LCMCR97.5)>myN)*100
+loglinCI = mean(as.numeric(simdat[myindex,]$loglin2.5)<myN&as.numeric(simdat[myindex,]$loglin97.5)>myN)*100
+IndependentCI = mean(as.numeric(simdat[myindex,]$Independent2.5)<myN&as.numeric(simdat[myindex,]$Independent97.5)>myN)*100
+```
+ \hline
+ Gamma(1,1)    & BLRCR($K=1$,$H_\omega=1$)  & `r op(normBLRCRNhat,3)`   & `r op(normBLRCRMSE,1)`   & `r op(normBLRCwidth,3)`   & `r op(normBLRCCI,1)` \\ 
+ Gamma(3,1)    & BLRCR($K=20$, $H_\omega=1$)    & `r op(SPBLRCRNhat,3)`     & `r op(SPBLRCRMSE,1)`     & `r op(SPBLRCwidth,3)`     & `r op(SPBLRCCI,1)` \\ 
+               & BLRCR($K=20$,$H_\omega=20$)    & `r op(HSPBLRCRNhat,3)`     & `r op(HSPBLRCRMSE,1)`     & `r op(HSPBLRCwidth,3)`     & `r op(HSPBLRCCI,1)` \\
+               & cMLCR       & `r op(cMLCRNhat,3)`       & `r op(cMLCRRMSE,1)`      & `r op(cMLCRwidth,3)`      & `r op(cMLRCCI,1)` \\
+               & Log Linear (BIC)  & `r op(loglinNhat,3)`      & `r op(loglinRMSE,1)`     & `r op(loglinwidth,3)`     & `r op(loglinCI,1)` \\ 
+               & LCMCR       & `r op(LCMCRNhat,3)`       & `r op(LCMCRRMSE,1)`      & `r op(LCMCRwidth,3)`      & `r op(LCMCRCI,1)` \\ 
+               & Independent & `r op(IndependentNhat,3)` & `r op(IndependentRMSE,1)`& `r op(Independentwidth,3)`& `r op(IndependentCI,1)` \\ 
+ \hline
+\end{tabular}
+\caption{Results of capture-recapture algorithms with simulations using different covariate distributions with "moderate" dependency between lists and N=2000.}
+\label{table:diffdists}
+\end{table}
+\doublespacing
+
+As we saw in the previous section, the BLRCR algorithm handles the normally distributed covariates well.  For the chi-square distributed covariates, using a single multivariate normal for the covariates results in poor performance with with an approximate bias of 1.656$\%$ of $N$ when $N=2000$.  Even though the covariates are not normally distributed, modeling them as a mixture of normal distributions results in a substantial reduction in the bias for $N$.  \autoref{fig:covariatedists} illustrates why this may be the case through a partial plotting of the simulated covariates.  In all plots, the black dots represent the individuals that are captured at least once in a list. The blue dots represent the individuals that are missing.  In the first and second plot in each row, the individuals that are missing are simulated using the BLRCR($K=1$, $H_\omega=1$) and BLRCR($K=20$, $H_\omega=1$) algorithms, respectively.  The third panel shows the true missing individuals that are unknown to the algorithm.  With the chi-square distribution, there is no good way to fit a single normal variable that well represents the space.  As a result, many missing covariates are populated into low probability density areas resulting in an overestimate of the missing covariates.  On the other hand, the BLRCR($K=20$, $H_\omega=1$) with it's less rigid covariate assumption, populates the space much better.
+
+
+```{r posteriornormalplots, fig.align='center',fig.width=9,fig.height=9.5,fig.margin=TRUE,fig.cap="\\label{fig:covariatedists}Posterior Distribution of X when simulating various covariate distributions with moderate dependency between lists and N=2000."}
+
+par(mar=c(2,2,1.2,2))
+layout(matrix(c(1,1,1,
+                2,3,4,
+                5,5,5,
+                6,7,8,
+                9,9,9,
+                10,11,12),ncol=3,byrow=TRUE),heights=c(1,4.5,1,4.5,1,4.2))
+
+#Bring in the Normal data
+myobserveddata=readRDS("simdata/normal09272022/myobserveddata.rds")
+mymissingdata=readRDS("simdata/normal09272022/mymissingdata.rds")
+mydataALL=readRDS("simdata/normal09272022/mydataALL.rds")
+SPBLRCR=readRDS("simdata/normal09272022/SPBLRCR.rds")
+normBLRCR=readRDS("simdata/normal09272022/normBLRCR.rds")
+nmis=nrow(mymissingdata)
+nsamples=nrow(SPBLRCR$Xmis)
+plot.new()
+text(.5,.5,"Normal(0,1) and Normal(0,1) Covariate Distributions",cex=1.75,font=2)
+plot(myobserveddata[,5:6],
+     xlab="X1",ylab="X2",main="Simulated Posterior - BLRCR(K=1,Hw=1)",
+     xlim=c(-4,4),ylim=c(-4,4),pch=16)
+points(normBLRCR$Xmis[(nsamples-nmis):nsamples,],col="blue")
+legend(-4,4,legend=c("Observed","Simulated Missing"),
+       col=c("black","blue"),pch=c(16,1),bg="lightblue",text.font=4,
+       text.width = 4)
+plot(myobserveddata[,5:6],
+     xlab="X1",ylab="X2",main="Simulated Posterior - BLRCR(K=20,Hw=1)",
+     xlim=c(-4,4),ylim=c(-4,4),pch=16)
+points(SPBLRCR$Xmis[(nsamples-nmis):nsamples,],col="blue")
+legend(-4,4,legend=c("Observed","Simulated Missing"),
+       col=c("black","blue"),pch=c(16,1),bg="lightblue",text.font=4,
+       text.width = 4)
+plot(myobserveddata[,5:6],xlab="X1",ylab="X2",main="True Population",
+     xlim=c(-4,4),ylim=c(-4,4),pch=16)
+points(mymissingdata[,5:6],col="blue")
+legend(-4,4,legend=c("Observed","Actual Missing"),
+       col=c("black","blue"),pch=c(16,1),bg="lightblue",text.font=4,
+       text.width = 4)
+
+#Bring in the Chi-Square data
+plot.new()
+text(0.5,0.5,"Chi-Square(1) and Chi-Square(1) Covariate Distributions",cex=1.75,font=2)
+myobserveddata=readRDS("simdata/chisquare09272022/myobserveddata.rds")
+mymissingdata=readRDS("simdata/chisquare09272022/mymissingdata.rds")
+mydataALL=readRDS("simdata/chisquare09272022/mydataALL.rds")
+SPBLRCR=readRDS("simdata/chisquare09272022/SPBLRCR.rds")
+normBLRCR=readRDS("simdata/chisquare09272022/normBLRCR.rds")
+nmis=nrow(mymissingdata)
+nsamples=nrow(SPBLRCR$Xmis)
+plot(myobserveddata[,5:6],
+     xlab="X1",ylab="X2",main="Simulated Posterior - BLRCR(K=1,Hw=1)",
+     xlim=c(-1,7),ylim=c(-1,7),pch=16)
+points(normBLRCR$Xmis[(nsamples-nmis):nsamples,],col="blue")
+legend(-1,7,legend=c("Observed","Simulated Missing"),
+       col=c("black","blue"),pch=c(16,1),bg="lightblue",text.font=4,
+       text.width = 4)
+plot(myobserveddata[,5:6],
+     xlab="X1",ylab="X2",main="Simulated Posterior - BLRCR(K=20,Hw=1)",
+     xlim=c(-1,7),ylim=c(-1,7),pch=16)
+points(SPBLRCR$Xmis[(nsamples-nmis):nsamples,],col="blue")
+legend(-1,7,legend=c("Observed","Simulated Missing"),
+       col=c("black","blue"),pch=c(16,1),bg="lightblue",text.font=4,
+       text.width = 4)
+plot(myobserveddata[,5:6],xlab="X1",ylab="X2",main="True Population",
+     xlim=c(-1,7),ylim=c(-1,7),pch=16)
+points(mymissingdata[,5:6],col="blue")
+legend(-1,7,legend=c("Observed","Actual Missing"),
+       col=c("black","blue"),pch=c(16,1),bg="lightblue",text.font=4,
+       text.width = 4)
+
+#Bring in the Gamma data
+plot.new()
+myobserveddata=readRDS("simdata/gamma09272022/myobserveddata.rds")
+mymissingdata=readRDS("simdata/gamma09272022/mymissingdata.rds")
+mydataALL=readRDS("simdata/gamma09272022/mydataALL.rds")
+SPBLRCR=readRDS("simdata/gamma09272022/SPBLRCR.rds")
+normBLRCR=readRDS("simdata/gamma09272022/normBLRCR.rds")
+nmis=nrow(mymissingdata)
+nsamples=nrow(SPBLRCR$Xmis)
+text(0.5,0.5,"Gamma(3,1) and Gamma(1,1) Covariate Distributions",cex=1.75,font=2)
+plot(myobserveddata[,5:6],
+     xlab="X1",ylab="X2",main="Simulated Posterior - BLRCR(K=1,Hw=1)",
+     xlim=c(-1,7),ylim=c(-1,7),pch=16)
+points(normBLRCR$Xmis[(nsamples-nmis):nsamples,],col="blue")
+legend(-1,7,legend=c("Observed","Simulated Missing"),
+       col=c("black","blue"),pch=c(16,1),bg="lightblue",text.font=4,
+       text.width = 4)
+plot(myobserveddata[,5:6],
+     xlab="X1",ylab="X2",main="Simulated Posterior - BLRCR(K=20,Hw=1)",
+     xlim=c(-1,7),ylim=c(-1,7),pch=16)
+points(SPBLRCR$Xmis[(nsamples-nmis):nsamples,],col="blue")
+legend(-1,7,legend=c("Observed","Simulated Missing"),
+       col=c("black","blue"),pch=c(16,1),bg="lightblue",text.font=4,
+       text.width = 4)
+plot(myobserveddata[,5:6],xlab="X1",ylab="X2",main="True Population",
+     xlim=c(-1,7),ylim=c(-1,7),pch=16)
+points(mymissingdata[,5:6],col="blue")
+legend(-1,7,legend=c("Observed","Actual Missing"),
+       col=c("black","blue"),pch=c(16,1),bg="lightblue",text.font=4,
+       text.width = 4)
+
+```
+
+
+The parameters of the covariate distribution are sampled based on augmented covariates, not just the observed covariates.  This results in uncertainty regarding the ability for the algorithm to correctly identify the covariate distribution.  To put the algorithm to the test, we simulate an example with a mixture of three multivariate normal distributions.  We use a population of size 2000 and the "moderate" coefficients. The results of the 100 simulations can be found in \autoref{table:mixdist}.  Despite on average nearly 50$\%$ of observations being missing, the algorithm when allowing for up to $K=20$ mixture normal distributions performs well. Of course, the cMLCR outperforms the algorithm in terms of MSE, but the BLRCR (without also trying to account for heterogeneity) is more precise with a smaller average credible interal width.
+
+
+```{r}
+###########################################
+####### Mixture Dists #####################
+###########################################
+#Set N and BETA
+myN=2000
+myBeta="moderate"
+mycovariates="twomixture3normcovs"
+myindex <- simdat$N==myN & simdat$BETA==myBeta & simdat$covariates==mycovariates
+
+#test=simdat[myindex,]
+#mean(as.numeric(test$cBLRCR))
+
+#Compute Percentage of N
+HSPBLRCRNhat = mean(as.numeric(simdat[myindex,]$HSPBLRCR50))/myN
+SPBLRCRNhat = mean(as.numeric(simdat[myindex,]$SPBLRCR50))/myN
+normBLRCRNhat = mean(as.numeric(simdat[myindex,]$normBLRCR50))/myN
+cMLCRNhat = mean(as.numeric(simdat[myindex,]$cMLCR))/myN
+cBLRCRNhat = mean(as.numeric(simdat[myindex,]$cBLRCR))/myN
+LCMCRNhat = mean(as.numeric(simdat[myindex,]$LCMCR50))/myN
+loglinNhat = mean(as.numeric(simdat[myindex,]$loglin50))/myN
+IndependentNhat = mean(as.numeric(simdat[myindex,]$Independent50))/myN
+
+#Check RMSE
+HSPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$HSPBLRCR50),myN)
+SPBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$SPBLRCR50),myN)
+normBLRCRMSE = RMSE(as.numeric(simdat[myindex,]$normBLRCR50),myN)
+cMLCRRMSE = RMSE(as.numeric(simdat[myindex,]$cMLCR),myN)
+cBLRCRRMSE = RMSE(as.numeric(simdat[myindex,]$cBLRCR),myN)
+LCMCRRMSE = RMSE(as.numeric(simdat[myindex,]$LCMCR50),myN)
+loglinRMSE = RMSE(as.numeric(simdat[myindex,]$loglin50),myN)
+IndependentRMSE = RMSE(as.numeric(simdat[myindex,]$Independent50),myN)
+
+#Average width of interval
+cMLCRwidth = mean(as.numeric(simdat[myindex,]$cMLCR97.5)-as.numeric(simdat[myindex,]$cMLCR2.5))/myN
+HSPBLRCwidth = mean(as.numeric(simdat[myindex,]$HSPBLRCR97.5)-as.numeric(simdat[myindex,]$HSPBLRCR2.5))/myN
+SPBLRCwidth = mean(as.numeric(simdat[myindex,]$SPBLRCR97.5)-as.numeric(simdat[myindex,]$SPBLRCR2.5))/myN
+normBLRCwidth = mean(as.numeric(simdat[myindex,]$normBLRCR97.5)-as.numeric(simdat[myindex,]$normBLRCR2.5))/myN
+LCMCRwidth = mean(as.numeric(simdat[myindex,]$LCMCR97.5)-as.numeric(simdat[myindex,]$LCMCR2.5))/myN
+loglinwidth = mean(as.numeric(simdat[myindex,]$loglin97.5)-as.numeric(simdat[myindex,]$loglin2.5))/myN
+Independentwidth = mean(as.numeric(simdat[myindex,]$Independent97.5)-as.numeric(simdat[myindex,]$Independent2.5))/myN
+
+#Check Percentage in Interval
+cMLRCCI = mean(as.numeric(simdat[myindex,]$cMLCR2.5)<myN&as.numeric(simdat[myindex,]$cMLCR97.5)>myN)*100
+HSPBLRCCI = mean(as.numeric(simdat[myindex,]$HSPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$HSPBLRCR97.5)>myN)*100
+SPBLRCCI = mean(as.numeric(simdat[myindex,]$SPBLRCR2.5)<myN&as.numeric(simdat[myindex,]$SPBLRCR97.5)>myN)*100
+normBLRCCI = mean(as.numeric(simdat[myindex,]$normBLRCR2.5)<myN&as.numeric(simdat[myindex,]$normBLRCR97.5)>myN)*100
+LCMCRCI = mean(as.numeric(simdat[myindex,]$LCMCR2.5)<myN&as.numeric(simdat[myindex,]$LCMCR97.5)>myN)*100
+loglinCI = mean(as.numeric(simdat[myindex,]$loglin2.5)<myN&as.numeric(simdat[myindex,]$loglin97.5)>myN)*100
+IndependentCI = mean(as.numeric(simdat[myindex,]$Independent2.5)<myN&as.numeric(simdat[myindex,]$Independent97.5)>myN)*100
+```
+
+\singlespacing
+\begin{table}[H]
+\centering
+\begin{tabular}{||r l r r r r||} 
+ \hline
+Distribution & Method & N$\%$ &MSE & CI Width & CI $\%$   \\ [0.5ex] 
+ \hline\hline
+ Mixture Normal& BLRCR($K=1$,$H_\omega=1$)  & `r op(normBLRCRNhat,3)`   & `r op(normBLRCRMSE,1)`   & `r op(normBLRCwidth,3)`   & `r op(normBLRCCI,1)` \\ 
+               & BLRCR($K=20$,$H_\omega=1$)    & `r op(SPBLRCRNhat,3)`     & `r op(SPBLRCRMSE,1)`     & `r op(SPBLRCwidth,3)`     & `r op(SPBLRCCI,1)` \\ 
+               & BLRCR($K=20$,$H_\omega=20$)    & `r op(HSPBLRCRNhat,3)`     & `r op(HSPBLRCRMSE,1)`     & `r op(HSPBLRCwidth,3)`     & `r op(HSPBLRCCI,1)` \\  
+               & cMLCR       & `r op(cMLCRNhat,3)`       & `r op(cMLCRRMSE,1)`      & `r op(cMLCRwidth,3)`      & `r op(cMLRCCI,1)` \\
+               & Log Linear (BIC)  & `r op(loglinNhat,3)`      & `r op(loglinRMSE,1)`     & `r op(loglinwidth,3)`     & `r op(loglinCI,1)` \\ 
+               & LCMCR       & `r op(LCMCRNhat,3)`       & `r op(LCMCRRMSE,1)`      & `r op(LCMCRwidth,3)`      & `r op(LCMCRCI,1)` \\ 
+               & Independent & `r op(IndependentNhat,3)` & `r op(IndependentRMSE,1)`& `r op(Independentwidth,3)`& `r op(IndependentCI,1)` \\ 
+
+ \hline
+\end{tabular}
+\caption{Results of capture-recapture algorithms with simulations using different covariate distributions with "moderate" dependency between lists.}
+\label{table:mixdist}
+\end{table}
+\doublespacing
+
+A look at the simulated posterior of the covariates in \autoref{fig:mixx} shows once again the benefits of using the mixture of normal distributions.  Using a single multivariate normal results in an imputation of covariates in low probability mass spaces, especially between the lower two mixtures. When a mixture of normal distributions is used, the imputation of the covariates is fairly consistent with the true distribution.
+
+```{r posteriormixtureplots, fig.align='center',fig.width=9,fig.height=4.5,fig.margin=TRUE,fig.cap="\\label{fig:mixx}Posterior Distribution of the missing X values using algorithm SP-BLRCR."}
+
+#Bring in the Normal data
+myobserveddata=readRDS("simdata/normmixture09302022/myobserveddata.rds")
+mymissingdata=readRDS("simdata/normmixture09302022/mymissingdata.rds")
+mydataALL=readRDS("simdata/normmixture09302022/mydataALL.rds")
+SPBLRCR=readRDS("simdata/normmixture09302022/SPBLRCR.rds")
+normBLRCR=readRDS("simdata/normmixture09302022/normBLRCR.rds")
+nmis=nrow(mymissingdata)
+N=nrow(mydataALL)
+n=nrow(myobserveddata)
+nsamples=nrow(SPBLRCR$Xmis)
+
+##Create a plot##
+par(mfrow=c(1,3))
+mu1 <- c(2,2)   
+mu2 <- c(0,0)
+mu3 <- c(-2,-2)
+Sigma1=matrix(c(0.5,.45,.45,0.5),2)
+Sigma2=matrix(c(1,0,0,1),2)
+Sigma3=matrix(c(0.5,-.35,-.35,0.5),2)
+plot(myobserveddata[,5:6],
+     xlab="X1",ylab="X2",main="BLRCR(K=1, Hw=1)",
+     xlim=c(-5,5),ylim=c(-5,5),pch=16)
+xmisposterior=normBLRCR$Xmis
+points(xmisposterior[round(seq(1,10000,length.out=nmis),0),],col="blue")
+lines(ellipse(Sigma1,centre=mu1,level=.75), col="blue")
+lines(ellipse(Sigma2,centre=mu2,level=.75), col="blue")
+lines(ellipse(Sigma3,centre=mu3,level=.75), col="blue")
+lines(ellipse(Sigma1,centre=mu1,level=.90), col="green")
+lines(ellipse(Sigma2,centre=mu2,level=.90), col="green")
+lines(ellipse(Sigma3,centre=mu3,level=.90), col="green")
+lines(ellipse(Sigma1,centre=mu1,level=.50), col="red")
+lines(ellipse(Sigma2,centre=mu2,level=.50), col="red")
+lines(ellipse(Sigma3,centre=mu3,level=.50), col="red")
+legend(-5,5,legend=c("Observed","Simulated Missing"),
+       col=c("black","blue"),pch=c(16,1),bg="lightblue",text.font=4,
+       text.width = 5)
+plot(myobserveddata[,5:6],
+     xlab="X1",ylab="X2",main="BLRCR(K=20, Hw=1)",
+     xlim=c(-5,5),ylim=c(-5,5),pch=16)
+xmisposterior=SPBLRCR$Xmis
+points(xmisposterior[round(seq(1,10000,length.out=nmis),0),],col="blue")
+lines(ellipse(Sigma1,centre=mu1,level=.75), col="blue")
+lines(ellipse(Sigma2,centre=mu2,level=.75), col="blue")
+lines(ellipse(Sigma3,centre=mu3,level=.75), col="blue")
+lines(ellipse(Sigma1,centre=mu1,level=.90), col="green")
+lines(ellipse(Sigma2,centre=mu2,level=.90), col="green")
+lines(ellipse(Sigma3,centre=mu3,level=.90), col="green")
+lines(ellipse(Sigma1,centre=mu1,level=.50), col="red")
+lines(ellipse(Sigma2,centre=mu2,level=.50), col="red")
+lines(ellipse(Sigma3,centre=mu3,level=.50), col="red")
+legend(-5,5,legend=c("Observed","Simulated Missing"),
+       col=c("black","blue"),pch=c(16,1),bg="lightblue",text.font=4,
+       text.width = 5)
+plot(myobserveddata[,5:6],xlab="X1",ylab="X2",main="True Population",
+     xlim=c(-5,5),ylim=c(-5,5),pch=16)
+points(mymissingdata[,5:6],col="blue")
+lines(ellipse(Sigma1,centre=mu1,level=.75), col="blue")
+lines(ellipse(Sigma2,centre=mu2,level=.75), col="blue")
+lines(ellipse(Sigma3,centre=mu3,level=.75), col="blue")
+lines(ellipse(Sigma1,centre=mu1,level=.90), col="green")
+lines(ellipse(Sigma2,centre=mu2,level=.90), col="green")
+lines(ellipse(Sigma3,centre=mu3,level=.90), col="green")
+lines(ellipse(Sigma1,centre=mu1,level=.50), col="red")
+lines(ellipse(Sigma2,centre=mu2,level=.50), col="red")
+lines(ellipse(Sigma3,centre=mu3,level=.50), col="red")
+legend(-5,5,legend=c("Observed","Actual Missing"),
+       col=c("black","blue"),pch=c(16,1),bg="lightblue",text.font=4,
+       text.width = 5)
+
+```
+
+From this subsection, we saw that depending on the level of the covariate distribution misspecification, the BLRCR model may perform poorly. However, using a non-parametric distribution like the mixture of normal distributions considerably reduced the bias.

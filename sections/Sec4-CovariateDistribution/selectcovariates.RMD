@@ -3,12 +3,12 @@ title: ''
 output: pdf_document
 ---
 
-\subsection{Selecting a Distribution for the Covariates}
+\section{Selecting a Distribution for the Covariates}
 \label{Sec:selectcovariates}
 
 When the probability that an individual is captured at least once is dependent upon the covariates, the observed covariate distribution will differ from population covariate distribution.  Simply using logistic regression on the observed data would lead to biased coefficients, which in turn would lead to bias in the population estimation.  The algorithm presented in subsection \ref{Sec:BLRCRmodel} alleviates this problem by concatenating samples of the missing covariates with the observed data before estimating the coefficients.  Unfortunately, this presents an additional burden on the user of specifying a distribution for the missing covariates, $\boldsymbol{g}(\boldsymbol{\phi})$. 
 
-\subsubsection{Specifying a Distribution for the Covariates}
+\subsection{Specifying a Distribution for the Covariates}
 \label{sec:normaldistributioncovariate}
 
 If the distribution is known including parameters, then we can simply use the aforementioned algorithm. If the distribution is known except for the parameters, then we could specify that distribution along with priors on the parameters. For example, \cite{royle_analysis_2009} uses a single covariate and specifies a normal distribution with a normal distribution prior for the mean and a gamma prior for the inverse variance. One could take a multivariate version of this approach by specifying,
@@ -48,15 +48,15 @@ where $\boldsymbol{\mu_{N}}=\frac{\kappa_{0}}{\kappa_{0}+N}\boldsymbol{\mu_{0}} 
 Different specified distributions would require different sampling procedures. In a supplementary document, \cite{royle_analysis_2009} considers other types of covariate distributions and found some variations in the inference. Unfortunately, knowing what distribution to specify can be difficult as rarely would we know this distribution.  Deciding on a proposal distribution based upon the observed distribution can be also dangerous or misleading as the observed distribution is a truncation of the true distribution. Not only are the missing covariates not missing at random but we do not even know how many are missing.  As we will shown in subsection \ref{Sec:simscovdists}, mispecifying the distribution can lead to inaccurate estimations.
 
 
-\subsubsection{Conditional Likelihood}
+\subsection{Conditional Likelihood}
 
 One approach to the problem is estimating the coefficients using the conditional maximum likelihood, where the likelihood function to be maximized is conditioned on the probability an individual is observed at least once \citep{alho_logistic_1990,huggins_statistical_1989}. This avoids the necessity of specifying a distribution for the covariates but can lead to unstable results when the observed distribution of the covariates is dissimilar to the population distribution of the covariates \citep{tilling_capture-recapture_1999}.  An article by \cite{yee_vgam_2015} shows an easy way to implement the technique using the \texttt{VGAM} package in \texttt{R}.  The technique works in two stages.  First, use generalized linear models with a positive Bernoulli family to estimate the the coefficients.  This allows us to obtain fitted values for the probability that each individual in the dataset is missing.  Second, use those fitted values in the Horvitz-Thompson estimator \citep{horvitz_generalization_1952} to estimate the population size, N.  One could take a Bayesian approach to the logistic regression and assign prior distributions to the parameters and estimate the population in a similar way.  We derive equations for finding the maximum a posteriori (MAP) estimate in  Section \ref{Sec:conditionalmaximumlike}: Appendix A using gradient ascent. 
 
-\subsubsection{Nonparametric Distributions}
+\subsection{Nonparametric Distributions}
 
 An alternative approach to the methods described above is to specify a nonparametric distribution for the covariates. Using a nonparametric method has the added consequence of increasing the complexity of the model which may lead to additional difficulties in the mixing of the posterior.  Nevertheless, it comes with multiple benefits in allowing us to maintain use of a full likelihood approach, continued extensibility, and (most importantly) flexibility in the fitting of the covariates. In this subsection, we present two methods for modeling the covariates in a non-parametric fashion: The Dirichlet Process Mixture of Normal Distributions and the Bayesian Bootstrap.  
 
-\paragraph{Dirichlet Process Mixture of Normal Distributions}\hspace{5px} \newline
+\subsubsection{Dirichlet Process Mixture of Normal Distributions}
 
 The first method is to fit a Dirichlet process mixture of normal distributions.  This nonparametric approach fits a potentially infinite number of multivariate normal distributions to the data.  The following is a description of the methodology and is adapted from \cite{gelman_bayesian_2014}.  This model introduces a latent variable, $z$, which is a latent parameter determining the mean and covariance matrix from which the observed covariate, $\boldsymbol{x_i}$, is drawn. The generative process for each observation's covariate can then be summarized as,
 
@@ -119,14 +119,14 @@ Set $V_{K*}=1$.  Then, $\pi_k = V_k\prod_{l<k}(1-V_l)$ for all $k=1,...,K^*$.
 \item[5)] Sample $\alpha$.
 
 \begin{equation}
-  \alpha \sim \text{ Gamma}\left(a_\alpha + K^* -1, b_\alpha - \ln(\pi_{K^*}) \right).
+  \alpha \sim \text{ Gamma}\left(a_\alpha + K^* -1, b_\alpha - \sum_{k}^{K^*-1}\ln(1-V_k) \right).
 \end{equation}
 
 \end{list}
 
 It should be noted that the normal distribution specified in subsection \ref{sec:normaldistributioncovariate} is a special case of this specification where $K^*=1$. We will show in section \ref{Sec:simscovdists} that the assumption of a single normal may lead to bias in the estimation process when the actual distribution is not normal. Using an infinite mixture of normal distributions tends to perform better, but still struggles when the distribution is discrete or is far from normally distributed.
 
-\paragraph{The Bayesian Bootstrap} \hspace{5px} \newline
+\subsubsection{The Bayesian Bootstrap}
 
 \vspace{-10px}
 
@@ -151,10 +151,15 @@ The posterior distribution for the $\psi_k$ is then,
 
 where $I_{d_k}(\boldsymbol{x_i})=1$ is an indicator function for $\boldsymbol{x_i} = \boldsymbol{d_i}$ and $I_{d_k}(\boldsymbol{x_i})=0$ otherwise.
 
-Although we are not performing an actual bootstrapping procedure, we refer to this modelling setup as the Bayesian Bootstrap \citep{rubin_bayesian_1981} for a couple of reasons. First, the construction is quite similar to the theory behind the Bayesian Bootstrap in terms of placing a Dirichlet distribution on the observed values in the sample.  Second, this methodology samples values for the missing observations in the same spirit as bootstrapping. Using the $n$ observed covariates, we sample $n_0$ values from the observed distribution with replacement and use these values in place of the missing covariates.
+Although we are not performing an actual bootstrapping procedure, we refer to this modelling setup as the Bayesian Bootstrap \citep{rubin_bayesian_1981} for a couple of reasons. First, the construction is quite similar to the theory behind the Bayesian Bootstrap in terms of placing a Dirichlet distribution on the observed values in the sample.  Second, this methodology samples values for the missing observations in the same spirit as bootstrapping. Using the $n$ observed covariates, we sample, with replacement, $n_0$ values from a discrete distribution based on the observed distribution and use these values in place of the missing covariates.
 
-To implement this model construction for the covariates, we only need to add one additional sampling stage to our estimation procedure. Noting that we use all covariates, not just the observed, we draw the probabilities, ($\psi_1, ..., \psi_K$) in accordance to equation \ref{eqn:bayesbootstrapposterior}. When $(\alpha_1, ..., \alpha_K) = \alpha = 0$, one can skip the adding of this sampling stage and simply draw, with replacement, from the current complete covariate data, $\mathcal{X}$. As along as you remember to still condition on the probability of being missing as in equation equation \ref{eqn:conditionalXmis}, these sampling techniques would be trivially the same.
+To implement this model construction for the covariates, we only need to add one additional sampling stage to our estimation procedure. Noting that we use all covariates, not just the observed, we draw the probabilities, ($\psi_1, ..., \psi_K$) in accordance to equation \ref{eqn:bayesbootstrapposterior}. Once the probabilities, ($\psi_1, ..., \psi_K$), are drawn, the covariate distribution is fully specified, so the rejection sampling method as displayed in equation \ref{eqn:conditionalXmis} can be performed. 
 
-This method addresses some of the potential issues in the covariate specification, but it also introduces new issues as well. These issues tend to align closely with those of the Bayesian Bootstrap. For example, the missing values are essentially being sampled from the observed empirical distribution. What happens if some of the potential values that are missing do not appear in the observed distribution? This is a concern for when the covariate distribution is discrete but a probabilistic certainty when the distribution is continuous. \cite{rubin_bayesian_1981} states that no method, even the bootstrap, is without constraints and any "serious data analysis should always include serious consideration of model constraints." Furthermore, we note that the end goal is to estimate the size of the population, so the exact modelling of the covariate distribution is not as important as long as it does not bias the estimation. Using the rejection sampler based on equation \ref{eqn:conditionalXmis} combined with $(\alpha_1, ..., \alpha_K) = \alpha = 0$, the probability of each draw is appropriately weighted based on the probability of going unobserved. This has similar intuition as the mechanic behind the Horvitz-Thompson estimator in the conditional likelihood approach where each covariate essentially gets magnified based on its estimated probability of being missing. 
+A common approximation to the Bayesian Bootstrap is to sample directly from the empirical distribution. When $(\alpha_1, ..., \alpha_K) = \alpha = 0$, one could skip the Dirichlet distribution sampling stage and simply draw, with replacement, from the current complete covariate data, $\mathcal{X}$. While this is a good approximation, it will have less smoothing than it's Bayesian counterpart.
 
+This Bayesian Bootstrap method addresses some of the potential issues in the covariate specification, but it also introduces new issues as well. This method provides an "all-purpose" solution in that it can be used when the covariate distribution is discrete, continuous, or both. Nevertheless, while it alleviates some of the issue with data type, no method is truly "all-purpose" as any method will provide some sort of constraint. The issues this particular model tends to have aligns closely with those of the Bayesian Bootstrap. For example, the missing values that are sampled only has support at values in the observed empirical distribution. What happens if some of the potential values that are missing do not appear in the observed distribution? This is a concern for when the covariate distribution is discrete but a probabilistic certainty when the distribution is continuous. This should be a concern but as  \cite{rubin_bayesian_1981} states "serious data analysis should always include serious consideration of model constraints" and that no method, even the bootstrap, is without constraints. Furthermore, we note that the end goal is to estimate the size of the population, so the exact modelling of the covariate distribution is not as important as long as it does not bias the estimation. Using the rejection sampler based on equation \ref{eqn:conditionalXmis} combined with $(\alpha_1, ..., \alpha_K) = \alpha = 0$, the probability of each draw is appropriately weighted based on the probability of going unobserved. This has similar intuition as the mechanic behind the Horvitz-Thompson estimator in the conditional likelihood approach where each covariate essentially gets magnified based on its estimated probability of being missing. 
+
+
+```{r covsims, child = 'diffcovariatesimulations.Rmd'}
+```
 
