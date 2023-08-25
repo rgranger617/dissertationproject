@@ -1,0 +1,52 @@
+This is BibTeX, Version 0.99d (TeX Live 2022)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: dissertationmain.aux
+The style file: apalike.bst
+Database file #1: dissertationbibliography.bib
+Warning--empty journal in castledine_bayesian_1981
+Warning--empty journal in manrique-vallier_capture-recapture_2020
+Warning--empty journal in manrique-vallier_estimating_2019
+Warning--there's a number but no volume in otis_statistical_1978
+Warning--empty booktitle in robert_computational_2009
+You've used 71 entries,
+            1935 wiz_defined-function locations,
+            890 strings with 15560 characters,
+and the built_in function-call counts, 27163 in all, are:
+= -- 2736
+> -- 909
+< -- 55
++ -- 328
+- -- 290
+* -- 2363
+:= -- 4701
+add.period$ -- 211
+call.type$ -- 71
+change.case$ -- 500
+chr.to.int$ -- 71
+cite$ -- 76
+duplicate$ -- 1002
+empty$ -- 1991
+format.name$ -- 407
+if$ -- 5251
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 73
+newline$ -- 356
+num.names$ -- 213
+pop$ -- 349
+preamble$ -- 1
+purify$ -- 500
+quote$ -- 0
+skip$ -- 777
+stack$ -- 0
+substring$ -- 2250
+swap$ -- 84
+text.length$ -- 3
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 418
+warning$ -- 5
+while$ -- 255
+width$ -- 0
+write$ -- 916
+(There were 5 warnings)

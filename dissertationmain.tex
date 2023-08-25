@@ -2435,9 +2435,9 @@ can be plugged into a Horvitz-Thompson estimator to find the
 
 Taking into consideration only the parts of the posterior that depend on
 \(\boldsymbol{\beta}\), the log posterior is \begin{align}
-\nonumber \ln p(N,\boldsymbol{\beta},\mathcal{X}_{mis}|\mathcal{Y},\mathcal{X}_{obs}) \propto & -\frac{1}{2}\sum_{j=1}^J (b-\boldsymbol{\beta_j})^T B^{-1}(b-\boldsymbol{\beta_j}) \\
-\nonumber + & \sum_{i=1}^N \sum_{j=1}^J y_{ij}\ln(\lambda_{ij}) + (1-y_{ij})\ln(1-\lambda_{ij}) \\ 
-+  & \ln(1-\prod_{j=1}^J(1-\lambda_{ij}))
+\nonumber \ln p(N,\boldsymbol{\beta},\mathcal{X}_{mis}|\mathcal{Y},\mathcal{X}_{obs}) \propto & \sum_{i=1}^N \Big( \sum_{j=1}^J \Big( y_{ij}\ln(\lambda_{ij}) + (1-y_{ij})\ln(1-\lambda_{ij})\Big) 
+- \ln(1-\prod_{j=1}^J(1-\lambda_{ij}))\Big) \\
+\nonumber & -\frac{1}{2}\sum_{j=1}^J (b-\boldsymbol{\beta_j})^T B^{-1}(b-\boldsymbol{\beta_j}) 
 \end{align}
 
 Taking the first derivative with respect to \(\boldsymbol{\beta_j}\)

@@ -1,0 +1,420 @@
+\begin{thebibliography}{}
+
+\bibitem[Agresti, 1994]{agresti_simple_1994}
+Agresti, A. (1994).
+\newblock Simple {Capture}-{Recapture} {Models} {Permitting} {Unequal}
+  {Catchability} and {Variable} {Sampling} {Effort}.
+\newblock {\em Biometrics}, 50(2):494--500.
+
+\bibitem[Alho, 1990]{alho_logistic_1990}
+Alho, J.~M. (1990).
+\newblock Logistic {Regression} in {Capture}-{Recapture} {Models}.
+\newblock {\em Biometrics}, 46(3):623.
+
+\bibitem[Alpizar-Jara and Pollock, 1996]{alpizar-jara_combination_1996}
+Alpizar-Jara, R. and Pollock, K.~H. (1996).
+\newblock A combination line transect and capture-recapture sampling model for
+  multiple observers in aerial surveys.
+\newblock {\em Environmental and Ecological Statistics}, 3(4):311--327.
+
+\bibitem[Baker, 1990]{baker_simple_1990}
+Baker, S.~G. (1990).
+\newblock A {Simple} {EM} {Algorithm} for {Capture}-{Recapture} {Data} with
+  {Categorical} {Covariates}.
+\newblock {\em Biometrics}, 46(4):1193.
+
+\bibitem[Ball et~al., 2003]{ball_estimate_2003}
+Ball, P., Asher, J., Sulmont, D., and Manrique, D. (2003).
+\newblock An estimate of the total number of victims killed or disappeared in
+  the armed internal conflict between 1980 and 2000.
+\newblock {\em AAAS. Report to the Peruvian Truth and Reconciliation Commission
+  (CVR).}
+
+\bibitem[Ball et~al., 2002]{ball_killings_2002}
+Ball, P., Betts, W., Scheuren, F., Dudukovich, J., and Asher, J. (2002).
+\newblock Killings and {Refugee} {Flow} in {Kosovo}, {March} - {June} 1999: {A}
+  {Report} to the {International} {Criminal} {Tribunal} for the {Former}
+  {Yugoslavia}.
+\newblock {\em American Association for the Advancement of Science (AAAS)}.
+
+\bibitem[Ball and Price, 2018]{ball_statistics_2018}
+Ball, P. and Price, M. (2018).
+\newblock The {Statistics} of {Genocide}.
+\newblock {\em CHANCE}, 31(1):38--45.
+
+\bibitem[Ball et~al., 2000]{ball_making_2000}
+Ball, P., Spirer, H.~F., and Spirer, L. (2000).
+\newblock {\em Making the case: investigating large scale human rights
+  violations using information systems and data analysis}.
+\newblock American Association for the Advancement of Science, Washington, D.C.
+
+\bibitem[Basu, 2001]{basu_bayesian_2001}
+Basu, S. (2001).
+\newblock Bayesian capture-recapture methods for error detection and estimation
+  of population size: {Heterogeneity} and dependence.
+\newblock {\em Biometrika}, 88(1):269--279.
+
+\bibitem[Bonner and Schofield, 2014]{bonner_mcmcmc_2014}
+Bonner, S. and Schofield, M. (2014).
+\newblock {MC}({MC}){MC}: exploring {Monte} {Carlo} integration within {MCMC}
+  for mark-recapture models with individual covariates.
+\newblock {\em Methods in Ecology and Evolution}, 5(12):1305--1315.
+
+\bibitem[Borchers et~al., 1998]{borchers_mark-recapture_1998}
+Borchers, D.~L., Zucchini, W., and Fewster, R.~M. (1998).
+\newblock Mark-{Recapture} {Models} for {Line} {Transect} {Surveys}.
+\newblock {\em Biometrics}, 54(4):1207--1220.
+
+\bibitem[Castledine, 1981]{castledine_bayesian_1981}
+Castledine, B.~J. (1981).
+\newblock A {Bayesian} {Analysis} of {Multiple}-{Recapture} {Sampling} for a
+  {Closed} {Population}.
+\newblock 68:197--210.
+
+\bibitem[Chapman, 1954]{chapman_estimation_1954}
+Chapman, D.~G. (1954).
+\newblock The {Estimation} of {Biological} {Populations}.
+\newblock {\em The Annals of Mathematical Statistics}, 25(1):1--15.
+
+\bibitem[Chib, 1995]{chib_marginal_1995}
+Chib, S. (1995).
+\newblock Marginal {LIkelihood} from the {Gibbs} {Output}.
+\newblock {\em Journal of the American Statistical Association},
+  90(432):1313--1321.
+
+\bibitem[Darroch, 1958]{darroch_multiple-recapture_1958}
+Darroch, J.~N. (1958).
+\newblock The {Multiple}-{Recapture} {Census}: {I}. {Estimation} of a {Closed}
+  {Population}.
+\newblock {\em Biometrika}, 45(3/4):343--359.
+
+\bibitem[Darroch et~al., 1993]{darroch_three-sample_1993}
+Darroch, J.~N., Fienberg, S.~E., Glonek, G. F.~V., and Junker, B.~W. (1993).
+\newblock A {Three}-{Sample} {Multiple}-{Recapture} {Approach} to {Census}
+  {Population} {Estimation} {With} {Heterogeneous} ·catchability.
+\newblock {\em Journal of the American Statistical Association}, page~13.
+
+\bibitem[Dunson and Park, 2008]{dunson_kernel_2008}
+Dunson, D.~B. and Park, J.-H. (2008).
+\newblock Kernel stick-breaking processes.
+\newblock {\em Biometrika}, 95(2):307--323.
+
+\bibitem[Dunson and Xing, 2009]{dunson_nonparametric_2009}
+Dunson, D.~B. and Xing, C. (2009).
+\newblock Nonparametric {Bayes} {Modeling} of {Multivariate} {Categorical}
+  {Data}.
+\newblock {\em Journal of the American Statistical Association},
+  104(487):1042--1051.
+
+\bibitem[Fienberg, 1972]{fienberg_multiple_1972}
+Fienberg, S.~E. (1972).
+\newblock The {Multiple} {Recapture} {Census} for {Closed} {Populations} and
+  {Incomplete} 2k {Contingency} {Tables}.
+\newblock {\em Biometrika}, 59(3):591--603.
+
+\bibitem[Fienberg et~al., 1999]{fienberg_classical_1999}
+Fienberg, S.~E., Johnson, M.~S., and Junker, B.~W. (1999).
+\newblock Classical {Multilevel} and {Bayesian} {Approaches} to {Population}
+  {Size} {Estimation} {Using} {Multiple} {Lists}.
+\newblock {\em Journal of Royal Statistical Society}, 162(3):383--405.
+
+\bibitem[Geiger and Werner, 1924]{geiger_zahl_1924}
+Geiger, H. and Werner, A. (1924).
+\newblock Die {Zahl} der von {Radium} ausgesandten a-{Teilchen}.
+\newblock {\em Zeitschrift für Physik}, 21:187--201.
+
+\bibitem[Gelfand and Dey, 1994]{gelfand_bayesian_1994}
+Gelfand, A.~E. and Dey, D.~K. (1994).
+\newblock Bayesian {Model} {Choice}: {Asymptotics} and {Exact} {Calculations}.
+\newblock {\em Journal of the Royal Statistical Society: Series B
+  (Methodological)}, 56(3):501--214.
+
+\bibitem[Gelman et~al., 2014]{gelman_bayesian_2014}
+Gelman, A., Carlin, J.~B., Stern, H.~S., Dunson, D.~B., Vehtari, A., and Rubin,
+  D.~B. (2014).
+\newblock {\em Bayesian {Data} {Analysis}}.
+\newblock Chapman \& Hall/CRC, third edition.
+
+\bibitem[George, 1992]{george_capture-recapture_1992}
+George, E.~I. (1992).
+\newblock Capture-{Recapture} {Estimation} {Via} {Gibbs} {Sampling}.
+\newblock {\em Biometrika}, 79(4):677--683.
+
+\bibitem[Goldberg and Wittes, 1978]{goldberg_estimation_1978}
+Goldberg, J.~D. and Wittes, J.~T. (1978).
+\newblock The {Estimation} of {False} {Negatives} in {Medical} {Screening}.
+\newblock {\em Biometrics}, 34(1):77--86.
+
+\bibitem[Goodman, 1974]{goodman_exploratory_1974}
+Goodman, L.~A. (1974).
+\newblock Exploratory {Latent} {Structure} {Analysis} {Using} {Both}
+  {Identifiable} and {Unidentifiable} {Models}.
+\newblock {\em Biometrika}, 61(2):215--231.
+
+\bibitem[Guberek et~al., 2010]{guberek_count_2010}
+Guberek, T., Guzman, D., Price, M., Lum, K., and Ball, P. (2010).
+\newblock To {Count} the {Uncounted}: {An} {Estimation} of {Lethal} {Violence}
+  in {Casanare}.
+\newblock {\em Benetech Human Rights Program}, pages 1--31.
+
+\bibitem[Henderson and Southwood, 2016]{henderson_ecological_2016}
+Henderson, P.~A. and Southwood, T. (2016).
+\newblock {\em Ecological {Methods}}.
+\newblock John Wiley and Sons, 4 edition.
+
+\bibitem[Horvitz and Thompson, 1952]{horvitz_generalization_1952}
+Horvitz, D.~G. and Thompson, D.~J. (1952).
+\newblock A {Generalization} of {Sampling} {Without} {Replacement} {From} a
+  {Finite} {Universe}.
+\newblock {\em Journal of the American Statistical Association},
+  47(260):663--685.
+
+\bibitem[Huggins, 1989]{huggins_statistical_1989}
+Huggins, R.~M. (1989).
+\newblock On the {Statistical} {Analysis} of {Capture} {Experiments}.
+\newblock {\em Biometrika}, 76(1):133--140.
+
+\bibitem[Ishwaran and James, 2001]{ishwaran_gibbs_2001}
+Ishwaran, H. and James, L.~F. (2001).
+\newblock Gibbs {Sampling} {Methods} for {Stick}-{Breaking} {Priors}.
+\newblock {\em Journal of the American Statistical Association},
+  96(453):161--173.
+
+\bibitem[Jeffreys, 1935]{jeffreys_tests_1935}
+Jeffreys, H. (1935).
+\newblock Some {Tests} of {Significance}, {Treated} by the {Theory} of
+  {Probability}.
+\newblock {\em Mathematical Proceedings of the Cambridge Philosophical
+  Society}, 31(2):203--222.
+
+\bibitem[Jeffreys, 1967]{jeffreys_theory_1967}
+Jeffreys, H. (1967).
+\newblock {\em Theory of {Probability}}.
+\newblock Clarendon Press, Oxford, 3rd edition.
+
+\bibitem[Kass and Raftery, 1995]{kass_bayes_1995}
+Kass, R.~E. and Raftery, A.~E. (1995).
+\newblock Bayes {Factors}.
+\newblock {\em Journal of the American Statistical Association},
+  90(430):773--795.
+
+\bibitem[Khabsa and Giles, 2014]{khabsa_number_2014}
+Khabsa, M. and Giles, C.~L. (2014).
+\newblock The {Number} of {Scholarly} {Documents} on the {Public} {Web}.
+\newblock {\em PLoS ONE}, 9(5):e93949.
+
+\bibitem[King and Brooks, 2008]{king_bayesian_2008}
+King, R. and Brooks, S.~P. (2008).
+\newblock On the {Bayesian} {Estimation} of a {Closed} {Population} {Size} in
+  the {Presence} of {Heterogeneity} and {Model} {Uncertainty}.
+\newblock {\em Biometrics}, 64(3):816--824.
+
+\bibitem[King et~al., 2016]{king_capturerecapture_2016}
+King, R., McClintock, B.~T., Kidney, D., and Borchers, D. (2016).
+\newblock Capture–recapture abundance estimation using a semi-complete data
+  likelihood approach.
+\newblock {\em The Annals of Applied Statistics}, 10(1):264--285.
+
+\bibitem[Lawrence and Giles, 1998]{lawrence_searching_1998}
+Lawrence, S. and Giles, C.~L. (1998).
+\newblock Searching the {World} {Wide} {Web}.
+\newblock {\em Science}, 280(5360):98--100.
+
+\bibitem[Lincoln, 1930]{lincoln_calculating_1930}
+Lincoln, F.~C. (1930).
+\newblock Calculating {Waterfowl} {Abundance} on the {Basis} of {Banding}
+  {Returns}.
+\newblock {\em United States Department of Agriculture}, Circular 118.
+
+\bibitem[Manrique-Vallier et~al.,
+  2020]{manrique-vallier_capture-recapture_2020}
+Manrique-Vallier, D., Ball, P., and Sadinle, M. (2020).
+\newblock Capture-{Recapture} for {Casualty} {Estimation} and {Beyond}:
+  {Recent} {Advances} and {Research} {Directions}.
+
+\bibitem[Manrique-Vallier et~al., 2019]{manrique-vallier_estimating_2019}
+Manrique-Vallier, D., Ball, P., and Sulmont, D. (2019).
+\newblock Estimating the {Number} of {Fatal} {Victims} of the {Peruvian}
+  {Internal} {Armed} {Conﬂict}, 1980-2000: an application of modern
+  multi-list {Capture}-{Recapture} techniques.
+
+\bibitem[Manrique-Vallier and Fienberg, 2008]{manrique-vallier_population_2008}
+Manrique-Vallier, D. and Fienberg, S.~E. (2008).
+\newblock Population {Size} {Estimation} {Using} {Individual} {Level} {Mixture}
+  {Models}.
+\newblock {\em Biometrical Journal}, 50(6):1051--1063.
+
+\bibitem[Manrique‐Vallier, 2016]{manriquevallier_bayesian_2016}
+Manrique‐Vallier, D. (2016).
+\newblock Bayesian {Population} {Size} {Estimation} using {Dirichlet} {Process}
+  {Mixtures}.
+\newblock {\em Biometrics}, 72(4):1246--1254.
+
+\bibitem[Marin and Robert, 2018]{marin_importance_2018}
+Marin, J.-M. and Robert, C.~P. (2018).
+\newblock Importance sampling methods for {Bayesian} discrimination between
+  embedded models.
+\newblock arXiv:0910.2325 [stat].
+
+\bibitem[Neal, 1994]{neal_contribution_1994}
+Neal, R. (1994).
+\newblock Contribution to the discussion of {Approximate} {Bayesian} inference
+  with the weighted likelihood bootstrap" by {Michael} {A}. {Newton} and
+  {Adrian} {E}. {Raftery}.
+\newblock {\em Journal of Royal Statistical Society Series B}, 56(1):41--42.
+
+\bibitem[Newton and Raftery, 1994]{newton_approximate_1994}
+Newton, M.~A. and Raftery, A.~E. (1994).
+\newblock Approximate {Bayesian} {Inference} with the {Weighted} {Likelihood}
+  {Bootstrap}.
+\newblock {\em Journal of the Royal Statistical Society: Series B
+  (Methodological)}, 56(1):3--26.
+
+\bibitem[Otis et~al., 1978]{otis_statistical_1978}
+Otis, D.~L., Burnham, K.~P., White, G.~C., and Anderson, D.~R. (1978).
+\newblock Statistical {Inference} from {Capture} {Data} on {Closed} {Animal}
+  {Populations}.
+\newblock {\em Wildlife Monographs}, (62,):3--135.
+
+\bibitem[Petersen, 1895]{petersen_yearly_1895}
+Petersen, C.~J. (1895).
+\newblock The yearly immigration of young plaice into the limfjord from the
+  german sea.
+\newblock {\em The Danish Biological Station}.
+
+\bibitem[Pledger, 2000]{pledger_unified_2000}
+Pledger, S. (2000).
+\newblock Unified {Maximum} {Likelihood} {Estimates} for {Closed}
+  {Capture}-{Recapture} {Models} {Using} {Mixtures}.
+\newblock {\em Biometrics}, 56(2):434--442.
+
+\bibitem[Pollock, 2002]{pollock_use_2002}
+Pollock, K.~H. (2002).
+\newblock The use of auxiliary variables in capture-recapture modelling: {An}
+  overview.
+\newblock {\em Journal of Applied Statistics}, 29(1-4):85--102.
+
+\bibitem[Pollock et~al., 1984]{pollock_use_1984}
+Pollock, K.~H., Hines, J.~E., and Nichols, J.~D. (1984).
+\newblock The {Use} of {Auxiliary} {Variables} in {Capture}-{Recapture} and
+  {Removal} {Experiments}.
+\newblock {\em Biometrics}, 40(2):329--340.
+
+\bibitem[Polson et~al., 2013]{polson_bayesian_2013}
+Polson, N.~G., Scott, J.~G., and Windle, J. (2013).
+\newblock Bayesian inference for logistic models using {Polya}-{Gamma} latent
+  variables.
+\newblock {\em Journal of the American Statistical Association},
+  108(504):1339--1349.
+
+\bibitem[Robert et~al., 2009]{robert_computational_2009}
+Robert, C.~P., Wraith, D., Goggans, P.~M., and Chan, C.-Y. (2009).
+\newblock Computational methods for {Bayesian} model choice.
+\newblock pages 251--262, Oxford (Mississippi).
+
+\bibitem[Roberts, 1967]{roberts_informative_1967}
+Roberts, H.~V. (1967).
+\newblock Informative {Stopping} {Rules} and {Inferences} about {Population}
+  {Size}.
+\newblock {\em Journal of the American Statistical Association}, 62:763--775.
+
+\bibitem[Royle, 2009]{royle_analysis_2009}
+Royle, J.~A. (2009).
+\newblock Analysis of {Capture}-{Recapture} {Models} with {Individual}
+  {Covariates} {Using} {Data} {Augmentation}.
+\newblock {\em Biometrics}, 65(1):267--274.
+
+\bibitem[Royle et~al., 2007]{royle_analysis_2007}
+Royle, J.~A., Dorazio, R.~M., and Link, W.~A. (2007).
+\newblock Analysis of {Multinomial} {Models} {With} {Unknown} {Index} {Using}
+  {Data} {Augmentation}.
+\newblock {\em Journal of Computational and Graphical Statistics},
+  16(1):67--85.
+
+\bibitem[Rubin, 1976]{rubin_inference_1976}
+Rubin, D.~B. (1976).
+\newblock Inference and {Missing} {Data}.
+\newblock {\em Biometrika}, 63(3):581--592.
+
+\bibitem[Rubin, 1981]{rubin_bayesian_1981}
+Rubin, D.~B. (1981).
+\newblock The {Bayesian} {Bootstrap}.
+\newblock {\em The Annals of Statistics}, 9(1):130--134.
+
+\bibitem[Sanathanan, 1972]{sanathanan_models_1972}
+Sanathanan, L. (1972).
+\newblock Models and {Estimation} {Methods} in {Visual} {Scanning}
+  {Experiments}.
+\newblock {\em Technometrics}, 14(4):813--829.
+
+\bibitem[Sandland and Cormack, 1984]{sandland_statistical_1984}
+Sandland, R.~L. and Cormack, R.~M. (1984).
+\newblock Statistical {Inference} for {Poisson} and {Multinomial} {Models} for
+  {Capture}- {Recapture} {Experiments}.
+\newblock {\em Biometrika}, 71(1):27--33.
+
+\bibitem[Schaefer, 1951]{schaefer_estimation_1951}
+Schaefer, M.~B. (1951).
+\newblock Estimation of {Size} of {Animal} {Populations} by {Marking}
+  {Experiments}.
+\newblock {\em Fishery Bulletin}, 52(69):191--203.
+
+\bibitem[Schnabel, 1938]{schnabel_estimation_1938}
+Schnabel, Z.~E. (1938).
+\newblock The {Estimation} of {Total} {Fish} {Population} of a {Lake}.
+\newblock {\em The American Mathematical Monthly}, 45(6):348.
+
+\bibitem[Sekar and Deming, 1949]{sekar_method_1949}
+Sekar, C.~C. and Deming, E. (1949).
+\newblock On a {Method} of {Estimating} {Birth} and {Death} {Rates} and the
+  {Extent} of {Registration}.
+\newblock {\em Journal of the American Statistical Association},
+  44(245):101--115.
+
+\bibitem[Sethuraman, 1991]{sethuraman_constructive_1991}
+Sethuraman, J. (1991).
+\newblock A {Constructive} {Definition} of {Dirichlet} {Priors}:.
+\newblock Technical report, Defense Technical Information Center, Fort Belvoir,
+  VA.
+
+\bibitem[Smith, 1991]{smith_bayesian_1991}
+Smith, P.~J. (1991).
+\newblock Bayesian {Analyses} for a {Multiple} {Capture}-{Recapture} {Model}.
+\newblock {\em Biometrika}, 78(2):399--407.
+
+\bibitem[Stoklosa et~al., 2011]{stoklosa_heterogeneous_2011}
+Stoklosa, J., Hwang, W.-H., Wu, S.-H., and Huggins, R. (2011).
+\newblock Heterogeneous {Capture}-{Recapture} {Models} with {Covariates}: {A}
+  {Partial} {Likelihood} {Approach} for {Closed} {Populations}.
+\newblock {\em Biometrics}, 67(4):1659--1665.
+
+\bibitem[Tilling and Sterne, 1999]{tilling_capture-recapture_1999}
+Tilling, K. and Sterne, J. A.~C. (1999).
+\newblock Capture-{Recapture} {Models} {Including} {Covariate} {Effects}.
+\newblock {\em American Journal of Epidemiology}, 149(4):392--400.
+
+\bibitem[Woodbury et~al., 1978]{woodbury_mathematical_1978}
+Woodbury, M., Clive, J., and Garson, A. (1978).
+\newblock Mathematical typology: a grade of membership technique for obtaining
+  disease definition.
+\newblock {\em Computers and Biomedical Research}, 11(3):277--298.
+
+\bibitem[Yee et~al., 2015]{yee_vgam_2015}
+Yee, T.~W., Stoklosa, J., and Huggins, R.~M. (2015).
+\newblock The \textbf{{VGAM}} {Package} for {Capture}-{Recapture} {Data}
+  {Using} the {Conditional} {Likelihood}.
+\newblock {\em Journal of Statistical Software}, 65(5).
+
+\bibitem[Zwane and van~der Heijden, 2003]{zwane_implementing_2003}
+Zwane, E. and van~der Heijden, P. (2003).
+\newblock Implementing the parametric bootstrap in capture–recapture models
+  with continuous covariates.
+\newblock {\em Statistics \& Probability Letters}, 65(2):121--125.
+
+\bibitem[Zwane and van~der Heijden, 2005]{zwane_population_2005}
+Zwane, E. and van~der Heijden, P. (2005).
+\newblock Population estimation using the multiple system estimator in the
+  presence of continuous covariates.
+\newblock {\em Statistical Modelling}, 5(1):39--52.
+
+\end{thebibliography}

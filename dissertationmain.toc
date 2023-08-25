@@ -1,0 +1,40 @@
+\contentsline {section}{\numberline {1}Introduction}{1}{section.1}%
+\contentsline {section}{\numberline {2}Literature Review}{5}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Early Approaches to List Dependency and Homogeneity}{6}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Capture-Recapture with Covariates}{8}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Bayesian Methods for Capture-Recapture}{9}{subsection.2.3}%
+\contentsline {section}{\numberline {3}The Bayesian Capture-Recapture Model with Covariates}{12}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Background and Preliminaries}{14}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}The Classical Capture-Recapture Approach}{14}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}Capture-Recapture with Covariates}{15}{subsubsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.2}The Bayesian Logistic Regression Capture-Recapture Model}{17}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}The BLRCR Model}{17}{subsubsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.2.2}Estimation of the BLRCR}{19}{subsubsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.3}Simulation Analysis}{21}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Simulations with Varying Levels of List Dependency }{24}{subsubsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {3.3.2}Simulations with Different Sized Populations}{26}{subsubsection.3.3.2}%
+\contentsline {section}{\numberline {4}Selecting a Distribution for the Covariates}{29}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Specifying a Distribution for the Covariates}{30}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Conditional Likelihood}{31}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Nonparametric Distributions}{32}{subsection.4.3}%
+\contentsline {subsubsection}{\numberline {4.3.1}Dirichlet Process Mixture of Normal Distributions}{32}{subsubsection.4.3.1}%
+\contentsline {subsubsection}{\numberline {4.3.2}The Bayesian Bootstrap}{35}{subsubsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.4}Simulations using Different Covariate Distributions}{37}{subsection.4.4}%
+\contentsline {section}{\numberline {5}Conditional Independence and Unobserved Heterogeneity}{42}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Modelling the Unobserved Heterogeneity with Latent Classes}{43}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Updating the Estimation}{44}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Simulations with Unobserved Heterogeneity}{45}{subsection.5.3}%
+\contentsline {section}{\numberline {6}Model Selection}{50}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Model Comparison via the Bayes Factor}{50}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Regularization and Prior Specifications}{54}{subsection.6.2}%
+\contentsline {section}{\numberline {7}Example 1 (probably superhero)}{56}{section.7}%
+\contentsline {section}{\numberline {8}Example 2 (find something real even if we don't know the answer)}{57}{section.8}%
+\contentsline {section}{\numberline {9}Conclusion}{58}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Unobserved Heterogeneity}{58}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}Modelling the Covariate Distribution}{58}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}Covariate Selection}{59}{subsection.9.3}%
+\contentsline {section}{\numberline {10}Appendix A: Conditional Maximum Likelihood Estimation}{60}{section.10}%
+\contentsline {section}{\numberline {11}Appendix B: LCMCR Model}{62}{section.11}%
+\contentsline {section}{\numberline {12}References}{64}{section.12}%
+\addvspace {10pt}
+\noindent \hyperref [curriculumvitae]{\textbf {Curriculum Vitae}}
